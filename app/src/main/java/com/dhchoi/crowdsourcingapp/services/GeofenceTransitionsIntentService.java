@@ -13,7 +13,6 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
-import android.os.ResultReceiver;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
@@ -52,20 +51,19 @@ public class GeofenceTransitionsIntentService extends IntentService {
             // Get the geofence id triggered. Note that only one geofence can be triggered at a
             // time in this example, but in some cases you might want to consider the full list of geofences triggered.
             final String triggeredGeoFenceId = geoFenceEvent.getTriggeringGeofences().get(0).getRequestId();
-            //String triggeredGeoFenceLocatioString = geoFenceEvent.getTriggeringLocation().toString();
 
             Intent fetchAddressIntent = new Intent(this, FetchAddressIntentService.class);
-            fetchAddressIntent.putExtra(RECEIVER, new FetchAddressResultReceiver(new Handler()) {
+            fetchAddressIntent.putExtra(RECEIVER, new FetchAddressResultReceiver(new Handler(Looper.getMainLooper())) {
                 @Override
                 protected void onReceiveResult(int resultCode, Bundle resultData) {
                     String locationString = resultData.getString(RESULT_DATA_KEY);
                     if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType) {
-                        showToast(GeofenceTransitionsIntentService.this, R.string.entering_geofence);
-                        createNotification(triggeredGeoFenceId, "Entered Geofence: " + locationString);
+                        showToast(R.string.entering_geofence);
+                        createNotification(triggeredGeoFenceId, "Entered: " + triggeredGeoFenceId + " (" + locationString + ")");
                     }
                     else if (Geofence.GEOFENCE_TRANSITION_EXIT == transitionType) {
-                        showToast(GeofenceTransitionsIntentService.this, R.string.exiting_geofence);
-                        createNotification(triggeredGeoFenceId, "Exited Geofence: " + locationString);
+                        showToast(R.string.exiting_geofence);
+                        createNotification(triggeredGeoFenceId, "Exited: " + triggeredGeoFenceId + " (" + locationString + ")");
                     }
                 }
             });
@@ -77,8 +75,9 @@ public class GeofenceTransitionsIntentService extends IntentService {
     /**
      * Showing a toast message, using the Main thread
      */
-    private void showToast(final Context context, final int resourceId) {
-        Handler mainThread = new Handler(Looper.getMainLooper());
+    private void showToast(final int resourceId) {
+        final Context context = getApplicationContext();
+        final Handler mainThread = new Handler(Looper.getMainLooper());
         mainThread.post(new Runnable() {
             @Override
             public void run() {
@@ -89,13 +88,11 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
     /**
      * Creates a notification
-     *
-     * @param notificationText
      */
-    private void createNotification(String notificationText, String tag) {
+    private void createNotification(String tag, String notificationText) {
         int notificationId = 1;
 
-        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
+        NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(getApplicationContext())
                 .setSmallIcon(R.mipmap.ic_launcher)
                 .setContentTitle(NOTIFICATION_TITLE)
                 .setContentText(notificationText)
