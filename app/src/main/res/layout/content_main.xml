@@ -14,11 +14,32 @@
 
     <TextView android:id="@+id/location_text" android:text="Location"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content" />
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/textView3"
+        android:layout_alignParentStart="true" />
 
     <TextView android:id="@+id/address_text" android:text="Address"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/location_text"
+        android:layout_below="@+id/textView4"
         android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Current Location (Raw)"
+        android:id="@+id/textView3"
+        android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Current Location (Address)"
+        android:id="@+id/textView4"
+        android:layout_below="@+id/location_text"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="29dp" />
 </RelativeLayout>
