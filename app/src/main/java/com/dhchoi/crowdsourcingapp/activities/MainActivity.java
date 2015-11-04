@@ -3,7 +3,6 @@ package com.dhchoi.crowdsourcingapp.activities;
 import static com.dhchoi.crowdsourcingapp.Constants.LOCATION_REQUEST;
 import static com.dhchoi.crowdsourcingapp.Constants.PLACE_PICKER_REQUEST;
 import static com.dhchoi.crowdsourcingapp.Constants.TAG;
-import static com.dhchoi.crowdsourcingapp.Constants.GEOFENCE_EXPIRATION_TIME;
 import static com.dhchoi.crowdsourcingapp.Constants.CONNECTION_FAILURE_RESOLUTION_REQUEST;
 
 import android.Manifest;
@@ -34,17 +33,14 @@ import android.widget.Toast;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.FetchAddressResultReceiver;
+import com.dhchoi.crowdsourcingapp.SimpleGeofenceManager;
 import com.dhchoi.crowdsourcingapp.services.FetchAddressIntentService;
-import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.R;
-import com.dhchoi.crowdsourcingapp.SimpleGeofence;
-import com.dhchoi.crowdsourcingapp.SimpleGeofenceStore;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
-import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -53,9 +49,7 @@ import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 
 import java.text.DateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
@@ -68,21 +62,17 @@ public class MainActivity extends AppCompatActivity implements
     private GoogleApiClient mGoogleApiClient;
     private boolean mResolvingError;
 
+    SimpleGeofenceManager mGeofenceManger;
     // Stores the PendingIntent used to request geofence monitoring.
     private PendingIntent mGeofenceRequestIntent;
-
-    // Persistent storage for geofences.
-    private SimpleGeofenceStore mGeofenceStorage;
-
-    // Internal List of Geofence objects. In a real app, these might be provided by an API based on
-    // locations within the user's proximity.
-    List<Geofence> mGeofenceList;
 
     // Locations
     Location mCurrentLocation;
     String mLastUpdateTime;
     // Receiver registered with this activity to get the response from FetchAddressIntentService.
     FetchAddressResultReceiver mFetchAddressResultReceiver;
+
+    // TextViews
     TextView mCurrentLocationTextView;
     TextView mLocationAddressTextView;
 
@@ -93,8 +83,6 @@ public class MainActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        // Rather than displayng this activity, simply display a toast indicating that the geofence service is being created.
-        // This should happen in less than a second.
         if (!isGooglePlayServicesAvailable()) {
             Log.e(TAG, "Google Play services unavailable.");
             finish();
@@ -110,25 +98,29 @@ public class MainActivity extends AppCompatActivity implements
                 .addOnConnectionFailedListener(this)
                 .build();
 
+        // create geofence manager
+        mGeofenceManger = new SimpleGeofenceManager(this);
+
         // check permissions
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Check Permissions Now
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST);
         } else {
-            initializeGeofenceService();
+            mGeofenceManger.createGeofences();
         }
 
         // create result receiver for FetchAddressIntentService
         mFetchAddressResultReceiver = new FetchAddressResultReceiver(new Handler()) {
             @Override
             protected void onReceiveResult(int resultCode, Bundle resultData) {
-                // Display the address string or an error message sent from the intent service.
-                mLocationAddressTextView.setText(resultData.getString(Constants.RESULT_DATA_KEY));
-
                 // Show a toast message if an address was found.
-//            if (resultCode == Constants.SUCCESS_RESULT) {
-//                showToast(getString(R.string.address_found));
-//            }
+                if (resultCode == Constants.SUCCESS_RESULT) {
+                    // Display the address string or an error message sent from the intent service.
+                    mLocationAddressTextView.setText(resultData.getString(Constants.RESULT_DATA_KEY));
+                }
+                else {
+                    mLocationAddressTextView.setText(getString(R.string.no_address_found));
+                }
             }
         };
 
@@ -144,8 +136,6 @@ public class MainActivity extends AppCompatActivity implements
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-//                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG).setAction("Action", null).show();
-//                createNotification("test");
                 try {
                     startActivityForResult(new PlacePicker.IntentBuilder().build(MainActivity.this), PLACE_PICKER_REQUEST);
                 } catch (GooglePlayServicesRepairableException e) {
@@ -199,9 +189,8 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
-        // Handle action bar item clicks here. The action bar will
-        // automatically handle clicks on the Home/Up button, so long
-        // as you specify a parent activity in AndroidManifest.xml.
+        // Handle action bar item clicks here. The action bar will automatically handle clicks on the Home/Up button,
+        // so long as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
         //noinspection SimplifiableIfStatement
@@ -243,7 +232,7 @@ public class MainActivity extends AppCompatActivity implements
         if (requestCode == LOCATION_REQUEST) {
             if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                 // We can now safely use the API we requested access to
-                initializeGeofenceService();
+                mGeofenceManger.createGeofences();
             } else {
                 // Permission was denied or request was cancelled
                 Toast.makeText(this, "The app needs location services to run properly!", Toast.LENGTH_SHORT).show();
@@ -256,12 +245,13 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void onConnected(Bundle bundle) {
-        mGeofenceRequestIntent = getGeofenceTransitionPendingIntent();
-        LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, mGeofenceList, mGeofenceRequestIntent);
+        // For requesting geofences
+        mGeofenceRequestIntent = mGeofenceManger.getGeofenceTransitionPendingIntent();
+        LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, mGeofenceManger.getGeofenceList(), mGeofenceRequestIntent);
         Toast.makeText(this, getString(R.string.start_geofence_service), Toast.LENGTH_SHORT).show();
 
+        // For displaying current location
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, createLocationRequest(), this);
-
     }
 
     @Override
@@ -340,14 +330,6 @@ public class MainActivity extends AppCompatActivity implements
         }
     }
 
-    private void initializeGeofenceService() {
-        // Instantiate a new geofence storage area.
-        mGeofenceStorage = new SimpleGeofenceStore(this);
-        // Instantiate the current List of geofences.
-        mGeofenceList = new ArrayList<Geofence>();
-        createGeofences();
-    }
-
     private LocationRequest createLocationRequest() {
         LocationRequest mLocationRequest = new LocationRequest();
         mLocationRequest.setInterval(10000);
@@ -355,39 +337,6 @@ public class MainActivity extends AppCompatActivity implements
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         return mLocationRequest;
-    }
-
-    /**
-     * In this sample, the geofences are predetermined and are hard-coded here.
-     * A real app might dynamically create geofences based on the user's location.
-     */
-    public void createGeofences() {
-        // These will store hard-coded geofences in this sample app.
-
-        // Create internal "flattened" objects containing the geofence data.
-        String mHomeGeofenceId = "home";
-        SimpleGeofence mHomeGeofence = new SimpleGeofence(
-                mHomeGeofenceId,
-                40.447222,
-                -79.946714,
-                60.0f,
-                GEOFENCE_EXPIRATION_TIME,
-                Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT
-        );
-        mGeofenceStorage.setGeofence(mHomeGeofenceId, mHomeGeofence);
-        mGeofenceList.add(mHomeGeofence.toGeofence());
-
-        String mGatesCenterGeofenceId = "gatesCenter";
-        SimpleGeofence mGatesCenterGeofence = new SimpleGeofence(
-                mGatesCenterGeofenceId,
-                40.443336,
-                -79.944675,
-                60.0f,
-                GEOFENCE_EXPIRATION_TIME,
-                Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT
-        );
-        mGeofenceStorage.setGeofence(mGatesCenterGeofenceId, mGatesCenterGeofence);
-        mGeofenceList.add(mGatesCenterGeofence.toGeofence());
     }
 
     /**
@@ -406,14 +355,5 @@ public class MainActivity extends AppCompatActivity implements
             Log.e(TAG, "Google Play services is unavailable.");
             return false;
         }
-    }
-
-    /**
-     * Create a PendingIntent that triggers GeofenceTransitionIntentService
-     * when a geofence transition occurs.
-     */
-    private PendingIntent getGeofenceTransitionPendingIntent() {
-        Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
-        return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
 }
