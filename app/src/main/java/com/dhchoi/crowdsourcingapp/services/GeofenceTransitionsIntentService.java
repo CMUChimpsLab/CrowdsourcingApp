@@ -1,5 +1,9 @@
 package com.dhchoi.crowdsourcingapp.services;
 
+import static com.dhchoi.crowdsourcingapp.Constants.LOCATION_DATA_EXTRA;
+import static com.dhchoi.crowdsourcingapp.Constants.NOTIFICATION_TITLE;
+import static com.dhchoi.crowdsourcingapp.Constants.RECEIVER;
+import static com.dhchoi.crowdsourcingapp.Constants.RESULT_DATA_KEY;
 import static com.dhchoi.crowdsourcingapp.Constants.TAG;
 
 import android.app.IntentService;
@@ -9,19 +13,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.ResultReceiver;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.dhchoi.crowdsourcingapp.FetchAddressResultReceiver;
 import com.dhchoi.crowdsourcingapp.R;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 
-public class GeofenceTransitionsIntentService extends IntentService implements
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+public class GeofenceTransitionsIntentService extends IntentService {
 
     public GeofenceTransitionsIntentService() {
         super(GeofenceTransitionsIntentService.class.getSimpleName());
@@ -30,12 +32,6 @@ public class GeofenceTransitionsIntentService extends IntentService implements
     @Override
     public void onCreate() {
         super.onCreate();
-
-//        mGoogleApiClient = new GoogleApiClient.Builder(this)
-//                .addApi(LocationServices.API)
-//                .addConnectionCallbacks(this)
-//                .addOnConnectionFailedListener(this)
-//                .build();
     }
 
     /**
@@ -52,41 +48,29 @@ public class GeofenceTransitionsIntentService extends IntentService implements
             Log.e(TAG, "Location Services error: " + errorCode);
         }
         else {
-            int transitionType = geoFenceEvent.getGeofenceTransition();
+            final int transitionType = geoFenceEvent.getGeofenceTransition();
+            // Get the geofence id triggered. Note that only one geofence can be triggered at a
+            // time in this example, but in some cases you might want to consider the full list of geofences triggered.
+            final String triggeredGeoFenceId = geoFenceEvent.getTriggeringGeofences().get(0).getRequestId();
+            //String triggeredGeoFenceLocatioString = geoFenceEvent.getTriggeringLocation().toString();
 
-            if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType) {
-
-                // Connect to the Google Api service in preparation for sending a DataItem.
-//                mGoogleApiClient.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-//
-//                // Get the geofence id triggered. Note that only one geofence can be triggered at a
-//                // time in this example, but in some cases you might want to consider the full list of geofences triggered.
-//                String triggeredGeoFenceId = geoFenceEvent.getTriggeringGeofences().get(0).getRequestId();
-//
-//                // Create a DataItem with this geofence's id. The wearable can use this to create a notification.
-//                final PutDataMapRequest putDataMapRequest = PutDataMapRequest.create(GEOFENCE_DATA_ITEM_PATH);
-//                putDataMapRequest.getDataMap().putString(KEY_GEOFENCE_ID, triggeredGeoFenceId);
-//                if (mGoogleApiClient.isConnected()) {
-//                    Wearable.DataApi.putDataItem(
-//                            mGoogleApiClient, putDataMapRequest.asPutDataRequest()).await();
-//                }
-//                else {
-//                    Log.e(TAG, "Failed to send data item: " + putDataMapRequest + " - Client disconnected from Google Play Services");
-//                }
-//                Toast.makeText(this, getString(R.string.entering_geofence), Toast.LENGTH_SHORT).show();
-//                mGoogleApiClient.disconnect();
-                showToast(this, R.string.entering_geofence);
-                Log.i(TAG, "entered geofence: " + geoFenceEvent.getTriggeringLocation().toString());
-                createNotification("Entered Geofence: " + geoFenceEvent.toString());
-            }
-            else if (Geofence.GEOFENCE_TRANSITION_EXIT == transitionType) {
-//                // Delete the data item when leaving a geofence region.
-//                mGoogleApiClient.blockingConnect(CONNECTION_TIME_OUT_MS, TimeUnit.MILLISECONDS);
-//                Wearable.DataApi.deleteDataItems(mGoogleApiClient, GEOFENCE_DATA_ITEM_URI).await();
-//                showToast(this, R.string.exiting_geofence);
-//                mGoogleApiClient.disconnect();
-                showToast(this, R.string.exiting_geofence);
-            }
+            Intent fetchAddressIntent = new Intent(this, FetchAddressIntentService.class);
+            fetchAddressIntent.putExtra(RECEIVER, new FetchAddressResultReceiver(new Handler()) {
+                @Override
+                protected void onReceiveResult(int resultCode, Bundle resultData) {
+                    String locationString = resultData.getString(RESULT_DATA_KEY);
+                    if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType) {
+                        showToast(GeofenceTransitionsIntentService.this, R.string.entering_geofence);
+                        createNotification(triggeredGeoFenceId, "Entered Geofence: " + locationString);
+                    }
+                    else if (Geofence.GEOFENCE_TRANSITION_EXIT == transitionType) {
+                        showToast(GeofenceTransitionsIntentService.this, R.string.exiting_geofence);
+                        createNotification(triggeredGeoFenceId, "Exited Geofence: " + locationString);
+                    }
+                }
+            });
+            fetchAddressIntent.putExtra(LOCATION_DATA_EXTRA, geoFenceEvent.getTriggeringLocation());
+            startService(fetchAddressIntent);
         }
     }
 
@@ -103,31 +87,21 @@ public class GeofenceTransitionsIntentService extends IntentService implements
         });
     }
 
-    private void createNotification(String notificationText) {
-        String notificationTitle = "Geofence Alert";
+    /**
+     * Creates a notification
+     *
+     * @param notificationText
+     */
+    private void createNotification(String notificationText, String tag) {
         int notificationId = 1;
 
         NotificationCompat.Builder mBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(notificationTitle)
-                .setContentText(notificationText);
+                .setContentTitle(NOTIFICATION_TITLE)
+                .setContentText(notificationText)
+                .setAutoCancel(true);
 
         NotificationManager mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-        mNotificationManager.notify(notificationId, mBuilder.build());
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int cause) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
+        mNotificationManager.notify(tag, notificationId, mBuilder.build());
     }
 }

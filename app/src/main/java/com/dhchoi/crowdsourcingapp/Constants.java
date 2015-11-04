@@ -9,6 +9,7 @@ public class Constants {
 
     public static final String TAG = "CrowdsourcingApp";
     public static final String PACKAGE_NAME = "com.dhchoi.crowdsourcingapp";
+    public static final String NOTIFICATION_TITLE = "CrowdsourcingApp";
 
     public final static int LOCATION_REQUEST = 2;
     // Request code to attempt to resolve Google Play services connection failures.

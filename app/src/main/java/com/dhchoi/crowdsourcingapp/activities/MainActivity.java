@@ -17,7 +17,6 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
-import android.os.ResultReceiver;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
@@ -34,6 +33,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dhchoi.crowdsourcingapp.Constants;
+import com.dhchoi.crowdsourcingapp.FetchAddressResultReceiver;
 import com.dhchoi.crowdsourcingapp.services.FetchAddressIntentService;
 import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.R;
@@ -82,7 +82,7 @@ public class MainActivity extends AppCompatActivity implements
     Location mCurrentLocation;
     String mLastUpdateTime;
     // Receiver registered with this activity to get the response from FetchAddressIntentService.
-    AddressResultReceiver mResultReceiver;
+    FetchAddressResultReceiver mFetchAddressResultReceiver;
     TextView mCurrentLocationTextView;
     TextView mLocationAddressTextView;
 
@@ -119,7 +119,18 @@ public class MainActivity extends AppCompatActivity implements
         }
 
         // create result receiver for FetchAddressIntentService
-        mResultReceiver = new AddressResultReceiver(new Handler());
+        mFetchAddressResultReceiver = new FetchAddressResultReceiver(new Handler()) {
+            @Override
+            protected void onReceiveResult(int resultCode, Bundle resultData) {
+                // Display the address string or an error message sent from the intent service.
+                mLocationAddressTextView.setText(resultData.getString(Constants.RESULT_DATA_KEY));
+
+                // Show a toast message if an address was found.
+//            if (resultCode == Constants.SUCCESS_RESULT) {
+//                showToast(getString(R.string.address_found));
+//            }
+            }
+        };
 
         // setup notification manager
         mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
@@ -309,7 +320,7 @@ public class MainActivity extends AppCompatActivity implements
             // Create an intent for passing to the intent service responsible for fetching the address.
             Intent intent = new Intent(this, FetchAddressIntentService.class);
             // Pass the result receiver as an extra to the service.
-            intent.putExtra(Constants.RECEIVER, mResultReceiver);
+            intent.putExtra(Constants.RECEIVER, mFetchAddressResultReceiver);
             // Pass the location data as an extra to the service.
             intent.putExtra(Constants.LOCATION_DATA_EXTRA, mCurrentLocation);
             // Start the service. If the service isn't already running, it is instantiated and started
@@ -347,8 +358,8 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * In this sample, the geofences are predetermined and are hard-coded here. A real app might
-     * dynamically create geofences based on the user's location.
+     * In this sample, the geofences are predetermined and are hard-coded here.
+     * A real app might dynamically create geofences based on the user's location.
      */
     public void createGeofences() {
         // These will store hard-coded geofences in this sample app.
@@ -398,37 +409,11 @@ public class MainActivity extends AppCompatActivity implements
     }
 
     /**
-     * Create a PendingIntent that triggers GeofenceTransitionIntentService when a geofence
-     * transition occurs.
+     * Create a PendingIntent that triggers GeofenceTransitionIntentService
+     * when a geofence transition occurs.
      */
     private PendingIntent getGeofenceTransitionPendingIntent() {
         Intent intent = new Intent(this, GeofenceTransitionsIntentService.class);
         return PendingIntent.getService(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
     }
-
-    /**
-     * Receiver for data sent from FetchAddressIntentService.
-     */
-    class AddressResultReceiver extends ResultReceiver {
-
-        public AddressResultReceiver(Handler handler) {
-            super(handler);
-        }
-
-        /**
-         *  Receives data sent from FetchAddressIntentService and updates the UI in MainActivity.
-         */
-        @Override
-        protected void onReceiveResult(int resultCode, Bundle resultData) {
-
-            // Display the address string or an error message sent from the intent service.
-            mLocationAddressTextView.setText(resultData.getString(Constants.RESULT_DATA_KEY));
-
-            // Show a toast message if an address was found.
-//            if (resultCode == Constants.SUCCESS_RESULT) {
-//                showToast(getString(R.string.address_found));
-//            }
-        }
-    }
-
 }
