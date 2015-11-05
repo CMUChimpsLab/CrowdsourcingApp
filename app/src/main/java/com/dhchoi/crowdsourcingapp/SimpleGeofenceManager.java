@@ -48,6 +48,16 @@ public class SimpleGeofenceManager {
         return mGeofenceStorage.getGeofence(id);
     }
 
+    public void removeGeofence(Geofence geofence) {
+        SharedPreferences.Editor prefs = mPrefs.edit();
+        Set<String> geofenceIdSet = getSavedGeofenceIdSet();
+        geofenceIdSet.remove(geofence.getRequestId());
+        prefs.putStringSet(KEY_ID_SET, geofenceIdSet);
+        prefs.commit();
+
+        mGeofenceStorage.clearGeofence(geofence.getRequestId());
+    }
+
     /**
      * Create a PendingIntent that triggers GeofenceTransitionIntentService
      * when a geofence transition occurs.
