@@ -9,6 +9,7 @@ import static com.dhchoi.crowdsourcingapp.Constants.KEY_TRANSITION_TYPE;
 import static com.dhchoi.crowdsourcingapp.Constants.INVALID_FLOAT_VALUE;
 import static com.dhchoi.crowdsourcingapp.Constants.INVALID_INT_VALUE;
 import static com.dhchoi.crowdsourcingapp.Constants.INVALID_LONG_VALUE;
+import static com.dhchoi.crowdsourcingapp.Constants.SHARED_PREFERENCES;
 
 import android.content.Context;
 import android.content.SharedPreferences;
@@ -17,8 +18,6 @@ public class SimpleGeofenceStore {
 
     // The SharedPreferences object in which geofences are stored.
     private final SharedPreferences mPrefs;
-    // The name of the SharedPreferences.
-    private static final String SHARED_PREFERENCES = "SharedPreferences";
 
     /**
      * Create the SharedPreferences storage with private access only.
@@ -93,5 +92,4 @@ public class SimpleGeofenceStore {
     private String getGeofenceFieldKey(String id, String fieldName) {
         return KEY_PREFIX + "_" + id + "_" + fieldName;
     }
-
 }

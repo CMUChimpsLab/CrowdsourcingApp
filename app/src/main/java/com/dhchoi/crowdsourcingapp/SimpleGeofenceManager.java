@@ -3,59 +3,49 @@ package com.dhchoi.crowdsourcingapp;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 
 import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.google.android.gms.location.Geofence;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
-import static com.dhchoi.crowdsourcingapp.Constants.GEOFENCE_EXPIRATION_TIME;
+import static com.dhchoi.crowdsourcingapp.Constants.KEY_ID_SET;
+import static com.dhchoi.crowdsourcingapp.Constants.SHARED_PREFERENCES;
 
 public class SimpleGeofenceManager {
-    Context applicationContext;
+    private Context applicationContext;
     // Persistent storage for geofences.
-    SimpleGeofenceStore mGeofenceStorage;
-    // Internal List of Geofence objects. In a real app, these might be provided by an API based on locations within the user's proximity.
-    List<Geofence> mGeofenceList;
+    private SimpleGeofenceStore mGeofenceStorage;
+    private final SharedPreferences mPrefs;
 
     public SimpleGeofenceManager(Context context) {
         applicationContext = context;
         mGeofenceStorage = new SimpleGeofenceStore(applicationContext);
-        mGeofenceList = new ArrayList<Geofence>();
+        mPrefs = context.getSharedPreferences(SHARED_PREFERENCES, Context.MODE_PRIVATE);
     }
 
     /**
-     * In this sample, the geofences are predetermined and are hard-coded here.
-     * A real app might dynamically create geofences based on the user's location.
+     * Create internal "flattened" objects containing the geofence data.
      */
-    public void createGeofences() {
-        // These will store hard-coded geofences in this sample app.
+    public void setGeofence(String geofenceId, double latitude, double longitude, float radius,
+                            long expiration, int transition) {
+        mGeofenceStorage.setGeofence(geofenceId, new SimpleGeofence(
+                geofenceId,
+                latitude,
+                longitude,
+                radius,
+                expiration,
+                transition
+        ));
+        saveGeofenceId(geofenceId);
+    }
 
-        // Create internal "flattened" objects containing the geofence data.
-        String mHomeGeofenceId = "home";
-        SimpleGeofence mHomeGeofence = new SimpleGeofence(
-                mHomeGeofenceId,
-                40.447222,
-                -79.946714,
-                60.0f,
-                GEOFENCE_EXPIRATION_TIME,
-                Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT
-        );
-        mGeofenceStorage.setGeofence(mHomeGeofenceId, mHomeGeofence);
-        mGeofenceList.add(mHomeGeofence.toGeofence());
-
-        String mGatesCenterGeofenceId = "gatesCenter";
-        SimpleGeofence mGatesCenterGeofence = new SimpleGeofence(
-                mGatesCenterGeofenceId,
-                40.443336,
-                -79.944675,
-                60.0f,
-                GEOFENCE_EXPIRATION_TIME,
-                Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT
-        );
-        mGeofenceStorage.setGeofence(mGatesCenterGeofenceId, mGatesCenterGeofence);
-        mGeofenceList.add(mGatesCenterGeofence.toGeofence());
+    public SimpleGeofence getGeofence(String id) {
+        return mGeofenceStorage.getGeofence(id);
     }
 
     /**
@@ -68,6 +58,22 @@ public class SimpleGeofenceManager {
     }
 
     public List<Geofence> getGeofenceList() {
-        return mGeofenceList;
+        List<Geofence> geofenceList = new ArrayList();
+        for(String geofenceId : getSavedGeofenceIdSet()) {
+            geofenceList.add(getGeofence(geofenceId).toGeofence());
+        }
+        return geofenceList;
+    }
+
+    private void saveGeofenceId(String id) {
+        SharedPreferences.Editor prefs = mPrefs.edit();
+        Set<String> geofenceIdSet = getSavedGeofenceIdSet();
+        geofenceIdSet.add(id);
+        prefs.putStringSet(KEY_ID_SET, geofenceIdSet);
+        prefs.commit();
+    }
+
+    private Set<String> getSavedGeofenceIdSet() {
+        return mPrefs.getStringSet(KEY_ID_SET, new HashSet<String>());
     }
 }

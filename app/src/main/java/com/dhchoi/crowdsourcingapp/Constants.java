@@ -4,12 +4,13 @@ import com.google.android.gms.location.Geofence;
 
 public class Constants {
 
-    private Constants() {
-    }
+    private Constants() {}
 
     public static final String TAG = "CrowdsourcingApp";
     public static final String PACKAGE_NAME = "com.dhchoi.crowdsourcingapp";
     public static final String NOTIFICATION_TITLE = "CrowdsourcingApp";
+    // The name of the SharedPreferences.
+    public static final String SHARED_PREFERENCES = "SharedPreferences";
 
     public final static int LOCATION_REQUEST = 2;
     // Request code to attempt to resolve Google Play services connection failures.
@@ -29,6 +30,8 @@ public class Constants {
     public static final String KEY_TRANSITION_TYPE = PACKAGE_NAME + ".KEY_TRANSITION_TYPE";
     // The prefix for flattened geofence keys.
     public static final String KEY_PREFIX = PACKAGE_NAME + ".KEY";
+    // Key for geofence id set
+    public static final String KEY_ID_SET = PACKAGE_NAME + ".ID_SET";
 
     // Invalid values, used to test geofence storage when retrieving geofences.
     public static final long INVALID_LONG_VALUE = -999l;

@@ -16,10 +16,8 @@ import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.util.Log;
-import android.view.View;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -37,10 +35,9 @@ import com.dhchoi.crowdsourcingapp.SimpleGeofenceManager;
 import com.dhchoi.crowdsourcingapp.services.FetchAddressIntentService;
 import com.dhchoi.crowdsourcingapp.R;
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
-import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -50,6 +47,7 @@ import com.google.android.gms.location.places.ui.PlacePicker;
 
 import java.text.DateFormat;
 import java.util.Date;
+import java.util.List;
 
 public class MainActivity extends AppCompatActivity implements
         NavigationView.OnNavigationItemSelectedListener,
@@ -105,8 +103,6 @@ public class MainActivity extends AppCompatActivity implements
         if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Check Permissions Now
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST);
-        } else {
-            mGeofenceManger.createGeofences();
         }
 
         // create result receiver for FetchAddressIntentService
@@ -197,16 +193,6 @@ public class MainActivity extends AppCompatActivity implements
             Intent intent = new Intent(this, ManageLocationsActivity.class);
             startActivity(intent);
         }
-        else if (id == R.id.nav_gallery) {
-        }
-        else if (id == R.id.nav_slideshow) {
-        }
-        else if (id == R.id.nav_manage) {
-        }
-        else if (id == R.id.nav_share) {
-        }
-        else if (id == R.id.nav_send) {
-        }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
@@ -216,13 +202,11 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
         if (requestCode == LOCATION_REQUEST) {
-            if (grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                // We can now safely use the API we requested access to
-                mGeofenceManger.createGeofences();
-            } else {
+            if (!(grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 // Permission was denied or request was cancelled
                 Toast.makeText(this, "The app needs location services to run properly!", Toast.LENGTH_SHORT).show();
             }
+            // else, we can now safely use the API we requested access to
         }
     }
 
@@ -232,9 +216,12 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onConnected(Bundle bundle) {
         // For requesting geofences
-        mGeofenceRequestIntent = mGeofenceManger.getGeofenceTransitionPendingIntent();
-        LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, mGeofenceManger.getGeofenceList(), mGeofenceRequestIntent);
-        Toast.makeText(this, getString(R.string.start_geofence_service), Toast.LENGTH_SHORT).show();
+        List<Geofence> geofenceList = mGeofenceManger.getGeofenceList();
+        if(geofenceList.size() > 0) {
+            mGeofenceRequestIntent = mGeofenceManger.getGeofenceTransitionPendingIntent();
+            LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, geofenceList, mGeofenceRequestIntent);
+            Toast.makeText(this, getString(R.string.start_geofence_service), Toast.LENGTH_SHORT).show();
+        }
 
         // For displaying current location
         LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, createLocationRequest(), this);
