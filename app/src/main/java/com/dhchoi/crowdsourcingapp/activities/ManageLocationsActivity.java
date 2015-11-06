@@ -34,12 +34,9 @@ import static com.dhchoi.crowdsourcingapp.Constants.GEOFENCE_EXPIRATION_TIME;
 import static com.dhchoi.crowdsourcingapp.Constants.PLACE_PICKER_REQUEST;
 import static com.dhchoi.crowdsourcingapp.Constants.TAG;
 
-public class ManageLocationsActivity extends AppCompatActivity implements
-        ResultCallback<Status>,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener {
+public class ManageLocationsActivity extends BaseGoogleApiActivity implements
+        ResultCallback<Status> {
 
-    private GoogleApiClient mGoogleApiClient;
     SimpleGeofenceManager mGeofenceManger;
     ArrayAdapter<Geofence> mListViewAdapter;
     Geofence mGeofenceToRemove;
@@ -47,15 +44,6 @@ public class ManageLocationsActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // connect to google api
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
 
         mGeofenceManger = new SimpleGeofenceManager(this);
         mListViewAdapter = new ArrayAdapter<Geofence>(this, android.R.layout.simple_list_item_1, mGeofenceManger.getGeofenceList());
@@ -94,7 +82,7 @@ public class ManageLocationsActivity extends AppCompatActivity implements
                         // User clicked OK button
                         mGeofenceToRemove = (Geofence) listView.getItemAtPosition(position);
                         LocationServices.GeofencingApi.removeGeofences(
-                                mGoogleApiClient,
+                                getGoogleApiClient(),
                                 // This is the same pending intent that was used in addGeofences().
                                 mGeofenceManger.getGeofenceTransitionPendingIntent()
                         ).setResultCallback(ManageLocationsActivity.this);
@@ -116,18 +104,6 @@ public class ManageLocationsActivity extends AppCompatActivity implements
 
         // Get the message from the intent
         // Intent intent = getIntent();
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    protected void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();
     }
 
     @Override
@@ -162,21 +138,6 @@ public class ManageLocationsActivity extends AppCompatActivity implements
             // Get the status code for the error and log it using a user-friendly message.
             Log.e(TAG, "Could not remove geofence. StatusCode=" + status.getStatusCode());
         }
-    }
-
-    @Override
-    public void onConnected(Bundle bundle) {
-
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-
     }
 
     private void updateListViewAdapter() {

@@ -49,20 +49,13 @@ import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
 
-public class MainActivity extends AppCompatActivity implements
+public class MainActivity extends BaseGoogleApiActivity implements
         NavigationView.OnNavigationItemSelectedListener,
-        GoogleApiClient.ConnectionCallbacks,
-        GoogleApiClient.OnConnectionFailedListener,
         ActivityCompat.OnRequestPermissionsResultCallback,
         LocationListener {
 
-    // google api
-    private GoogleApiClient mGoogleApiClient;
-    private boolean mResolvingError;
-
+    // Geofence manager
     SimpleGeofenceManager mGeofenceManger;
-    // Stores the PendingIntent used to request geofence monitoring.
-    private PendingIntent mGeofenceRequestIntent;
 
     // Locations
     Location mCurrentLocation;
@@ -80,21 +73,6 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        if (!isGooglePlayServicesAvailable()) {
-            Log.e(TAG, "Google Play services unavailable.");
-            finish();
-            return;
-        }
-
-        // connect to google api
-        mGoogleApiClient = new GoogleApiClient.Builder(this)
-                .addApi(LocationServices.API)
-                .addApi(Places.GEO_DATA_API)
-                .addApi(Places.PLACE_DETECTION_API)
-                .addConnectionCallbacks(this)
-                .addOnConnectionFailedListener(this)
-                .build();
 
         // create geofence manager
         mGeofenceManger = new SimpleGeofenceManager(this);
@@ -138,18 +116,6 @@ public class MainActivity extends AppCompatActivity implements
 
         mCurrentLocationTextView = (TextView) findViewById(R.id.location_text);
         mLocationAddressTextView = (TextView) findViewById(R.id.address_text);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        mGoogleApiClient.connect();
-    }
-
-    @Override
-    protected void onStop() {
-        mGoogleApiClient.disconnect();
-        super.onStop();
     }
 
     @Override
@@ -215,53 +181,17 @@ public class MainActivity extends AppCompatActivity implements
      */
     @Override
     public void onConnected(Bundle bundle) {
+        super.onConnected(bundle);
+
         // For requesting geofences
         List<Geofence> geofenceList = mGeofenceManger.getGeofenceList();
         if(geofenceList.size() > 0) {
-            mGeofenceRequestIntent = mGeofenceManger.getGeofenceTransitionPendingIntent();
-            LocationServices.GeofencingApi.addGeofences(mGoogleApiClient, geofenceList, mGeofenceRequestIntent);
+            LocationServices.GeofencingApi.addGeofences(getGoogleApiClient(), geofenceList, mGeofenceManger.getGeofenceTransitionPendingIntent());
             Toast.makeText(this, getString(R.string.start_geofence_service), Toast.LENGTH_SHORT).show();
         }
 
         // For displaying current location
-        LocationServices.FusedLocationApi.requestLocationUpdates(mGoogleApiClient, createLocationRequest(), this);
-    }
-
-    @Override
-    public void onConnectionSuspended(int i) {
-        // The connection has been interrupted.
-        // Disable any UI components that depend on Google APIs until onConnected() is called.
-
-        if (null != mGeofenceRequestIntent) {
-            LocationServices.GeofencingApi.removeGeofences(mGoogleApiClient, mGeofenceRequestIntent);
-        }
-    }
-
-    @Override
-    public void onConnectionFailed(ConnectionResult connectionResult) {
-        // This callback is important for handling errors that may occur while attempting to connect with Google.
-        // More about this in the 'Handle Connection Failures' section.
-        // https://developers.google.com/android/guides/api-client
-
-        if (mResolvingError) {
-            // Already attempting to resolve an error.
-            return;
-        } else if (connectionResult.hasResolution()) {
-            try {
-                mResolvingError = true;
-                connectionResult.startResolutionForResult(this, CONNECTION_FAILURE_RESOLUTION_REQUEST);
-            } catch (IntentSender.SendIntentException e) {
-                String errMsg = "Exception while resolving connection error.";
-                Log.e(TAG, errMsg, e);
-                Toast.makeText(this, errMsg, Toast.LENGTH_SHORT).show();
-            }
-        } else {
-            int errorCode = connectionResult.getErrorCode();
-            String errMsg = "Connection to Google Play services failed with error code " + errorCode;
-            Log.e(TAG, errMsg);
-            Toast.makeText(this, errMsg, Toast.LENGTH_SHORT).show();
-            mResolvingError = false;
-        }
+        LocationServices.FusedLocationApi.requestLocationUpdates(getGoogleApiClient(), createLocationRequest(), this);
     }
 
     @Override
@@ -310,23 +240,5 @@ public class MainActivity extends AppCompatActivity implements
         mLocationRequest.setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
 
         return mLocationRequest;
-    }
-
-    /**
-     * Checks if Google Play services is available.
-     *
-     * @return true if it is.
-     */
-    private boolean isGooglePlayServicesAvailable() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (ConnectionResult.SUCCESS == resultCode) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "Google Play services is available.");
-            }
-            return true;
-        } else {
-            Log.e(TAG, "Google Play services is unavailable.");
-            return false;
-        }
     }
 }
