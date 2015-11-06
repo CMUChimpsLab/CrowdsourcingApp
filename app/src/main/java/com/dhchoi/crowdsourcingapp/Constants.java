@@ -12,7 +12,7 @@ public class Constants {
     // The name of the SharedPreferences.
     public static final String SHARED_PREFERENCES = "SharedPreferences";
 
-    public final static int LOCATION_REQUEST = 2;
+    public final static int PERMISSION_REQUEST = 2;
     // Request code to attempt to resolve Google Play services connection failures.
     public final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     // Timeout for making a connection to GoogleApiClient (in milliseconds).

@@ -1,28 +1,18 @@
 package com.dhchoi.crowdsourcingapp.activities;
 
-import static com.dhchoi.crowdsourcingapp.Constants.LOCATION_REQUEST;
 import static com.dhchoi.crowdsourcingapp.Constants.PLACE_PICKER_REQUEST;
-import static com.dhchoi.crowdsourcingapp.Constants.TAG;
-import static com.dhchoi.crowdsourcingapp.Constants.CONNECTION_FAILURE_RESOLUTION_REQUEST;
 
-import android.Manifest;
 import android.app.NotificationManager;
-import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentSender;
-import android.content.pm.PackageManager;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
-import android.support.v4.app.ActivityCompat;
-import android.util.Log;
 import android.support.design.widget.NavigationView;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
-import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -34,15 +24,11 @@ import com.dhchoi.crowdsourcingapp.FetchAddressResultReceiver;
 import com.dhchoi.crowdsourcingapp.SimpleGeofenceManager;
 import com.dhchoi.crowdsourcingapp.services.FetchAddressIntentService;
 import com.dhchoi.crowdsourcingapp.R;
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
-import com.google.android.gms.location.places.Places;
 import com.google.android.gms.location.places.ui.PlacePicker;
 
 import java.text.DateFormat;
@@ -51,7 +37,6 @@ import java.util.List;
 
 public class MainActivity extends BaseGoogleApiActivity implements
         NavigationView.OnNavigationItemSelectedListener,
-        ActivityCompat.OnRequestPermissionsResultCallback,
         LocationListener {
 
     // Geofence manager
@@ -76,12 +61,6 @@ public class MainActivity extends BaseGoogleApiActivity implements
 
         // create geofence manager
         mGeofenceManger = new SimpleGeofenceManager(this);
-
-        // check permissions
-        if (ActivityCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
-            // Check Permissions Now
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.ACCESS_FINE_LOCATION}, LOCATION_REQUEST);
-        }
 
         // create result receiver for FetchAddressIntentService
         mFetchAddressResultReceiver = new FetchAddressResultReceiver(new Handler()) {
@@ -163,17 +142,6 @@ public class MainActivity extends BaseGoogleApiActivity implements
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
         drawer.closeDrawer(GravityCompat.START);
         return true;
-    }
-
-    @Override
-    public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == LOCATION_REQUEST) {
-            if (!(grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
-                // Permission was denied or request was cancelled
-                Toast.makeText(this, "The app needs location services to run properly!", Toast.LENGTH_SHORT).show();
-            }
-            // else, we can now safely use the API we requested access to
-        }
     }
 
     /**
