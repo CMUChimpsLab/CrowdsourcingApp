@@ -2,8 +2,6 @@ package com.dhchoi.crowdsourcingapp.activities;
 
 import static com.dhchoi.crowdsourcingapp.Constants.PLACE_PICKER_REQUEST;
 
-import android.app.NotificationManager;
-import android.content.Context;
 import android.content.Intent;
 import android.location.Geocoder;
 import android.location.Location;
@@ -24,6 +22,7 @@ import com.dhchoi.crowdsourcingapp.FetchAddressResultReceiver;
 import com.dhchoi.crowdsourcingapp.SimpleGeofenceManager;
 import com.dhchoi.crowdsourcingapp.services.FetchAddressIntentService;
 import com.dhchoi.crowdsourcingapp.R;
+import com.dhchoi.crowdsourcingapp.services.GcmRegistrationIntentService;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -52,9 +51,6 @@ public class MainActivity extends BaseGoogleApiActivity implements
     TextView mCurrentLocationTextView;
     TextView mLocationAddressTextView;
 
-    // Notifiations
-    NotificationManager mNotificationManager;
-
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -77,8 +73,8 @@ public class MainActivity extends BaseGoogleApiActivity implements
             }
         };
 
-        // setup notification manager
-        mNotificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
+        // start IntentService to register this application with GCM
+        startService(new Intent(this, GcmRegistrationIntentService.class));
 
         // setup views
         setContentView(R.layout.activity_main);

@@ -12,10 +12,12 @@ public class Constants {
     // The name of the SharedPreferences.
     public static final String SHARED_PREFERENCES = "SharedPreferences";
 
-    public final static int PERMISSION_REQUEST = 2;
+    public static final int PERMISSION_REQUEST = 2;
     public static final int PLAY_SERVICES_RESOLUTION_REQUEST = 8000;
+    public static final String SENT_GCM_TOKEN_TO_SERVER = "sentTokenToServer";
+    public static final String GCM_REGISTRATION_COMPLETE = "registrationComplete";
     // Request code to attempt to resolve Google Play services connection failures.
-    public final static int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+    public static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
     // Timeout for making a connection to GoogleApiClient (in milliseconds).
     public static final long CONNECTION_TIME_OUT_MS = 100;
 
