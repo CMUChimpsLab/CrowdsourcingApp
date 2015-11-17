@@ -1,5 +1,6 @@
 package com.dhchoi.crowdsourcingapp.services;
 
+import static com.dhchoi.crowdsourcingapp.Constants.GEOFENCE_EXPIRATION_TIME;
 import static com.dhchoi.crowdsourcingapp.Constants.NOTIFICATION_TITLE;
 
 import android.app.NotificationManager;
@@ -13,8 +14,10 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.dhchoi.crowdsourcingapp.R;
+import com.dhchoi.crowdsourcingapp.SimpleGeofenceManager;
 import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.google.android.gms.gcm.GcmListenerService;
+import com.google.android.gms.location.Geofence;
 
 public class GcmMessageListenerService extends GcmListenerService {
 
@@ -30,9 +33,19 @@ public class GcmMessageListenerService extends GcmListenerService {
     // [START receive_message]
     @Override
     public void onMessageReceived(String from, Bundle data) {
-        String message = data.getString("message");
+        Log.d(TAG, "Bundle Data: " + data);
+
+        SimpleGeofenceManager geofenceManager = new SimpleGeofenceManager(this);
+        String name = data.getString("name", "DEFAULT");
+        double lat = Double.valueOf(data.getString("lat", "40.4472512"));
+        double lng = Double.valueOf(data.getString("lng", "-79.9460148"));
+        float radius = Float.valueOf(data.getString("radius", "60.0f"));
+
         Log.d(TAG, "From: " + from);
-        Log.d(TAG, "Message: " + message);
+        Log.d(TAG, "Name: " + name);
+        Log.d(TAG, "Lat: " + lat);
+        Log.d(TAG, "Lng: " + lng);
+        Log.d(TAG, "Radius: " + radius);
 
         if (from.startsWith("/topics/")) {
             // message received from some topic.
@@ -47,12 +60,18 @@ public class GcmMessageListenerService extends GcmListenerService {
          *     - Store message in local database.
          *     - Update UI.
          */
+        geofenceManager.setGeofence(name,
+                lat,
+                lng,
+                radius,
+                GEOFENCE_EXPIRATION_TIME,
+                Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT);
 
         /**
          * In some cases it may be useful to show a notification indicating to the user
          * that a message was received.
          */
-        sendNotification(message);
+        sendNotification("Received New Geofence: " + name);
         // [END_EXCLUDE]
     }
     // [END receive_message]
