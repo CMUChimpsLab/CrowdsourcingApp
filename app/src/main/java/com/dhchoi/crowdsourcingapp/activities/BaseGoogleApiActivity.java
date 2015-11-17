@@ -10,13 +10,14 @@ import android.util.Log;
 import android.widget.Toast;
 
 import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 
 import static com.dhchoi.crowdsourcingapp.Constants.CONNECTION_FAILURE_RESOLUTION_REQUEST;
 import static com.dhchoi.crowdsourcingapp.Constants.PERMISSION_REQUEST;
+import static com.dhchoi.crowdsourcingapp.Constants.PLAY_SERVICES_RESOLUTION_REQUEST;
 import static com.dhchoi.crowdsourcingapp.Constants.TAG;
 
 public class BaseGoogleApiActivity extends AppCompatActivity implements
@@ -34,6 +35,7 @@ public class BaseGoogleApiActivity extends AppCompatActivity implements
 
         if (!isGooglePlayServicesAvailable()) {
             Log.e(TAG, "Google Play services unavailable.");
+            Toast.makeText(this, "The app needs Google Play Services to run properly!", Toast.LENGTH_SHORT).show();
             finish();
             return;
         }
@@ -135,20 +137,25 @@ public class BaseGoogleApiActivity extends AppCompatActivity implements
     }
 
     /**
-     * Checks if Google Play services is available.
+     * Check the device to make sure it has the Google Play Services APK. If
+     * it doesn't, display a dialog that allows users to download the APK from
+     * the Google Play Store or enable it in the device's system settings.
      *
      * @return true if it is.
      */
     protected boolean isGooglePlayServicesAvailable() {
-        int resultCode = GooglePlayServicesUtil.isGooglePlayServicesAvailable(this);
-        if (ConnectionResult.SUCCESS == resultCode) {
-            if (Log.isLoggable(TAG, Log.DEBUG)) {
-                Log.d(TAG, "Google Play services is available.");
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
             }
-            return true;
-        } else {
-            Log.e(TAG, "Google Play services is unavailable.");
+            else {
+                Log.i(TAG, "This device is not supported.");
+            }
             return false;
         }
+
+        return true;
     }
 }
