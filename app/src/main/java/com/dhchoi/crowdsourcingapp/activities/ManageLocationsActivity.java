@@ -12,9 +12,11 @@ import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 import android.widget.Toast;
-
+import com.dhchoi.crowdsourcingapp.LocationListAdapter;
 import com.dhchoi.crowdsourcingapp.R;
+import com.dhchoi.crowdsourcingapp.SimpleGeofence;
 import com.dhchoi.crowdsourcingapp.SimpleGeofenceManager;
+import com.dhchoi.crowdsourcingapp.LocationListAdapter;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.common.api.ResultCallback;
@@ -24,23 +26,27 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 
+
 import static com.dhchoi.crowdsourcingapp.Constants.GEOFENCE_EXPIRATION_TIME;
 import static com.dhchoi.crowdsourcingapp.Constants.PLACE_PICKER_REQUEST;
+import static com.dhchoi.crowdsourcingapp.Constants.KEY_NAME;
+import static com.dhchoi.crowdsourcingapp.Constants.KEY_QUESTION;
 import static com.dhchoi.crowdsourcingapp.Constants.TAG;
 
 public class ManageLocationsActivity extends BaseGoogleApiActivity implements
         ResultCallback<Status> {
 
     SimpleGeofenceManager mGeofenceManger;
-    ArrayAdapter<Geofence> mListViewAdapter;
+    ArrayAdapter<SimpleGeofence> mListViewAdapter;
     Geofence mGeofenceToRemove;
+    SimpleGeofence mGeofenceToQuestion;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
         mGeofenceManger = new SimpleGeofenceManager(this);
-        mListViewAdapter = new ArrayAdapter<Geofence>(this, android.R.layout.simple_list_item_1, mGeofenceManger.getGeofenceList());
+        mListViewAdapter = new LocationListAdapter(this, mGeofenceManger.getSimpleGeofenceList());
 
         // setup views
         setContentView(R.layout.activity_manage_locations);
@@ -48,19 +54,19 @@ public class ManageLocationsActivity extends BaseGoogleApiActivity implements
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
-        fab.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                try {
-                    startActivityForResult(new PlacePicker.IntentBuilder().build(ManageLocationsActivity.this), PLACE_PICKER_REQUEST);
-                } catch (GooglePlayServicesRepairableException e) {
-                    e.printStackTrace();
-                } catch (GooglePlayServicesNotAvailableException e) {
-                    e.printStackTrace();
-                }
-            }
-        });
+//        FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
+//        fab.setOnClickListener(new View.OnClickListener() {
+//            @Override
+//            public void onClick(View view) {
+//                try {
+//                    startActivityForResult(new PlacePicker.IntentBuilder().build(ManageLocationsActivity.this), PLACE_PICKER_REQUEST);
+//                } catch (GooglePlayServicesRepairableException e) {
+//                    e.printStackTrace();
+//                } catch (GooglePlayServicesNotAvailableException e) {
+//                    e.printStackTrace();
+//                }
+//            }
+//        });
 
         final ListView listView = (ListView) findViewById(R.id.listView);
         listView.setAdapter(mListViewAdapter);
@@ -68,29 +74,40 @@ public class ManageLocationsActivity extends BaseGoogleApiActivity implements
             @Override
             public void onItemClick(final AdapterView<?> parent, final View view, final int position, final long id) {
                 // Customize AlertDialog
-                AlertDialog.Builder builder = new AlertDialog.Builder(ManageLocationsActivity.this);
-                builder.setTitle("Delete Geofence");
-                builder.setMessage("Do you wish to delete the Geofence?");
-                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User clicked OK button
-                        mGeofenceToRemove = (Geofence) listView.getItemAtPosition(position);
-                        LocationServices.GeofencingApi.removeGeofences(
-                                getGoogleApiClient(),
-                                // This is the same pending intent that was used in addGeofences().
-                                mGeofenceManger.getGeofenceTransitionPendingIntent()
-                        ).setResultCallback(ManageLocationsActivity.this);
-                    }
-                });
-                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
-                    public void onClick(DialogInterface dialog, int id) {
-                        // User cancelled the dialog
-                    }
-                });
 
-                // Create the AlertDialog
-                AlertDialog dialog = builder.create();
-                dialog.show();
+                mGeofenceToQuestion = (SimpleGeofence) listView.getItemAtPosition(position);
+                Intent mIntent = new Intent(ManageLocationsActivity.this, AnswerQuestionActivity.class);
+                Bundle mBundle = new Bundle();
+                mBundle.putString(KEY_NAME, mGeofenceToQuestion.getName());
+                mBundle.putString(KEY_QUESTION, mGeofenceToQuestion.getQuestion());
+                mIntent.putExtras(mBundle);
+
+                startActivity(mIntent);
+
+
+//                AlertDialog.Builder builder = new AlertDialog.Builder(ManageLocationsActivity.this);
+//                builder.setTitle("Delete Geofence");
+//                builder.setMessage("Do you wish to delete the Geofence?");
+//                builder.setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        // User clicked OK button
+//                        mGeofenceToRemove = (Geofence) listView.getItemAtPosition(position);
+//                        LocationServices.GeofencingApi.removeGeofences(
+//                                getGoogleApiClient(),
+//                                // This is the same pending intent that was used in addGeofences().
+//                                mGeofenceManger.getGeofenceTransitionPendingIntent()
+//                        ).setResultCallback(ManageLocationsActivity.this);
+//                    }
+//                });
+//                builder.setNegativeButton("No", new DialogInterface.OnClickListener() {
+//                    public void onClick(DialogInterface dialog, int id) {
+//                        // User cancelled the dialog
+//                    }
+//                });
+//
+//                // Create the AlertDialog
+//                AlertDialog dialog = builder.create();
+//                dialog.show();
             }
         });
 
@@ -100,25 +117,27 @@ public class ManageLocationsActivity extends BaseGoogleApiActivity implements
         // Intent intent = getIntent();
     }
 
-    @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == PLACE_PICKER_REQUEST) {
-            if (resultCode == RESULT_OK) {
-                Place place = PlacePicker.getPlace(data, this);
-                String placeName = String.valueOf(place.getName());
-                Toast.makeText(this, "Added: " + placeName, Toast.LENGTH_LONG).show();
 
-                mGeofenceManger.setGeofence(placeName,
-                        place.getLatLng().latitude,
-                        place.getLatLng().longitude,
-                        60.0f,
-                        GEOFENCE_EXPIRATION_TIME,
-                        Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT);
 
-                updateListViewAdapter();
-            }
-        }
-    }
+//    @Override
+//    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
+//        if (requestCode == PLACE_PICKER_REQUEST) {
+//            if (resultCode == RESULT_OK) {
+//                Place place = PlacePicker.getPlace(data, this);
+//                String placeName = String.valueOf(place.getName());
+//                Toast.makeText(this, "Added: " + placeName, Toast.LENGTH_LONG).show();
+//
+//                mGeofenceManger.setGeofence(placeName,
+//                        place.getLatLng().latitude,
+//                        place.getLatLng().longitude,
+//                        60.0f,
+//                        GEOFENCE_EXPIRATION_TIME,
+//                        Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT);
+//
+//                updateListViewAdapter();
+//            }
+//        }
+//    }
 
     @Override
     public void onResult(Status status) {
@@ -136,7 +155,7 @@ public class ManageLocationsActivity extends BaseGoogleApiActivity implements
 
     private void updateListViewAdapter() {
         mListViewAdapter.clear();
-        mListViewAdapter.addAll(mGeofenceManger.getGeofenceList());
+        mListViewAdapter.addAll(mGeofenceManger.getSimpleGeofenceList());
         mListViewAdapter.notifyDataSetChanged();
     }
 }

@@ -1,29 +1,40 @@
 package com.dhchoi.crowdsourcingapp;
 
+import android.util.Log;
+
 import com.google.android.gms.location.Geofence;
 
 public class SimpleGeofence {
 
+    private static final String TAG = "SimpleGeoFence";
+
     // Instance variables
     private final String mId;
+    private final String mName;
+    private final String mQuestion;
     private final double mLatitude;
     private final double mLongitude;
     private final float mRadius;
     private long mExpirationDuration;
     private int mTransitionType;
 
+
     /**
      * @param geofenceId The Geofence's request ID.
+     * @param name The Geofence's request name.
+     * @param question The Geofence's request question.
      * @param latitude Latitude of the Geofence's center in degrees.
      * @param longitude Longitude of the Geofence's center in degrees.
      * @param radius Radius of the geofence circle in meters.
      * @param expiration Geofence expiration duration.
      * @param transition Type of Geofence transition.
      */
-    public SimpleGeofence(String geofenceId, double latitude, double longitude, float radius,
+    public SimpleGeofence(String geofenceId, String name, String question, double latitude, double longitude, float radius,
                           long expiration, int transition) {
         // Set the instance fields from the constructor.
         this.mId = geofenceId;
+        this.mName = name;
+        this.mQuestion = question;
         this.mLatitude = latitude;
         this.mLongitude = longitude;
         this.mRadius = radius;
@@ -32,9 +43,7 @@ public class SimpleGeofence {
     }
 
     // Instance field getters.
-    public String getId() {
-        return mId;
-    }
+    public String getId() { return mId; }
     public double getLatitude() {
         return mLatitude;
     }
@@ -50,6 +59,8 @@ public class SimpleGeofence {
     public int getTransitionType() {
         return mTransitionType;
     }
+    public String getName() { return mName; }
+    public String getQuestion() { return mQuestion; }
 
     /**
      * Creates a Location Services Geofence object from a SimpleGeofence.

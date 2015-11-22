@@ -4,6 +4,7 @@ import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.google.android.gms.location.Geofence;
@@ -22,6 +23,8 @@ public class SimpleGeofenceManager {
     private SimpleGeofenceStore mGeofenceStorage;
     private final SharedPreferences mPrefs;
 
+    private static final String TAG = "SimpleGeofenceManager";
+
     public SimpleGeofenceManager(Context context) {
         applicationContext = context;
         mGeofenceStorage = new SimpleGeofenceStore(applicationContext);
@@ -31,17 +34,19 @@ public class SimpleGeofenceManager {
     /**
      * Create internal "flattened" objects containing the geofence data.
      */
-    public void setGeofence(String geofenceId, double latitude, double longitude, float radius,
+    public void setGeofence(String uid, String name, String question, double latitude, double longitude, float radius,
                             long expiration, int transition) {
-        mGeofenceStorage.setGeofence(geofenceId, new SimpleGeofence(
-                geofenceId,
+        mGeofenceStorage.setGeofence(uid, new SimpleGeofence(
+                uid,
+                name,
+                question,
                 latitude,
                 longitude,
                 radius,
                 expiration,
                 transition
         ));
-        saveGeofenceId(geofenceId);
+        saveGeofenceId(uid);
     }
 
     public SimpleGeofence getGeofence(String id) {
@@ -70,7 +75,16 @@ public class SimpleGeofenceManager {
     public List<Geofence> getGeofenceList() {
         List<Geofence> geofenceList = new ArrayList();
         for(String geofenceId : getSavedGeofenceIdSet()) {
+            Log.d(TAG, geofenceId);
             geofenceList.add(getGeofence(geofenceId).toGeofence());
+        }
+        return geofenceList;
+    }
+
+    public ArrayList<SimpleGeofence> getSimpleGeofenceList() {
+        ArrayList<SimpleGeofence> geofenceList = new ArrayList();
+        for(String geofenceId : getSavedGeofenceIdSet()) {
+            geofenceList.add(getGeofence(geofenceId));
         }
         return geofenceList;
     }

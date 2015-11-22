@@ -3,18 +3,24 @@ package com.dhchoi.crowdsourcingapp;
 import static com.dhchoi.crowdsourcingapp.Constants.KEY_PREFIX;
 import static com.dhchoi.crowdsourcingapp.Constants.KEY_LATITUDE;
 import static com.dhchoi.crowdsourcingapp.Constants.KEY_LONGITUDE;
+import static com.dhchoi.crowdsourcingapp.Constants.KEY_NAME;
+import static com.dhchoi.crowdsourcingapp.Constants.KEY_QUESTION;
 import static com.dhchoi.crowdsourcingapp.Constants.KEY_RADIUS;
 import static com.dhchoi.crowdsourcingapp.Constants.KEY_EXPIRATION_DURATION;
 import static com.dhchoi.crowdsourcingapp.Constants.KEY_TRANSITION_TYPE;
 import static com.dhchoi.crowdsourcingapp.Constants.INVALID_FLOAT_VALUE;
 import static com.dhchoi.crowdsourcingapp.Constants.INVALID_INT_VALUE;
 import static com.dhchoi.crowdsourcingapp.Constants.INVALID_LONG_VALUE;
+import static com.dhchoi.crowdsourcingapp.Constants.INVALID_STRING_VALUE;
 import static com.dhchoi.crowdsourcingapp.Constants.SHARED_PREFERENCES;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
 
 public class SimpleGeofenceStore {
+
+    private static final String TAG = "SimpleGeofenceStore";
 
     // The SharedPreferences object in which geofences are stored.
     private final SharedPreferences mPrefs;
@@ -34,6 +40,8 @@ public class SimpleGeofenceStore {
     public SimpleGeofence getGeofence(String id) {
         // Get the latitude for the geofence identified by id, or INVALID_FLOAT_VALUE if it doesn't
         // exist (similarly for the other values that follow).
+        String name = mPrefs.getString(getGeofenceFieldKey(id, KEY_NAME), INVALID_STRING_VALUE);
+        String question = mPrefs.getString(getGeofenceFieldKey(id, KEY_QUESTION), INVALID_STRING_VALUE);
         double lat = mPrefs.getFloat(getGeofenceFieldKey(id, KEY_LATITUDE), INVALID_FLOAT_VALUE);
         double lng = mPrefs.getFloat(getGeofenceFieldKey(id, KEY_LONGITUDE), INVALID_FLOAT_VALUE);
         float radius = mPrefs.getFloat(getGeofenceFieldKey(id, KEY_RADIUS), INVALID_FLOAT_VALUE);
@@ -45,9 +53,12 @@ public class SimpleGeofenceStore {
                 && radius != INVALID_FLOAT_VALUE
                 && expirationDuration != INVALID_LONG_VALUE
                 && transitionType != INVALID_INT_VALUE) {
-            return new SimpleGeofence(id, lat, lng, radius, expirationDuration, transitionType);
+            Log.d(TAG, "found: " + question);
+            return new SimpleGeofence(id, name, question, lat, lng, radius, expirationDuration, transitionType);
         }
         // Otherwise, return null.
+        Log.d(TAG, "uh oh null object");
+        Log.d(TAG, question);
         return null;
     }
 
@@ -60,13 +71,18 @@ public class SimpleGeofenceStore {
         // ensures that updates are atomic and non-concurrent.
         SharedPreferences.Editor prefs = mPrefs.edit();
         // Write the Geofence values to SharedPreferences.
+        prefs.putString(getGeofenceFieldKey(id, KEY_NAME), geofence.getName());
+        prefs.putString(getGeofenceFieldKey(id, KEY_QUESTION), geofence.getQuestion());
         prefs.putFloat(getGeofenceFieldKey(id, KEY_LATITUDE), (float) geofence.getLatitude());
         prefs.putFloat(getGeofenceFieldKey(id, KEY_LONGITUDE), (float) geofence.getLongitude());
         prefs.putFloat(getGeofenceFieldKey(id, KEY_RADIUS), geofence.getRadius());
         prefs.putLong(getGeofenceFieldKey(id, KEY_EXPIRATION_DURATION), geofence.getExpirationDuration());
         prefs.putInt(getGeofenceFieldKey(id, KEY_TRANSITION_TYPE), geofence.getTransitionType());
         // Commit the changes.
-        prefs.commit();
+
+        prefs.apply();
+        Log.d(TAG, "Set Geofence in memory: " +  geofence.getQuestion());
+
     }
 
     /**
@@ -74,12 +90,14 @@ public class SimpleGeofenceStore {
      */
     public void clearGeofence(String id) {
         SharedPreferences.Editor prefs = mPrefs.edit();
+        prefs.remove(getGeofenceFieldKey(id, KEY_NAME));
+        prefs.remove(getGeofenceFieldKey(id, KEY_QUESTION));
         prefs.remove(getGeofenceFieldKey(id, KEY_LATITUDE));
         prefs.remove(getGeofenceFieldKey(id, KEY_LONGITUDE));
         prefs.remove(getGeofenceFieldKey(id, KEY_RADIUS));
         prefs.remove(getGeofenceFieldKey(id, KEY_EXPIRATION_DURATION));
         prefs.remove(getGeofenceFieldKey(id, KEY_TRANSITION_TYPE));
-        prefs.commit();
+        prefs.apply();
     }
 
     /**

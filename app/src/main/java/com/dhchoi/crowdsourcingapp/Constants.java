@@ -26,6 +26,9 @@ public class Constants {
     public static final long GEOFENCE_EXPIRATION_TIME = Geofence.NEVER_EXPIRE;
 
     // Keys for flattened geofences stored in SharedPreferences.
+    public static final String KEY_ID = PACKAGE_NAME + ".KEY_UID";
+    public static final String KEY_NAME = PACKAGE_NAME + ".KEY_NAME";
+    public static final String KEY_QUESTION = PACKAGE_NAME + ".KEY_QUESTION";
     public static final String KEY_LATITUDE = PACKAGE_NAME + ".KEY_LATITUDE";
     public static final String KEY_LONGITUDE = PACKAGE_NAME + ".KEY_LONGITUDE";
     public static final String KEY_RADIUS = PACKAGE_NAME + ".KEY_RADIUS";
@@ -40,6 +43,7 @@ public class Constants {
     public static final long INVALID_LONG_VALUE = -999l;
     public static final float INVALID_FLOAT_VALUE = -999.0f;
     public static final int INVALID_INT_VALUE = -999;
+    public static final String INVALID_STRING_VALUE = "none";
 
     // For FetchAddressIntentService
     public static final int SUCCESS_RESULT = 0;

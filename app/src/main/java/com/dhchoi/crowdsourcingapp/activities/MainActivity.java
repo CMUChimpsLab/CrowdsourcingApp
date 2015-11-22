@@ -1,7 +1,9 @@
 package com.dhchoi.crowdsourcingapp.activities;
 
 import static com.dhchoi.crowdsourcingapp.Constants.PLACE_PICKER_REQUEST;
+import static com.dhchoi.crowdsourcingapp.Constants.SHARED_PREFERENCES;
 
+import android.content.Context;
 import android.content.Intent;
 import android.location.Geocoder;
 import android.location.Location;
@@ -16,6 +18,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
+import android.content.SharedPreferences;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.FetchAddressResultReceiver;
@@ -29,6 +32,8 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+
+
 
 import java.text.DateFormat;
 import java.util.Date;
@@ -57,6 +62,12 @@ public class MainActivity extends BaseGoogleApiActivity implements
 
         // create geofence manager
         mGeofenceManger = new SimpleGeofenceManager(this);
+
+        //To delete phone's saved geolocations. Uncomment.
+//        SharedPreferences preferences = getSharedPreferences(SHARED_PREFERENCES, 0);
+//        SharedPreferences.Editor editor = preferences.edit();
+//        editor.clear();
+//        editor.commit();
 
         // create result receiver for FetchAddressIntentService
         mFetchAddressResultReceiver = new FetchAddressResultReceiver(new Handler()) {

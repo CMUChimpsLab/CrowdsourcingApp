@@ -37,12 +37,15 @@ public class GcmMessageListenerService extends GcmListenerService {
 
         SimpleGeofenceManager geofenceManager = new SimpleGeofenceManager(this);
         String name = data.getString("name", "DEFAULT");
+        String id = data.getString("uid", "DEFAULT");
+        String question = data.getString("question", "DEFAULT");
         double lat = Double.valueOf(data.getString("lat", "40.4472512"));
         double lng = Double.valueOf(data.getString("lng", "-79.9460148"));
         float radius = Float.valueOf(data.getString("radius", "60.0f"));
 
-        Log.d(TAG, "From: " + from);
-        Log.d(TAG, "Name: " + name);
+        Log.d(TAG, "id: " + id);
+        Log.d(TAG, "Location: " + name);
+        Log.d(TAG, "Question: " + question);
         Log.d(TAG, "Lat: " + lat);
         Log.d(TAG, "Lng: " + lng);
         Log.d(TAG, "Radius: " + radius);
@@ -60,7 +63,9 @@ public class GcmMessageListenerService extends GcmListenerService {
          *     - Store message in local database.
          *     - Update UI.
          */
-        geofenceManager.setGeofence(name,
+        geofenceManager.setGeofence(id,
+                name,
+                question,
                 lat,
                 lng,
                 radius,
