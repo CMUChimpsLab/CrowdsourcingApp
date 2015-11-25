@@ -12,7 +12,7 @@
     <!--<TextView android:text="Hello World!" android:layout_width="wrap_content"-->
         <!--android:layout_height="wrap_content" />-->
 
-    <TextView android:id="@+id/location_text" android:text="Location"
+    <TextView android:id="@+id/task_location" android:text="Location"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_below="@+id/textView3"
@@ -39,7 +39,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Current Location (Address)"
         android:id="@+id/textView4"
-        android:layout_below="@+id/location_text"
+        android:layout_below="@+id/task_location"
         android:layout_alignParentStart="true"
         android:layout_marginTop="30dp" />
 </RelativeLayout>

@@ -9,8 +9,8 @@
     <!-- [START location_permission] -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
-
     <!-- [END location_permission] -->
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
@@ -28,8 +28,17 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.ManageLocationsActivity"
+            android:name=".activities.TaskManagementActivity"
             android:label="@string/title_activity_manage_locations"
+            android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar" >
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.MainActivity" />
+        </activity>
+        <activity
+            android:name=".activities.TaskCompletionActivity"
+            android:label="@string/title_activity_answer_question"
             android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar" >
             <meta-data
@@ -56,6 +65,10 @@
         <service
             android:name=".services.FetchAddressIntentService"
             android:exported="false" />
+        <service
+            android:name=".services.GcmRegistrationIntentService"
+            android:exported="false" >
+        </service>
         <!-- [START gcm_listener] -->
         <service
             android:name=".services.GcmMessageListenerService"
@@ -74,20 +87,11 @@
             </intent-filter>
         </service>
         <!-- [END instanceId_listener] -->
-        <service
-            android:name=".services.GcmRegistrationIntentService"
-            android:exported="false" >
-        </service>
 
         <meta-data
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDOx9RwakcaApU4sc1SbOwadHpsVwP5hAo" />
 
-        <activity
-            android:name=".activities.AnswerQuestionActivity"
-            android:label="@string/title_activity_answer_question"
-            android:theme="@style/AppTheme.NoActionBar" >
-        </activity>
     </application>
 
 </manifest>

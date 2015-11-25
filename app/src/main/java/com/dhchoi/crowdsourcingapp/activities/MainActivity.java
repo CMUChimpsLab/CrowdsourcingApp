@@ -1,9 +1,5 @@
 package com.dhchoi.crowdsourcingapp.activities;
 
-import static com.dhchoi.crowdsourcingapp.Constants.PLACE_PICKER_REQUEST;
-import static com.dhchoi.crowdsourcingapp.Constants.SHARED_PREFERENCES;
-
-import android.content.Context;
 import android.content.Intent;
 import android.location.Geocoder;
 import android.location.Location;
@@ -18,14 +14,13 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
 import android.widget.Toast;
-import android.content.SharedPreferences;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.FetchAddressResultReceiver;
-import com.dhchoi.crowdsourcingapp.SimpleGeofenceManager;
-import com.dhchoi.crowdsourcingapp.services.FetchAddressIntentService;
 import com.dhchoi.crowdsourcingapp.R;
+import com.dhchoi.crowdsourcingapp.services.FetchAddressIntentService;
 import com.dhchoi.crowdsourcingapp.services.GcmRegistrationIntentService;
+import com.dhchoi.crowdsourcingapp.simplegeofence.SimpleGeofenceManager;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -33,18 +28,18 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 
-
-
 import java.text.DateFormat;
 import java.util.Date;
 import java.util.List;
+
+import static com.dhchoi.crowdsourcingapp.Constants.PLACE_PICKER_REQUEST;
 
 public class MainActivity extends BaseGoogleApiActivity implements
         NavigationView.OnNavigationItemSelectedListener,
         LocationListener {
 
     // Geofence manager
-    SimpleGeofenceManager mGeofenceManger;
+    SimpleGeofenceManager mSimpleGeofenceManager;
 
     // Locations
     Location mCurrentLocation;
@@ -61,13 +56,7 @@ public class MainActivity extends BaseGoogleApiActivity implements
         super.onCreate(savedInstanceState);
 
         // create geofence manager
-        mGeofenceManger = new SimpleGeofenceManager(this);
-
-        //To delete phone's saved geolocations. Uncomment.
-//        SharedPreferences preferences = getSharedPreferences(SHARED_PREFERENCES, 0);
-//        SharedPreferences.Editor editor = preferences.edit();
-//        editor.clear();
-//        editor.commit();
+        mSimpleGeofenceManager = new SimpleGeofenceManager(this);
 
         // create result receiver for FetchAddressIntentService
         mFetchAddressResultReceiver = new FetchAddressResultReceiver(new Handler()) {
@@ -77,8 +66,7 @@ public class MainActivity extends BaseGoogleApiActivity implements
                 if (resultCode == Constants.SUCCESS_RESULT) {
                     // Display the address string or an error message sent from the intent service.
                     mLocationAddressTextView.setText(resultData.getString(Constants.RESULT_DATA_KEY));
-                }
-                else {
+                } else {
                     mLocationAddressTextView.setText(getString(R.string.no_address_found));
                 }
             }
@@ -100,7 +88,7 @@ public class MainActivity extends BaseGoogleApiActivity implements
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
 
-        mCurrentLocationTextView = (TextView) findViewById(R.id.location_text);
+        mCurrentLocationTextView = (TextView) findViewById(R.id.task_location);
         mLocationAddressTextView = (TextView) findViewById(R.id.address_text);
     }
 
@@ -142,7 +130,7 @@ public class MainActivity extends BaseGoogleApiActivity implements
         int id = item.getItemId();
 
         if (id == R.id.nav_manage_locations) {
-            Intent intent = new Intent(this, ManageLocationsActivity.class);
+            Intent intent = new Intent(this, TaskManagementActivity.class);
             startActivity(intent);
         }
 
@@ -159,9 +147,9 @@ public class MainActivity extends BaseGoogleApiActivity implements
         super.onConnected(bundle);
 
         // For requesting geofences
-        List<Geofence> geofenceList = mGeofenceManger.getGeofenceList();
-        if(geofenceList.size() > 0) {
-            LocationServices.GeofencingApi.addGeofences(getGoogleApiClient(), geofenceList, mGeofenceManger.getGeofenceTransitionPendingIntent());
+        List<Geofence> geofenceList = mSimpleGeofenceManager.getGeofenceList();
+        if (geofenceList.size() > 0) {
+            LocationServices.GeofencingApi.addGeofences(getGoogleApiClient(), geofenceList, SimpleGeofenceManager.getGeofenceTransitionPendingIntent(this));
             Toast.makeText(this, getString(R.string.start_geofence_service), Toast.LENGTH_SHORT).show();
         }
 
@@ -175,9 +163,9 @@ public class MainActivity extends BaseGoogleApiActivity implements
         mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         mCurrentLocationTextView.setText(String.valueOf(mCurrentLocation.toString()) + " (" + mLastUpdateTime + ")");
 
-        if(mCurrentLocation != null) {
+        if (mCurrentLocation != null) {
             // Determine whether a Geocoder is available.
-            if(!Geocoder.isPresent()) {
+            if (!Geocoder.isPresent()) {
                 Toast.makeText(this, R.string.no_geocoder_available, Toast.LENGTH_LONG).show();
                 return;
             }

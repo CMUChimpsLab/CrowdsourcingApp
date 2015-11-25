@@ -122,7 +122,7 @@ public class BaseGoogleApiActivity extends AppCompatActivity implements
         }
     }
 
-    protected GoogleApiClient getGoogleApiClient() {
+    public GoogleApiClient getGoogleApiClient() {
         return mGoogleApiClient;
     }
 

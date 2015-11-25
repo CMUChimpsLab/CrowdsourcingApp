@@ -4,12 +4,12 @@ import com.google.android.gms.location.Geofence;
 
 public class Constants {
 
-    private Constants() {}
+    private Constants() {
+    }
 
     public static final String TAG = "CrowdsourcingApp";
     public static final String PACKAGE_NAME = "com.dhchoi.crowdsourcingapp";
     public static final String NOTIFICATION_TITLE = "CrowdsourcingApp";
-    // The name of the SharedPreferences.
     public static final String SHARED_PREFERENCES = "SharedPreferences";
 
     public static final int PERMISSION_REQUEST = 2;
@@ -24,26 +24,6 @@ public class Constants {
     // For the purposes of this demo, the geofences are hard-coded and should not expire.
     // An app with dynamically-created geofences would want to include a reasonable expiration time.
     public static final long GEOFENCE_EXPIRATION_TIME = Geofence.NEVER_EXPIRE;
-
-    // Keys for flattened geofences stored in SharedPreferences.
-    public static final String KEY_ID = PACKAGE_NAME + ".KEY_UID";
-    public static final String KEY_NAME = PACKAGE_NAME + ".KEY_NAME";
-    public static final String KEY_QUESTION = PACKAGE_NAME + ".KEY_QUESTION";
-    public static final String KEY_LATITUDE = PACKAGE_NAME + ".KEY_LATITUDE";
-    public static final String KEY_LONGITUDE = PACKAGE_NAME + ".KEY_LONGITUDE";
-    public static final String KEY_RADIUS = PACKAGE_NAME + ".KEY_RADIUS";
-    public static final String KEY_EXPIRATION_DURATION = PACKAGE_NAME + ".KEY_EXPIRATION_DURATION";
-    public static final String KEY_TRANSITION_TYPE = PACKAGE_NAME + ".KEY_TRANSITION_TYPE";
-    // The prefix for flattened geofence keys.
-    public static final String KEY_PREFIX = PACKAGE_NAME + ".KEY";
-    // Key for geofence id set
-    public static final String KEY_ID_SET = PACKAGE_NAME + ".ID_SET";
-
-    // Invalid values, used to test geofence storage when retrieving geofences.
-    public static final long INVALID_LONG_VALUE = -999l;
-    public static final float INVALID_FLOAT_VALUE = -999.0f;
-    public static final int INVALID_INT_VALUE = -999;
-    public static final String INVALID_STRING_VALUE = "none";
 
     // For FetchAddressIntentService
     public static final int SUCCESS_RESULT = 0;

@@ -14,8 +14,8 @@ import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
 import com.dhchoi.crowdsourcingapp.R;
-import com.dhchoi.crowdsourcingapp.SimpleGeofenceManager;
 import com.dhchoi.crowdsourcingapp.activities.MainActivity;
+import com.dhchoi.crowdsourcingapp.simplegeofence.SimpleGeofenceManager;
 import com.google.android.gms.gcm.GcmListenerService;
 import com.google.android.gms.location.Geofence;
 
@@ -35,7 +35,7 @@ public class GcmMessageListenerService extends GcmListenerService {
     public void onMessageReceived(String from, Bundle data) {
         Log.d(TAG, "Bundle Data: " + data);
 
-        SimpleGeofenceManager geofenceManager = new SimpleGeofenceManager(this);
+        SimpleGeofenceManager simpleGeofenceManager = new SimpleGeofenceManager(this);
         String name = data.getString("name", "DEFAULT");
         String id = data.getString("uid", "DEFAULT");
         String question = data.getString("question", "DEFAULT");
@@ -44,8 +44,8 @@ public class GcmMessageListenerService extends GcmListenerService {
         float radius = Float.valueOf(data.getString("radius", "60.0f"));
 
         Log.d(TAG, "id: " + id);
-        Log.d(TAG, "Location: " + name);
-        Log.d(TAG, "Question: " + question);
+        Log.d(TAG, "Name: " + name);
+        //Log.d(TAG, "Question: " + question);
         Log.d(TAG, "Lat: " + lat);
         Log.d(TAG, "Lng: " + lng);
         Log.d(TAG, "Radius: " + radius);
@@ -63,9 +63,8 @@ public class GcmMessageListenerService extends GcmListenerService {
          *     - Store message in local database.
          *     - Update UI.
          */
-        geofenceManager.setGeofence(id,
+        simpleGeofenceManager.setGeofence(id,
                 name,
-                question,
                 lat,
                 lng,
                 radius,
