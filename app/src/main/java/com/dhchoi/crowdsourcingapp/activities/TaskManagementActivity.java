@@ -30,7 +30,7 @@ public class TaskManagementActivity extends BaseGoogleApiActivity {
         super.onCreate(savedInstanceState);
 
         mTaskManager = new TaskManager();
-        mTaskListViewAdapter = new TaskListAdapter(this, mTaskManager.getTasksList());
+        mTaskListViewAdapter = new TaskListAdapter(this, TaskManager.getAllTasks(this));
 
         // setup views
         setContentView(R.layout.activity_task_management);
@@ -56,15 +56,16 @@ public class TaskManagementActivity extends BaseGoogleApiActivity {
     }
 
     private void updateListViewAdapter() {
-        mTaskListViewAdapter.clear();
-        mTaskListViewAdapter.addAll(mTaskManager.getTasksList());
-        mTaskListViewAdapter.notifyDataSetChanged();
+//        mTaskListViewAdapter.clear();
+//        mTaskListViewAdapter.addAll(mTaskManager.getTasksList());
+//        mTaskListViewAdapter.notifyDataSetChanged();
     }
 
     class TaskListAdapter extends ArrayAdapter<Task> {
 
         public TaskListAdapter(Context context, List<Task> tasks) {
             super(context, 0, tasks);
+            Log.d(Constants.TAG, "got tasks: " + tasks);
         }
 
         @Override

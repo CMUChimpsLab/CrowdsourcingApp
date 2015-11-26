@@ -1,37 +1,47 @@
 package com.dhchoi.crowdsourcingapp.task;
 
+import com.google.gson.annotations.SerializedName;
+
 import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
 
 public class TaskAction implements Serializable {
 
-    public enum ResponseType {
-        TEXT, SELECTION, MEDIA
+    public enum TaskActionType {
+        @SerializedName("text")
+        TEXT,
+        @SerializedName("selection")
+        SELECTION,
+        @SerializedName("media")
+        MEDIA
     }
 
+    @SerializedName("id")
+    private String mId;
+    @SerializedName("description")
     private String mDescription;
-    private ResponseType mResponseType;
-    private List<String> mPossibleResponses = new ArrayList<String>();
+    @SerializedName("type")
+    private TaskActionType mTaskActionType;
 
-    public TaskAction(String description, ResponseType responseType) {
+    public TaskAction(String id, String description, TaskActionType taskActionType) {
+        mId = id;
         mDescription = description;
-        mResponseType = responseType;
+        mTaskActionType = taskActionType;
+    }
+
+    public String getId() {
+        return mId;
     }
 
     public String getDescription() {
         return mDescription;
     }
 
-    public ResponseType getResponseType() {
-        return mResponseType;
+    public TaskActionType getType() {
+        return mTaskActionType;
     }
 
-    public void addPossibleResponse(String response) {
-        mPossibleResponses.add(response);
-    }
-
-    public List<String> getPossibleResponses() {
-        return mPossibleResponses;
+    @Override
+    public String toString() {
+        return mId + "-" + mDescription + "-" + mTaskActionType;
     }
 }

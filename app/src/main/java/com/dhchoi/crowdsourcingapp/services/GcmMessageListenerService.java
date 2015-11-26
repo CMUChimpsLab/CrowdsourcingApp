@@ -1,6 +1,5 @@
 package com.dhchoi.crowdsourcingapp.services;
 
-import static com.dhchoi.crowdsourcingapp.Constants.GEOFENCE_EXPIRATION_TIME;
 import static com.dhchoi.crowdsourcingapp.Constants.NOTIFICATION_TITLE;
 
 import android.app.NotificationManager;
@@ -17,7 +16,6 @@ import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.dhchoi.crowdsourcingapp.simplegeofence.SimpleGeofenceManager;
 import com.google.android.gms.gcm.GcmListenerService;
-import com.google.android.gms.location.Geofence;
 
 public class GcmMessageListenerService extends GcmListenerService {
 
@@ -63,13 +61,13 @@ public class GcmMessageListenerService extends GcmListenerService {
          *     - Store message in local database.
          *     - Update UI.
          */
-        simpleGeofenceManager.setGeofence(id,
-                name,
-                lat,
-                lng,
-                radius,
-                GEOFENCE_EXPIRATION_TIME,
-                Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT);
+//        simpleGeofenceManager.setGeofence(id,
+//                name,
+//                lat,
+//                lng,
+//                radius,
+//                GEOFENCE_EXPIRATION_TIME,
+//                Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT);
 
         /**
          * In some cases it may be useful to show a notification indicating to the user

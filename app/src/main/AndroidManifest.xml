@@ -10,6 +10,7 @@
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
     <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
     <!-- [END location_permission] -->
+    <uses-permission android:name="android.permission.INTERNET" />
 
     <application
         android:allowBackup="true"
@@ -64,6 +65,9 @@
             android:exported="false" />
         <service
             android:name=".services.FetchAddressIntentService"
+            android:exported="false" />
+        <service
+            android:name=".services.SyncTasksIntentService"
             android:exported="false" />
         <service
             android:name=".services.GcmRegistrationIntentService"
