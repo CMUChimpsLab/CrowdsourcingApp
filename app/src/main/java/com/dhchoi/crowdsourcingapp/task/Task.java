@@ -51,10 +51,6 @@ public class Task implements Serializable {
         return mTaskActions;
     }
 
-    public void addTaskAction(TaskAction taskAction) {
-        mTaskActions.add(taskAction);
-    }
-
     @Override
     public String toString() {
         return mId + "-" + mName + "-" + mLocation.getName();

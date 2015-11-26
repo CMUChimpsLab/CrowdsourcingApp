@@ -10,7 +10,6 @@ import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.TextView;
@@ -18,12 +17,9 @@ import android.widget.Toast;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.FetchAddressResultReceiver;
-import com.dhchoi.crowdsourcingapp.HttpClientAsyncTask;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.services.FetchAddressIntentService;
 import com.dhchoi.crowdsourcingapp.services.GcmRegistrationIntentService;
-import com.dhchoi.crowdsourcingapp.task.Task;
-import com.dhchoi.crowdsourcingapp.task.TaskAction;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -31,24 +27,15 @@ import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
 
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
 import java.text.DateFormat;
 import java.util.Date;
-import java.util.List;
 
 import static com.dhchoi.crowdsourcingapp.Constants.PLACE_PICKER_REQUEST;
-import static com.dhchoi.crowdsourcingapp.Constants.TAG;
 
 public class MainActivity extends BaseGoogleApiActivity implements
         NavigationView.OnNavigationItemSelectedListener,
         LocationListener {
 
-    // Locations
-    Location mCurrentLocation;
-    String mLastUpdateTime;
     // Receiver registered with this activity to get the response from FetchAddressIntentService.
     FetchAddressResultReceiver mFetchAddressResultReceiver;
 
@@ -151,47 +138,14 @@ public class MainActivity extends BaseGoogleApiActivity implements
         // For displaying current location
         LocationServices.FusedLocationApi.requestLocationUpdates(getGoogleApiClient(), createLocationRequest(), this);
 
-        /**
-         *
-         */
-        new HttpClientAsyncTask() {
-            @Override
-            public void onHttpResponse(String response) {
-                try {
-                    JSONObject responseObj = new JSONObject(response);
-                    String lastUpdated = (String) responseObj.get("lastUpdated");
-                    JSONArray taskIds = responseObj.getJSONArray("taskIds");
-                    Log.d(TAG, "lastUpdated: " + lastUpdated);
-                    Log.d(TAG, "taskIds: " + taskIds.toString());
-                    for(int i = 0; i < taskIds.length(); i++) {
-                        Log.d(TAG, taskIds.getString(i));
-                    }
-
-                    new HttpClientAsyncTask() {
-                        @Override
-                        public void onHttpResponse(String response) {
-                            List<Task> tasks = TaskManager.setTasks(response, MainActivity.this, getGoogleApiClient());
-                            for(Task task : tasks) {
-                                Log.d(TAG, "task: " + task);
-                                Log.d(TAG, "location: " + task.getLocation());
-                                for(TaskAction taskAction : task.getTaskActions()) {
-                                    Log.d(TAG, "action: " + taskAction);
-                                }
-                            }
-                        }
-                    }.execute(Constants.APP_SERVER_FETCH_TASKS_URL, HttpClientAsyncTask.GET, "taskIds=1,2");
-
-                } catch (JSONException e) {
-                    Log.e(TAG, e.getMessage());
-                }
-            }
-        }.execute(Constants.APP_SERVER_SYNC_URL, HttpClientAsyncTask.GET, "time=now");
+        // sync tasks with server
+        TaskManager.syncTasks(this, getGoogleApiClient());
     }
 
     @Override
     public void onLocationChanged(Location location) {
-        mCurrentLocation = location;
-        mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
+        Location mCurrentLocation = location;
+        String mLastUpdateTime = DateFormat.getTimeInstance().format(new Date());
         mCurrentLocationTextView.setText(String.valueOf(mCurrentLocation.toString()) + " (" + mLastUpdateTime + ")");
 
         if (mCurrentLocation != null) {

@@ -15,12 +15,15 @@ import android.widget.Toast;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientAsyncTask;
+import com.dhchoi.crowdsourcingapp.HttpClientCallable;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskAction;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TaskCompletionActivity extends AppCompatActivity {
 
@@ -61,9 +64,9 @@ public class TaskCompletionActivity extends AppCompatActivity {
                 submitResponseButton.setEnabled(false);
                 submitResponseProgressBar.setVisibility(ProgressBar.VISIBLE);
 
-                new HttpClientAsyncTask() {
+                new HttpClientAsyncTask(Constants.APP_SERVER_TEST_URL, HttpClientCallable.POST, getUserResponses(task)) {
                     @Override
-                    public void onHttpResponse(String response) {
+                    protected void onPostExecute(String response) {
                         submitResponseButton.setEnabled(true);
                         submitResponseProgressBar.setVisibility(ProgressBar.GONE);
 
@@ -74,31 +77,25 @@ public class TaskCompletionActivity extends AppCompatActivity {
                             Toast.makeText(TaskCompletionActivity.this, "Failed to submit response!", Toast.LENGTH_SHORT).show();
                         }
                     }
-                }.execute(Constants.APP_SERVER_TEST_URL, HttpClientAsyncTask.POST, getUserResponses(task));
+                }.execute();
             }
         });
     }
 
-    private String getUserResponses(Task task) {
-        String userResponses = "taskId=" + task.getId();
-
-        Log.d(Constants.TAG, "mTaskActionLayouts.size(): " + mTaskActionLayouts.size());
+    private Map<String, String> getUserResponses(Task task) {
+        Map<String, String> userResponses = new HashMap<String, String>();
+        userResponses.put("taskId", task.getId());
 
         for(ViewGroup viewGroup : mTaskActionLayouts) {
-            Log.d(Constants.TAG, "viewGroup.getChildCount(): " + viewGroup.getChildCount());
-
             for(int i = 0; i < viewGroup.getChildCount(); i++) {
                 View childView = viewGroup.getChildAt(i);
                 if(childView instanceof EditText) {
-                    if(!userResponses.isEmpty()) {
-                        userResponses += "&";
-                    }
-                    userResponses += childView.getTag() + "=" + ((EditText) childView).getText();
+                    userResponses.put((String) childView.getTag(), ((EditText) childView).getText().toString());
                 }
             }
         }
 
-        Log.d(Constants.TAG, "User response: " + userResponses);
+        Log.d(Constants.TAG, "userResponses: " + userResponses);
 
         return userResponses;
     }
