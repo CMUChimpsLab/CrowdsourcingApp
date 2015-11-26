@@ -1,4 +1,4 @@
-package com.dhchoi.crowdsourcingapp.simplegeofence;
+package com.dhchoi.crowdsourcingapp;
 
 import android.app.PendingIntent;
 import android.content.Context;

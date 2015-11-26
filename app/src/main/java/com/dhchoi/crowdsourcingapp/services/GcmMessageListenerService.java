@@ -1,7 +1,5 @@
 package com.dhchoi.crowdsourcingapp.services;
 
-import static com.dhchoi.crowdsourcingapp.Constants.NOTIFICATION_TITLE;
-
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
@@ -14,8 +12,9 @@ import android.util.Log;
 
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.activities.MainActivity;
-import com.dhchoi.crowdsourcingapp.simplegeofence.SimpleGeofenceManager;
 import com.google.android.gms.gcm.GcmListenerService;
+
+import static com.dhchoi.crowdsourcingapp.Constants.NOTIFICATION_TITLE;
 
 public class GcmMessageListenerService extends GcmListenerService {
 
@@ -33,7 +32,6 @@ public class GcmMessageListenerService extends GcmListenerService {
     public void onMessageReceived(String from, Bundle data) {
         Log.d(TAG, "Bundle Data: " + data);
 
-        SimpleGeofenceManager simpleGeofenceManager = new SimpleGeofenceManager(this);
         String name = data.getString("name", "DEFAULT");
         String id = data.getString("uid", "DEFAULT");
         String question = data.getString("question", "DEFAULT");

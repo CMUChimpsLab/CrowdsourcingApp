@@ -3,7 +3,7 @@ package com.dhchoi.crowdsourcingapp.task;
 import android.content.Context;
 import android.content.SharedPreferences;
 
-import com.dhchoi.crowdsourcingapp.simplegeofence.SimpleGeofence;
+import com.dhchoi.crowdsourcingapp.SimpleGeofence;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
@@ -21,6 +21,9 @@ public class TaskManager {
     public static final String TASK_SHARED_PREF = PACKAGE_NAME + ".TASK_SHARED_PREF";
     public static final String TASK_KEY_ID = PACKAGE_NAME + ".TASK_KEY_ID";
     public static final String TASK_KEY_ID_SET = PACKAGE_NAME + ".TASK_KEY_ID_SET";
+
+    private TaskManager() {
+    }
 
     public static Task getTaskById(Context context, String id) {
         return new Gson().fromJson(getSharedPreferences(context).getString(getTaskKeyById(id), ""), Task.class);

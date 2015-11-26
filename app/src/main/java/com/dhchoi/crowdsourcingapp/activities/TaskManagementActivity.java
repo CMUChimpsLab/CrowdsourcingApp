@@ -22,14 +22,12 @@ import java.util.List;
 
 public class TaskManagementActivity extends BaseGoogleApiActivity {
 
-    TaskManager mTaskManager;
     ArrayAdapter<Task> mTaskListViewAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        mTaskManager = new TaskManager();
         mTaskListViewAdapter = new TaskListAdapter(this, TaskManager.getAllTasks(this));
 
         // setup views

@@ -1,7 +1,5 @@
 package com.dhchoi.crowdsourcingapp;
 
-import com.google.android.gms.location.Geofence;
-
 public class Constants {
 
     private Constants() {
@@ -10,7 +8,6 @@ public class Constants {
     public static final String TAG = "CrowdsourcingApp";
     public static final String PACKAGE_NAME = "com.dhchoi.crowdsourcingapp";
     public static final String NOTIFICATION_TITLE = "CrowdsourcingApp";
-    public static final String SHARED_PREFERENCES = "SharedPreferences";
 
     public static final String APP_SERVER_BASE_URL = "http://10.0.0.16:3000";
     public static final String APP_SERVER_TEST_URL = APP_SERVER_BASE_URL + "/test";

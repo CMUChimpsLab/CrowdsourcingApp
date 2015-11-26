@@ -1,6 +1,6 @@
 package com.dhchoi.crowdsourcingapp.task;
 
-import com.dhchoi.crowdsourcingapp.simplegeofence.SimpleGeofence;
+import com.dhchoi.crowdsourcingapp.SimpleGeofence;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;

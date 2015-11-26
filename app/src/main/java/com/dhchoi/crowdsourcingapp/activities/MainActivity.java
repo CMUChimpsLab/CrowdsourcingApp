@@ -13,7 +13,6 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -23,12 +22,9 @@ import com.dhchoi.crowdsourcingapp.HttpClientAsyncTask;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.services.FetchAddressIntentService;
 import com.dhchoi.crowdsourcingapp.services.GcmRegistrationIntentService;
-import com.dhchoi.crowdsourcingapp.services.SyncTasksIntentService;
-import com.dhchoi.crowdsourcingapp.simplegeofence.SimpleGeofenceManager;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskAction;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
-import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -50,9 +46,6 @@ public class MainActivity extends BaseGoogleApiActivity implements
         NavigationView.OnNavigationItemSelectedListener,
         LocationListener {
 
-    // Geofence manager
-    SimpleGeofenceManager mSimpleGeofenceManager;
-
     // Locations
     Location mCurrentLocation;
     String mLastUpdateTime;
@@ -66,9 +59,6 @@ public class MainActivity extends BaseGoogleApiActivity implements
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // create geofence manager
-        mSimpleGeofenceManager = new SimpleGeofenceManager(this);
 
         // create result receiver for FetchAddressIntentService
         mFetchAddressResultReceiver = new FetchAddressResultReceiver(new Handler()) {
@@ -157,13 +147,6 @@ public class MainActivity extends BaseGoogleApiActivity implements
     @Override
     public void onConnected(Bundle bundle) {
         super.onConnected(bundle);
-
-        // For requesting geofences
-//        List<Geofence> geofenceList = mSimpleGeofenceManager.getGeofenceList();
-//        if (geofenceList.size() > 0) {
-//            LocationServices.GeofencingApi.addGeofences(getGoogleApiClient(), geofenceList, SimpleGeofenceManager.getGeofenceTransitionPendingIntent(this));
-//            Toast.makeText(this, getString(R.string.start_geofence_service), Toast.LENGTH_SHORT).show();
-//        }
 
         // For displaying current location
         LocationServices.FusedLocationApi.requestLocationUpdates(getGoogleApiClient(), createLocationRequest(), this);
