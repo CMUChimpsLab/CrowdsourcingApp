@@ -89,7 +89,7 @@ public class HttpClientCallable implements Callable<String> {
     }
 
     private static String createParams(Map<String, String> params) {
-        if(params == null || params.isEmpty()) {
+        if (params == null || params.isEmpty()) {
             return null;
         }
 

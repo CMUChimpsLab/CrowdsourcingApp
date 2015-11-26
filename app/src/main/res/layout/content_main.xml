@@ -9,37 +9,8 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior" tools:showIn="@layout/app_bar_main"
     tools:context=".MainActivity">
 
-    <!--<TextView android:text="Hello World!" android:layout_width="wrap_content"-->
-        <!--android:layout_height="wrap_content" />-->
-
-    <TextView android:id="@+id/task_location" android:text="Location"
+    <TextView android:text="Select from menu"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView3"
-        android:layout_alignParentStart="true" />
+        android:layout_height="wrap_content" />
 
-    <TextView android:id="@+id/address_text" android:text="Address"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView4"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Current Location (Raw)"
-        android:id="@+id/textView3"
-        android:layout_alignParentTop="true"
-        android:layout_alignParentStart="true" />
-
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textAppearance="?android:attr/textAppearanceLarge"
-        android:text="Current Location (Address)"
-        android:id="@+id/textView4"
-        android:layout_below="@+id/task_location"
-        android:layout_alignParentStart="true"
-        android:layout_marginTop="30dp" />
 </RelativeLayout>

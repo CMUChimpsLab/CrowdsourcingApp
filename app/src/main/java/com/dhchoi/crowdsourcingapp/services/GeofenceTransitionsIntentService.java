@@ -1,11 +1,5 @@
 package com.dhchoi.crowdsourcingapp.services;
 
-import static com.dhchoi.crowdsourcingapp.Constants.LOCATION_DATA_EXTRA;
-import static com.dhchoi.crowdsourcingapp.Constants.NOTIFICATION_TITLE;
-import static com.dhchoi.crowdsourcingapp.Constants.RECEIVER;
-import static com.dhchoi.crowdsourcingapp.Constants.RESULT_DATA_KEY;
-import static com.dhchoi.crowdsourcingapp.Constants.TAG;
-
 import android.app.IntentService;
 import android.app.NotificationManager;
 import android.content.Context;
@@ -13,14 +7,17 @@ import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.ResultReceiver;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 import android.widget.Toast;
 
-import com.dhchoi.crowdsourcingapp.FetchAddressResultReceiver;
 import com.dhchoi.crowdsourcingapp.R;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
+
+import static com.dhchoi.crowdsourcingapp.Constants.NOTIFICATION_TITLE;
+import static com.dhchoi.crowdsourcingapp.Constants.TAG;
 
 public class GeofenceTransitionsIntentService extends IntentService {
 
@@ -35,8 +32,9 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
     /**
      * Handles incoming intents.
+     *
      * @param intent The Intent sent by Location Services. This Intent is provided to Location
-     * Services (inside a PendingIntent) when addGeofences() is called.
+     *               Services (inside a PendingIntent) when addGeofences() is called.
      */
     @Override
     protected void onHandleIntent(Intent intent) {
@@ -45,29 +43,27 @@ public class GeofenceTransitionsIntentService extends IntentService {
         if (geoFenceEvent.hasError()) {
             int errorCode = geoFenceEvent.getErrorCode();
             Log.e(TAG, "Location Services error: " + errorCode);
-        }
-        else {
+        } else {
             final int transitionType = geoFenceEvent.getGeofenceTransition();
             // Get the geofence id triggered. Note that only one geofence can be triggered at a
             // time in this example, but in some cases you might want to consider the full list of geofences triggered.
             final String triggeredGeoFenceId = geoFenceEvent.getTriggeringGeofences().get(0).getRequestId();
 
             Intent fetchAddressIntent = new Intent(this, FetchAddressIntentService.class);
-            fetchAddressIntent.putExtra(RECEIVER, new FetchAddressResultReceiver(new Handler(Looper.getMainLooper())) {
+            fetchAddressIntent.putExtra(FetchAddressIntentService.FETCH_ADDRESS_RESULT_RECEIVER, new ResultReceiver(new Handler(Looper.getMainLooper())) {
                 @Override
                 protected void onReceiveResult(int resultCode, Bundle resultData) {
-                    String locationString = resultData.getString(RESULT_DATA_KEY);
+                    String locationString = resultData.getString(FetchAddressIntentService.FETCH_ADDRESS_RESULT_DATA_KEY);
                     if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType) {
                         showToast(R.string.entering_geofence);
                         createNotification(triggeredGeoFenceId, "Entered: " + triggeredGeoFenceId + " (" + locationString + ")");
-                    }
-                    else if (Geofence.GEOFENCE_TRANSITION_EXIT == transitionType) {
+                    } else if (Geofence.GEOFENCE_TRANSITION_EXIT == transitionType) {
                         showToast(R.string.exiting_geofence);
                         createNotification(triggeredGeoFenceId, "Exited: " + triggeredGeoFenceId + " (" + locationString + ")");
                     }
                 }
             });
-            fetchAddressIntent.putExtra(LOCATION_DATA_EXTRA, geoFenceEvent.getTriggeringLocation());
+            fetchAddressIntent.putExtra(FetchAddressIntentService.FETCH_ADDRESS_LOCATION_DATA_EXTRA, geoFenceEvent.getTriggeringLocation());
             startService(fetchAddressIntent);
         }
     }

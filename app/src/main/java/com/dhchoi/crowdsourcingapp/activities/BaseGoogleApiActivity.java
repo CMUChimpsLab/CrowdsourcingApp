@@ -15,8 +15,8 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 
+import static com.dhchoi.crowdsourcingapp.Constants.APP_PERMISSIONS_REQUEST;
 import static com.dhchoi.crowdsourcingapp.Constants.CONNECTION_FAILURE_RESOLUTION_REQUEST;
-import static com.dhchoi.crowdsourcingapp.Constants.PERMISSION_REQUEST;
 import static com.dhchoi.crowdsourcingapp.Constants.PLAY_SERVICES_RESOLUTION_REQUEST;
 import static com.dhchoi.crowdsourcingapp.Constants.TAG;
 
@@ -43,9 +43,8 @@ public class BaseGoogleApiActivity extends AppCompatActivity implements
         // check permissions
         if (ActivityCompat.checkSelfPermission(this, requiredPermission) != PackageManager.PERMISSION_GRANTED) {
             // Check Permissions Now
-            ActivityCompat.requestPermissions(this, new String[]{requiredPermission}, PERMISSION_REQUEST);
-        }
-        else {
+            ActivityCompat.requestPermissions(this, new String[]{requiredPermission}, APP_PERMISSIONS_REQUEST);
+        } else {
             buildGoogleApiClient();
         }
     }
@@ -53,14 +52,14 @@ public class BaseGoogleApiActivity extends AppCompatActivity implements
     @Override
     protected void onStart() {
         super.onStart();
-        if(mGoogleApiClient != null) {
+        if (mGoogleApiClient != null) {
             mGoogleApiClient.connect();
         }
     }
 
     @Override
     protected void onStop() {
-        if(mGoogleApiClient != null) {
+        if (mGoogleApiClient != null) {
             mGoogleApiClient.disconnect();
         }
         super.onStop();
@@ -68,12 +67,11 @@ public class BaseGoogleApiActivity extends AppCompatActivity implements
 
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        if (requestCode == PERMISSION_REQUEST) {
+        if (requestCode == APP_PERMISSIONS_REQUEST) {
             if (!(grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 // Permission was denied or request was cancelled
                 Toast.makeText(this, "The app needs the proper permissions to run properly!", Toast.LENGTH_SHORT).show();
-            }
-            else {
+            } else {
                 // else, we can now safely use the API we requested access to
                 buildGoogleApiClient();
                 mGoogleApiClient.connect();
@@ -149,8 +147,7 @@ public class BaseGoogleApiActivity extends AppCompatActivity implements
         if (resultCode != ConnectionResult.SUCCESS) {
             if (apiAvailability.isUserResolvableError(resultCode)) {
                 apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            }
-            else {
+            } else {
                 Log.i(TAG, "This device is not supported.");
             }
             return false;

@@ -23,6 +23,13 @@ public class FetchAddressIntentService extends IntentService {
 
     private static final String TAG = "FetchAddressIS";
 
+    // For FetchAddressIntentService
+    public static final int FETCH_ADDRESS_SUCCESS_RESULT = 0;
+    public static final int FETCH_ADDRESS_FAILURE_RESULT = 1;
+    public static final String FETCH_ADDRESS_RESULT_RECEIVER = Constants.PACKAGE_NAME + ".FETCH_ADDRESS_RESULT_RECEIVER";
+    public static final String FETCH_ADDRESS_RESULT_DATA_KEY = Constants.PACKAGE_NAME + ".FETCH_ADDRESS_RESULT_DATA_KEY";
+    public static final String FETCH_ADDRESS_LOCATION_DATA_EXTRA = Constants.PACKAGE_NAME + ".FETCH_ADDRESS_LOCATION_DATA_EXTRA";
+
     /**
      * The receiver where results are forwarded from this service.
      */
@@ -50,7 +57,7 @@ public class FetchAddressIntentService extends IntentService {
     protected void onHandleIntent(Intent intent) {
         String errorMessage = "";
 
-        mReceiver = intent.getParcelableExtra(Constants.RECEIVER);
+        mReceiver = intent.getParcelableExtra(FETCH_ADDRESS_RESULT_RECEIVER);
 
         // Check if receiver was properly registered.
         if (mReceiver == null) {
@@ -59,14 +66,14 @@ public class FetchAddressIntentService extends IntentService {
         }
 
         // Get the location passed to this service through an extra.
-        Location location = intent.getParcelableExtra(Constants.LOCATION_DATA_EXTRA);
+        Location location = intent.getParcelableExtra(FETCH_ADDRESS_LOCATION_DATA_EXTRA);
 
         // Make sure that the location data was really sent over through an extra. If it wasn't,
         // send an error error message and return.
         if (location == null) {
             errorMessage = getString(R.string.no_location_data_provided);
             Log.wtf(TAG, errorMessage);
-            deliverResultToReceiver(Constants.FAILURE_RESULT, errorMessage);
+            deliverResultToReceiver(FETCH_ADDRESS_FAILURE_RESULT, errorMessage);
             return;
         }
 
@@ -110,7 +117,7 @@ public class FetchAddressIntentService extends IntentService {
                 errorMessage = getString(R.string.no_address_found);
                 Log.e(TAG, errorMessage);
             }
-            deliverResultToReceiver(Constants.FAILURE_RESULT, errorMessage);
+            deliverResultToReceiver(FETCH_ADDRESS_FAILURE_RESULT, errorMessage);
         } else {
             Address address = addresses.get(0);
             ArrayList<String> addressFragments = new ArrayList<String>();
@@ -128,7 +135,7 @@ public class FetchAddressIntentService extends IntentService {
                 addressFragments.add(address.getAddressLine(i));
             }
             Log.i(TAG, getString(R.string.address_found));
-            deliverResultToReceiver(Constants.SUCCESS_RESULT, TextUtils.join(System.getProperty("line.separator"), addressFragments));
+            deliverResultToReceiver(FETCH_ADDRESS_SUCCESS_RESULT, TextUtils.join(System.getProperty("line.separator"), addressFragments));
         }
     }
 
@@ -137,7 +144,7 @@ public class FetchAddressIntentService extends IntentService {
      */
     private void deliverResultToReceiver(int resultCode, String message) {
         Bundle bundle = new Bundle();
-        bundle.putString(Constants.RESULT_DATA_KEY, message);
+        bundle.putString(FETCH_ADDRESS_RESULT_DATA_KEY, message);
         mReceiver.send(resultCode, bundle);
     }
 

@@ -70,10 +70,9 @@ public class TaskCompletionActivity extends AppCompatActivity {
                         submitResponseButton.setEnabled(true);
                         submitResponseProgressBar.setVisibility(ProgressBar.GONE);
 
-                        if(response != null) {
+                        if (response != null) {
                             Toast.makeText(TaskCompletionActivity.this, "Response submitted!", Toast.LENGTH_SHORT).show();
-                        }
-                        else {
+                        } else {
                             Toast.makeText(TaskCompletionActivity.this, "Failed to submit response!", Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -86,10 +85,10 @@ public class TaskCompletionActivity extends AppCompatActivity {
         Map<String, String> userResponses = new HashMap<String, String>();
         userResponses.put("taskId", task.getId());
 
-        for(ViewGroup viewGroup : mTaskActionLayouts) {
-            for(int i = 0; i < viewGroup.getChildCount(); i++) {
+        for (ViewGroup viewGroup : mTaskActionLayouts) {
+            for (int i = 0; i < viewGroup.getChildCount(); i++) {
                 View childView = viewGroup.getChildAt(i);
-                if(childView instanceof EditText) {
+                if (childView instanceof EditText) {
                     userResponses.put((String) childView.getTag(), ((EditText) childView).getText().toString());
                 }
             }

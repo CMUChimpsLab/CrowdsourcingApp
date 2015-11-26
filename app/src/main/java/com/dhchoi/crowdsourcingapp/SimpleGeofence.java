@@ -23,10 +23,10 @@ public class SimpleGeofence implements Serializable {
     private final float mRadius;
 
     /**
-     * @param name         The Geofence's request name.
-     * @param latitude   Latitude of the Geofence's center in degrees.
-     * @param longitude  Longitude of the Geofence's center in degrees.
-     * @param radius     Radius of the geofence circle in meters.
+     * @param name      The Geofence's request name.
+     * @param latitude  Latitude of the Geofence's center in degrees.
+     * @param longitude Longitude of the Geofence's center in degrees.
+     * @param radius    Radius of the geofence circle in meters.
      */
     public SimpleGeofence(String name, double latitude, double longitude, float radius) {
         mName = name;

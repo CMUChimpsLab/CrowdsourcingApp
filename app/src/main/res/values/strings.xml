@@ -20,5 +20,6 @@
 
     <string name="title_activity_task_management">Manage Tasks</string>
     <string name="title_activity_task_completion">Complete Task</string>
+    <string name="title_activity_check_location">Current Location</string>
 
 </resources>

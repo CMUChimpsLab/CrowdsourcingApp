@@ -37,7 +37,7 @@ public class TaskManagementActivity extends BaseGoogleApiActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        final ListView taskListView = (ListView) findViewById(R.id.listView);
+        final ListView taskListView = (ListView) findViewById(R.id.allTasksListView);
         taskListView.setAdapter(mTaskListViewAdapter);
         taskListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
@@ -72,7 +72,7 @@ public class TaskManagementActivity extends BaseGoogleApiActivity {
 
             // Check if an existing view is being reused, otherwise inflate the view
             if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.task_line, parent, false);
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.task_list_line, parent, false);
             }
 
             ((TextView) convertView.findViewById(R.id.task_name)).setText(task.getName());

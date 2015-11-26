@@ -1,8 +1,5 @@
 package com.dhchoi.crowdsourcingapp.services;
 
-import static com.dhchoi.crowdsourcingapp.Constants.GCM_REGISTRATION_COMPLETE;
-import static com.dhchoi.crowdsourcingapp.Constants.SENT_GCM_TOKEN_TO_SERVER;
-
 import android.app.IntentService;
 import android.content.Intent;
 import android.content.SharedPreferences;
@@ -16,6 +13,9 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
 
 import java.io.IOException;
+
+import static com.dhchoi.crowdsourcingapp.Constants.GCM_REGISTRATION_COMPLETE;
+import static com.dhchoi.crowdsourcingapp.Constants.SENT_GCM_TOKEN_TO_SERVER;
 
 public class GcmRegistrationIntentService extends IntentService {
 
@@ -66,7 +66,7 @@ public class GcmRegistrationIntentService extends IntentService {
 
     /**
      * Persist registration to third-party servers.
-     *
+     * <p/>
      * Modify this method to associate the user's GCM registration token with any server-side account
      * maintained by your application.
      *

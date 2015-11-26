@@ -82,7 +82,8 @@ public class TaskManager {
         Set<String> savedTaskIdsSet = getSavedTaskIdsSet(sharedPreferences);
 
         // create list of tasks from json string
-        List<Task> tasks = new Gson().fromJson(jsonArray, new TypeToken<ArrayList<Task>>() {}.getType());
+        List<Task> tasks = new Gson().fromJson(jsonArray, new TypeToken<ArrayList<Task>>() {
+        }.getType());
         for (Task t : tasks) {
             // save task id
             prefsEditor.putString(getTaskKeyById(t.getId()), new Gson().toJson(t));
@@ -100,7 +101,7 @@ public class TaskManager {
         prefsEditor.putStringSet(TASK_KEY_ID_SET, savedTaskIdsSet);
         prefsEditor.apply();
 
-        for(OnTasksUpdatedListener listener : mOnTasksUpdatedListeners) {
+        for (OnTasksUpdatedListener listener : mOnTasksUpdatedListeners) {
             listener.onTasksAdded(tasks);
         }
     }
@@ -109,7 +110,7 @@ public class TaskManager {
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Set<String> savedTaskIdsSet = getSavedTaskIdsSet(sharedPreferences);
 
-        for(String id : taskIds) {
+        for (String id : taskIds) {
             Task task = getTaskById(sharedPreferences, id);
 
             // remove task id
@@ -127,7 +128,7 @@ public class TaskManager {
         prefsEditor.putStringSet(TASK_KEY_ID_SET, savedTaskIdsSet);
         prefsEditor.apply();
 
-        for(OnTasksUpdatedListener listener : mOnTasksUpdatedListeners) {
+        for (OnTasksUpdatedListener listener : mOnTasksUpdatedListeners) {
             listener.onTasksDeleted(taskIds);
         }
     }
@@ -212,6 +213,7 @@ public class TaskManager {
 
     public interface OnTasksUpdatedListener {
         void onTasksAdded(List<Task> addedTasks);
+
         void onTasksDeleted(List<String> deletedTaskIds);
     }
 }
