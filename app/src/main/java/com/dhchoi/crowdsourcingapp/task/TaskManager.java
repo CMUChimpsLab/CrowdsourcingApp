@@ -78,31 +78,36 @@ public class TaskManager {
     }
 
     private static void setTasks(Context context, SharedPreferences sharedPreferences, GoogleApiClient googleApiClient, String jsonArray) {
-        SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
-        Set<String> savedTaskIdsSet = getSavedTaskIdsSet(sharedPreferences);
+        try {
+            SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
+            Set<String> savedTaskIdsSet = getSavedTaskIdsSet(sharedPreferences);
 
-        // create list of tasks from json string
-        List<Task> tasks = new Gson().fromJson(jsonArray, new TypeToken<ArrayList<Task>>() {
-        }.getType());
-        for (Task t : tasks) {
-            // save task id
-            prefsEditor.putString(getTaskKeyById(t.getId()), new Gson().toJson(t));
+            // create list of tasks from json string
+            List<Task> tasks = new Gson().fromJson(jsonArray, new TypeToken<ArrayList<Task>>() {
+            }.getType());
 
-            // save task id to saved tasks id set
-            savedTaskIdsSet.add(t.getId());
+            for (Task t : tasks) {
+                // save task id
+                prefsEditor.putString(getTaskKeyById(t.getId()), new Gson().toJson(t));
 
-            // start geofence
-            LocationServices.GeofencingApi.addGeofences(
-                    googleApiClient,
-                    SimpleGeofence.getGeofencingRequest(t.getLocation().toGeofence()),
-                    SimpleGeofence.getGeofenceTransitionPendingIntent(context));
-        }
+                // save task id to saved tasks id set
+                savedTaskIdsSet.add(t.getId());
 
-        prefsEditor.putStringSet(TASK_KEY_ID_SET, savedTaskIdsSet);
-        prefsEditor.apply();
+                // start geofence
+                LocationServices.GeofencingApi.addGeofences(
+                        googleApiClient,
+                        SimpleGeofence.getGeofencingRequest(t.getLocation().toGeofence()),
+                        SimpleGeofence.getGeofenceTransitionPendingIntent(context));
+            }
 
-        for (OnTasksUpdatedListener listener : mOnTasksUpdatedListeners) {
-            listener.onTasksAdded(tasks);
+            prefsEditor.putStringSet(TASK_KEY_ID_SET, savedTaskIdsSet);
+            prefsEditor.apply();
+
+            for (OnTasksUpdatedListener listener : mOnTasksUpdatedListeners) {
+                listener.onTasksAdded(tasks);
+            }
+        } catch (Exception e) {
+            Log.e(TAG, e.getMessage());
         }
     }
 
@@ -112,17 +117,18 @@ public class TaskManager {
 
         for (String id : taskIds) {
             Task task = getTaskById(sharedPreferences, id);
+            if (task != null) {
+                // remove task id
+                prefsEditor.remove(getTaskKeyById(task.getId()));
 
-            // remove task id
-            prefsEditor.remove(getTaskKeyById(task.getId()));
+                // remove task id from saved tasks id set
+                savedTaskIdsSet.remove(task.getId());
 
-            // remove task id from saved tasks id set
-            savedTaskIdsSet.remove(task.getId());
-
-            // cancel geofence
-            List<String> geofenceId = new ArrayList<String>();
-            geofenceId.add(task.getLocation().getId());
-            LocationServices.GeofencingApi.removeGeofences(googleApiClient, geofenceId);
+                // cancel geofence
+                List<String> geofenceId = new ArrayList<String>();
+                geofenceId.add(task.getLocation().getId());
+                LocationServices.GeofencingApi.removeGeofences(googleApiClient, geofenceId);
+            }
         }
 
         prefsEditor.putStringSet(TASK_KEY_ID_SET, savedTaskIdsSet);
@@ -134,56 +140,64 @@ public class TaskManager {
     }
 
     public static void syncTasks(Context context, GoogleApiClient googleApiClient) {
-        SharedPreferences sharedPreferences = getSharedPreferences(context);
-
         try {
-            Log.d(TAG, "check sync availability server");
+            SharedPreferences sharedPreferences = getSharedPreferences(context);
+            final long appLastUpdatedTime = getLastUpdatedTime(sharedPreferences);
 
-            final String appLastUpdatedTime = getLastUpdatedTime(sharedPreferences);
+            Log.d(TAG, "check sync availability with server. appLastUpdatedTime: " + appLastUpdatedTime);
 
             // check sync availability
             Map<String, String> syncParams = new HashMap<String, String>();
-            syncParams.put(JSON_FIELD_LAST_UPDATED, appLastUpdatedTime);
-            String syncResponse = HttpClientCallable.Executor.execute(new HttpClientCallable(Constants.APP_SERVER_SYNC_URL, HttpClientCallable.GET, syncParams));
-            JSONObject syncResponseObj = new JSONObject(syncResponse);
-            String serverLastUpdatedTime = (String) syncResponseObj.get(JSON_FIELD_LAST_UPDATED);
-            JSONArray changes = syncResponseObj.getJSONArray(JSON_FIELD_CHANGES);
+            syncParams.put(JSON_FIELD_LAST_UPDATED, String.valueOf(appLastUpdatedTime));
+            String syncResponse = HttpClientCallable.Executor.execute(new HttpClientCallable(Constants.APP_SERVER_TASK_SYNC_URL, HttpClientCallable.GET, syncParams));
+            if (syncResponse != null) {
+                JSONObject syncResponseObj = new JSONObject(syncResponse);
+                long serverLastUpdatedTime = syncResponseObj.getLong(JSON_FIELD_LAST_UPDATED);
+                JSONArray changes = syncResponseObj.getJSONArray(JSON_FIELD_CHANGES);
 
-            Log.d(TAG, "lastUpdated: " + serverLastUpdatedTime);
-            Log.d(TAG, "changes: " + changes.toString());
+                Log.d(TAG, "serverLastUpdatedTime: " + serverLastUpdatedTime);
+                Log.d(TAG, "changes: " + changes.toString());
 
-//            // fetch changes
-//            if(serverLastUpdatedTime != null && serverLastUpdatedTime > appLastUpdatedTime) {
-//                Log.d(TAG, "start fetching changes");
-//
-//                // update appLastUpdatedTime to serverLastUpdatedTime
-//                saveLastUpdatedTime(sharedPreferences, serverLastUpdatedTime);
-//
-//                List<String> tasksCreated = new ArrayList<String>();
-//                List<String> tasksDeleted = new ArrayList<String>();
-//                for(int i = 0; i < changes.length(); i++) {
-//                    String taskId = changes.getJSONObject(i).getString(JSON_FIELD_TASK_ID);
-//                    String taskStatus = changes.getJSONObject(i).getString(JSON_FIELD_STATUS);
-//                    if (taskStatus.equals(JSON_FIELD_STATUS_CREATED)) {
-//                        tasksCreated.add(taskId);
-//                    }
-//                    if (taskStatus.equals(JSON_FIELD_STATUS_DELETED)) {
-//                        tasksDeleted.add(taskId);
-//                    }
-//                }
-//
-//                // remove deleted tasks
-//                removeTasks(sharedPreferences, googleApiClient, tasksDeleted);
-//
-//                // fetch and set new tasks
-//                Map<String, String> fetchParams = new HashMap<String, String>();
-//                fetchParams.put(JSON_FIELD_TASK_ID, tasksCreated.toString());
-//                String fetchResponse = HttpClientCallable.Executor.execute(new HttpClientCallable(Constants.APP_SERVER_FETCH_TASKS_URL, HttpClientCallable.GET, fetchParams));
-//                if (fetchResponse != null) {
-//                    setTasks(context, sharedPreferences, googleApiClient, fetchResponse);
-//                }
-//            }
+                // fetch changes
+                if (appLastUpdatedTime < serverLastUpdatedTime) {
+                    Log.d(TAG, "start fetching changes");
 
+                    // update appLastUpdatedTime to serverLastUpdatedTime
+                    saveLastUpdatedTime(sharedPreferences, serverLastUpdatedTime);
+
+                    List<String> tasksCreated = new ArrayList<String>();
+                    List<String> tasksDeleted = new ArrayList<String>();
+                    for (int i = 0; i < changes.length(); i++) {
+                        String taskId = changes.getJSONObject(i).getString(JSON_FIELD_TASK_ID);
+                        String taskStatus = changes.getJSONObject(i).getString(JSON_FIELD_STATUS);
+                        if (taskStatus.equals(JSON_FIELD_STATUS_CREATED)) {
+                            tasksCreated.add(taskId);
+                        }
+                        if (taskStatus.equals(JSON_FIELD_STATUS_DELETED)) {
+                            tasksDeleted.add(taskId);
+                        }
+                    }
+
+                    // no need to deal with tasks that were deleted after being created
+                    for (String id : tasksDeleted) {
+                        if (tasksCreated.contains(id)) {
+                            tasksCreated.remove(id);
+                            tasksDeleted.remove(id);
+                        }
+                    }
+
+                    // remove deleted tasks
+                    removeTasks(sharedPreferences, googleApiClient, tasksDeleted);
+
+                    // fetch and set new tasks
+                    Map<String, String> fetchParams = new HashMap<String, String>();
+                    fetchParams.put(JSON_FIELD_TASK_ID, tasksCreated.toString());
+                    String fetchResponse = HttpClientCallable.Executor.execute(new HttpClientCallable(Constants.APP_SERVER_TASK_FETCH_URL, HttpClientCallable.GET, fetchParams));
+                    if (fetchResponse != null) {
+                        setTasks(context, sharedPreferences, googleApiClient, fetchResponse);
+                    }
+                }
+            }
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage());
         }
@@ -201,13 +215,13 @@ public class TaskManager {
         return sharedPreferences.getStringSet(TASK_KEY_ID_SET, new HashSet<String>());
     }
 
-    private static String getLastUpdatedTime(SharedPreferences sharedPreferences) {
-        return sharedPreferences.getString(TASKS_LAST_UPDATED, "");
+    private static long getLastUpdatedTime(SharedPreferences sharedPreferences) {
+        return sharedPreferences.getLong(TASKS_LAST_UPDATED, 0);
     }
 
-    private static void saveLastUpdatedTime(SharedPreferences sharedPreferences, String time) {
+    private static void saveLastUpdatedTime(SharedPreferences sharedPreferences, long time) {
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
-        prefsEditor.putString(TASKS_LAST_UPDATED, time);
+        prefsEditor.putLong(TASKS_LAST_UPDATED, time);
         prefsEditor.apply();
     }
 

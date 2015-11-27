@@ -21,7 +21,7 @@ public class Task implements Serializable {
     private int mCost;
     @SerializedName("location")
     private SimpleGeofence mLocation;
-    @SerializedName("actions")
+    @SerializedName("taskactions")
     private List<TaskAction> mTaskActions = new ArrayList<TaskAction>();
 
     public Task(String id, String name, int cost, SimpleGeofence location) {

@@ -64,16 +64,16 @@ public class TaskCompletionActivity extends AppCompatActivity {
                 submitResponseButton.setEnabled(false);
                 submitResponseProgressBar.setVisibility(ProgressBar.VISIBLE);
 
-                new HttpClientAsyncTask(Constants.APP_SERVER_TEST_URL, HttpClientCallable.POST, getUserResponses(task)) {
+                new HttpClientAsyncTask(Constants.APP_SERVER_TASK_RESPOND_URL, HttpClientCallable.POST, getUserResponses(task)) {
                     @Override
                     protected void onPostExecute(String response) {
                         submitResponseButton.setEnabled(true);
                         submitResponseProgressBar.setVisibility(ProgressBar.GONE);
 
                         if (response != null) {
-                            Toast.makeText(TaskCompletionActivity.this, "Response submitted!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(TaskCompletionActivity.this, "Response submitted!", Toast.LENGTH_LONG).show();
                         } else {
-                            Toast.makeText(TaskCompletionActivity.this, "Failed to submit response!", Toast.LENGTH_SHORT).show();
+                            Toast.makeText(TaskCompletionActivity.this, "Failed to submit response!", Toast.LENGTH_LONG).show();
                         }
                     }
                 }.execute();
