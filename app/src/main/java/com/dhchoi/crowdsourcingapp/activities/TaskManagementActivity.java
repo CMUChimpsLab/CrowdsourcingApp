@@ -46,7 +46,7 @@ public class TaskManagementActivity extends BaseGoogleApiActivity {
                 Log.d(Constants.TAG, "clicked task: " + task);
 
                 Intent intent = new Intent(TaskManagementActivity.this, TaskCompletionActivity.class);
-                intent.putExtra(Task.KEY_SERIALIZABLE, task);
+                intent.putExtra(Task.TASK_KEY_SERIALIZABLE, task);
 
                 startActivity(intent);
             }

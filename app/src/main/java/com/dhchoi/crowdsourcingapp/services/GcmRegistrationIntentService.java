@@ -14,10 +14,10 @@ import com.google.android.gms.iid.InstanceID;
 
 import java.io.IOException;
 
-import static com.dhchoi.crowdsourcingapp.Constants.GCM_REGISTRATION_COMPLETE;
-import static com.dhchoi.crowdsourcingapp.Constants.SENT_GCM_TOKEN_TO_SERVER;
-
 public class GcmRegistrationIntentService extends IntentService {
+
+    public static final String GCM_TOKEN_SENT_TO_SERVER = "sentTokenToServer";
+    public static final String GCM_REGISTRATION_COMPLETE = "registrationComplete";
 
     private static final String TAG = "GcmRgstrIntentService";
     private static final String[] TOPICS = {"global"};
@@ -51,13 +51,13 @@ public class GcmRegistrationIntentService extends IntentService {
             // You should store a boolean that indicates whether the generated token has been
             // sent to your server. If the boolean is false, send the token to your server,
             // otherwise your server should have already received the token.
-            sharedPreferences.edit().putBoolean(SENT_GCM_TOKEN_TO_SERVER, true).apply();
+            sharedPreferences.edit().putBoolean(GCM_TOKEN_SENT_TO_SERVER, true).apply();
             // [END register_for_gcm]
         } catch (Exception e) {
             Log.d(TAG, "Failed to complete token refresh", e);
             // If an exception happens while fetching the new token or updating our registration data
             // on a third-party server, this ensures that we'll attempt the update at a later time.
-            sharedPreferences.edit().putBoolean(SENT_GCM_TOKEN_TO_SERVER, false).apply();
+            sharedPreferences.edit().putBoolean(GCM_TOKEN_SENT_TO_SERVER, false).apply();
         }
         // Notify any listener that registration has completed
         Intent registrationComplete = new Intent(GCM_REGISTRATION_COMPLETE);

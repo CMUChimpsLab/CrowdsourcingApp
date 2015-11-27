@@ -15,15 +15,19 @@ import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.location.places.Places;
 
-import static com.dhchoi.crowdsourcingapp.Constants.APP_PERMISSIONS_REQUEST;
-import static com.dhchoi.crowdsourcingapp.Constants.CONNECTION_FAILURE_RESOLUTION_REQUEST;
-import static com.dhchoi.crowdsourcingapp.Constants.PLAY_SERVICES_RESOLUTION_REQUEST;
 import static com.dhchoi.crowdsourcingapp.Constants.TAG;
 
 public class BaseGoogleApiActivity extends AppCompatActivity implements
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener,
         ActivityCompat.OnRequestPermissionsResultCallback {
+
+    public static final int APP_PERMISSIONS_REQUEST = 2;
+    public static final int PLAY_SERVICES_RESOLUTION_REQUEST = 8000;
+    // Request code to attempt to resolve Google Play services connection failures.
+    public static final int CONNECTION_FAILURE_RESOLUTION_REQUEST = 9000;
+    // Timeout for making a connection to GoogleApiClient (in milliseconds).
+    public static final long CONNECTION_TIME_OUT_MS = 100;
 
     private GoogleApiClient mGoogleApiClient;
     private boolean mResolvingError;

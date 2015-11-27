@@ -39,7 +39,7 @@ public class TaskCompletionActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        final Task task = (Task) getIntent().getSerializableExtra(Task.KEY_SERIALIZABLE);
+        final Task task = (Task) getIntent().getSerializableExtra(Task.TASK_KEY_SERIALIZABLE);
         Log.d(Constants.TAG, "serialized task: " + task);
 
         final ProgressBar submitResponseProgressBar = (ProgressBar) findViewById(R.id.submitResponseProgressBar);

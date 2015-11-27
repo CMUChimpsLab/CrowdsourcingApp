@@ -11,7 +11,7 @@ import static com.dhchoi.crowdsourcingapp.Constants.PACKAGE_NAME;
 
 public class Task implements Serializable {
 
-    public static final String KEY_SERIALIZABLE = PACKAGE_NAME + ".TASK_KEY_SERIALIZABLE";
+    public static final String TASK_KEY_SERIALIZABLE = PACKAGE_NAME + ".TASK_KEY_SERIALIZABLE";
 
     @SerializedName("id")
     private String mId;
