@@ -67,6 +67,9 @@
             android:name=".services.FetchAddressIntentService"
             android:exported="false" />
         <service
+            android:name=".services.RegisterUserIntentService"
+            android:exported="false"></service>
+        <service
             android:name=".services.GcmRegistrationIntentService"
             android:exported="false"></service>
         <!-- [START gcm_listener] -->

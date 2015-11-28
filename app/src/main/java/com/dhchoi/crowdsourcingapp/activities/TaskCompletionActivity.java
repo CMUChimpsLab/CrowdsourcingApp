@@ -1,5 +1,6 @@
 package com.dhchoi.crowdsourcingapp.activities;
 
+import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -20,6 +21,9 @@ import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskAction;
 
+import org.json.JSONException;
+import org.json.JSONObject;
+
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -28,6 +32,7 @@ import java.util.Map;
 public class TaskCompletionActivity extends AppCompatActivity {
 
     private List<ViewGroup> mTaskActionLayouts = new ArrayList<ViewGroup>();
+    private SharedPreferences mSharedPreferences;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -38,6 +43,8 @@ public class TaskCompletionActivity extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
+
+        mSharedPreferences = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, MODE_PRIVATE);
 
         final Task task = (Task) getIntent().getSerializableExtra(Task.TASK_KEY_SERIALIZABLE);
         Log.d(Constants.TAG, "serialized task: " + task);
@@ -58,22 +65,33 @@ public class TaskCompletionActivity extends AppCompatActivity {
             }
         }
 
+        if (!mSharedPreferences.getBoolean(Constants.USER_REGISTERED_KEY, false)) {
+            submitResponseButton.setEnabled(false);
+        }
+
         submitResponseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 submitResponseButton.setEnabled(false);
                 submitResponseProgressBar.setVisibility(ProgressBar.VISIBLE);
 
-                new HttpClientAsyncTask(Constants.APP_SERVER_TASK_RESPOND_URL, HttpClientCallable.POST, getUserResponses(task)) {
+                new HttpClientAsyncTask(Constants.APP_SERVER_TASK_RESPOND_URL, HttpClientCallable.POST, getUserResponses()) {
                     @Override
                     protected void onPostExecute(String response) {
                         submitResponseButton.setEnabled(true);
                         submitResponseProgressBar.setVisibility(ProgressBar.GONE);
 
-                        if (response != null) {
-                            Toast.makeText(TaskCompletionActivity.this, "Response submitted!", Toast.LENGTH_LONG).show();
-                        } else {
-                            Toast.makeText(TaskCompletionActivity.this, "Failed to submit response!", Toast.LENGTH_LONG).show();
+                        try {
+                            JSONObject responseObj = new JSONObject(response);
+                            if (responseObj.getBoolean("result")) {
+                                Toast.makeText(TaskCompletionActivity.this, "Response submitted!", Toast.LENGTH_LONG).show();
+                            } else {
+                                Toast.makeText(TaskCompletionActivity.this, "Response was not accepted.", Toast.LENGTH_LONG).show();
+                            }
+                        } catch (JSONException e) {
+                            e.printStackTrace();
+                            Log.e(Constants.TAG, e.getMessage());
+                            Toast.makeText(TaskCompletionActivity.this, "Failed to submit response.", Toast.LENGTH_LONG).show();
                         }
                     }
                 }.execute();
@@ -81,9 +99,9 @@ public class TaskCompletionActivity extends AppCompatActivity {
         });
     }
 
-    private Map<String, String> getUserResponses(Task task) {
+    private Map<String, String> getUserResponses() {
         Map<String, String> userResponses = new HashMap<String, String>();
-        userResponses.put("taskId", task.getId());
+        userResponses.put("userId", mSharedPreferences.getString(Constants.USER_ID_KEY, ""));
 
         for (ViewGroup viewGroup : mTaskActionLayouts) {
             for (int i = 0; i < viewGroup.getChildCount(); i++) {

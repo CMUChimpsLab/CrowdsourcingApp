@@ -9,7 +9,8 @@
     app:layout_behavior="@string/appbar_scrolling_view_behavior" tools:showIn="@layout/app_bar_main"
     tools:context=".MainActivity">
 
-    <TextView android:text="Select from menu"
+    <TextView android:text="@string/notice_need_email"
+        android:id="@+id/notice_text"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content" />
 

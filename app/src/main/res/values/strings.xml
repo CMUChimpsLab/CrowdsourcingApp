@@ -22,4 +22,7 @@
     <string name="title_activity_task_completion">Complete Task</string>
     <string name="title_activity_check_location">Current Location</string>
 
+    <string name="notice_need_email">Choose your email in order to start completing tasks!</string>
+    <string name="notice_welcome">Hi %1$s! Go start completing some tasks!</string>
+
 </resources>
