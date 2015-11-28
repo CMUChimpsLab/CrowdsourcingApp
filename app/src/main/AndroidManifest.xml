@@ -68,10 +68,10 @@
             android:exported="false" />
         <service
             android:name=".services.RegisterUserIntentService"
-            android:exported="false"></service>
+            android:exported="false" />
         <service
             android:name=".services.GcmRegistrationIntentService"
-            android:exported="false"></service>
+            android:exported="false" />
         <!-- [START gcm_listener] -->
         <service
             android:name=".services.GcmMessageListenerService"

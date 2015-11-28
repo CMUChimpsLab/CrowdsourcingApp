@@ -30,21 +30,22 @@ public class GcmMessageListenerService extends GcmListenerService {
     // [START receive_message]
     @Override
     public void onMessageReceived(String from, Bundle data) {
+        Log.d(TAG, "From: " + from);
         Log.d(TAG, "Bundle Data: " + data);
 
-        String name = data.getString("name", "DEFAULT");
-        String id = data.getString("uid", "DEFAULT");
-        String question = data.getString("question", "DEFAULT");
-        double lat = Double.valueOf(data.getString("lat", "40.4472512"));
-        double lng = Double.valueOf(data.getString("lng", "-79.9460148"));
-        float radius = Float.valueOf(data.getString("radius", "60.0f"));
-
-        Log.d(TAG, "id: " + id);
-        Log.d(TAG, "Name: " + name);
-        //Log.d(TAG, "Question: " + question);
-        Log.d(TAG, "Lat: " + lat);
-        Log.d(TAG, "Lng: " + lng);
-        Log.d(TAG, "Radius: " + radius);
+//        String name = data.getString("name", "DEFAULT");
+//        String id = data.getString("uid", "DEFAULT");
+//        String question = data.getString("question", "DEFAULT");
+//        double lat = Double.valueOf(data.getString("lat", "40.4472512"));
+//        double lng = Double.valueOf(data.getString("lng", "-79.9460148"));
+//        float radius = Float.valueOf(data.getString("radius", "60.0f"));
+//
+//        Log.d(TAG, "id: " + id);
+//        Log.d(TAG, "Name: " + name);
+//        //Log.d(TAG, "Question: " + question);
+//        Log.d(TAG, "Lat: " + lat);
+//        Log.d(TAG, "Lng: " + lng);
+//        Log.d(TAG, "Radius: " + radius);
 
         if (from.startsWith("/topics/")) {
             // message received from some topic.
@@ -71,7 +72,7 @@ public class GcmMessageListenerService extends GcmListenerService {
          * In some cases it may be useful to show a notification indicating to the user
          * that a message was received.
          */
-        sendNotification("Received New Geofence: " + name);
+        sendNotification("New task available", data.getString("name", "Touch to check new task."));
         // [END_EXCLUDE]
     }
     // [END receive_message]
@@ -81,7 +82,7 @@ public class GcmMessageListenerService extends GcmListenerService {
      *
      * @param message GCM message received.
      */
-    private void sendNotification(String message) {
+    private void sendNotification(String title, String message) {
         Intent intent = new Intent(this, MainActivity.class);
         intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
         PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_ONE_SHOT);
@@ -89,7 +90,7 @@ public class GcmMessageListenerService extends GcmListenerService {
         Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
         NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
                 .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(NOTIFICATION_TITLE)
+                .setContentTitle(title)
                 .setContentText(message)
                 .setAutoCancel(true)
                 .setSound(defaultSoundUri)
