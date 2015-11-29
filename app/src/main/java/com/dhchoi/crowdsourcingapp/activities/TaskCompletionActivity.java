@@ -27,7 +27,6 @@ import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskAction;
 
-import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
@@ -107,7 +106,7 @@ public class TaskCompletionActivity extends AppCompatActivity {
                             } else {
                                 Toast.makeText(TaskCompletionActivity.this, "Response was not accepted.", Toast.LENGTH_LONG).show();
                             }
-                        } catch (JSONException e) {
+                        } catch (Exception e) {
                             e.printStackTrace();
                             Log.e(Constants.TAG, e.getMessage());
                             Toast.makeText(TaskCompletionActivity.this, "Failed to submit response.", Toast.LENGTH_LONG).show();

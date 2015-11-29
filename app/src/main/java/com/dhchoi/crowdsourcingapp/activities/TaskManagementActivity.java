@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
+import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -23,10 +24,9 @@ import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
-public class TaskManagementActivity extends BaseGoogleApiActivity {
+public class TaskManagementActivity extends AppCompatActivity {
 
     private ArrayAdapter<Task> mActiveTaskListAdapter;
     private ArrayAdapter<Task> mInactiveTaskListAdapter;
