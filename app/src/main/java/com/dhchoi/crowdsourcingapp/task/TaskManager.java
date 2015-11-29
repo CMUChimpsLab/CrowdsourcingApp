@@ -126,7 +126,7 @@ public class TaskManager {
 
                 // cancel geofence
                 List<String> geofenceId = new ArrayList<String>();
-                geofenceId.add(task.getLocation().getId());
+                geofenceId.add(task.getLocation().getTaskId());
                 LocationServices.GeofencingApi.removeGeofences(googleApiClient, geofenceId);
             }
         }

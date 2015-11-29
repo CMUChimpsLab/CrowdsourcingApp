@@ -15,6 +15,8 @@ public class SimpleGeofence implements Serializable {
 
     @SerializedName("name")
     private final String mName;
+    @SerializedName("taskId")
+    private String mTaskId;
     @SerializedName("lat")
     private final double mLatitude;
     @SerializedName("lng")
@@ -24,12 +26,14 @@ public class SimpleGeofence implements Serializable {
 
     /**
      * @param name      The Geofence's request name.
+     * @param taskId    The ID of the task that owns this Geofence.
      * @param latitude  Latitude of the Geofence's center in degrees.
      * @param longitude Longitude of the Geofence's center in degrees.
      * @param radius    Radius of the geofence circle in meters.
      */
-    public SimpleGeofence(String name, double latitude, double longitude, float radius) {
+    public SimpleGeofence(String name, String taskId, double latitude, double longitude, float radius) {
         mName = name;
+        mTaskId = taskId;
         mLatitude = latitude;
         mLongitude = longitude;
         mRadius = radius;
@@ -37,6 +41,10 @@ public class SimpleGeofence implements Serializable {
 
     public String getName() {
         return mName;
+    }
+
+    public String getTaskId() {
+        return mTaskId;
     }
 
     public double getLatitude() {
@@ -51,10 +59,6 @@ public class SimpleGeofence implements Serializable {
         return mRadius;
     }
 
-    public String getId() {
-        return toString();
-    }
-
     /**
      * Creates a Location Services Geofence object from a SimpleGeofence.
      *
@@ -63,7 +67,7 @@ public class SimpleGeofence implements Serializable {
     public Geofence toGeofence() {
         // Build a new Geofence object.
         return new Geofence.Builder()
-                .setRequestId(getId())
+                .setRequestId(getTaskId())
                 .setTransitionTypes(Geofence.GEOFENCE_TRANSITION_ENTER | Geofence.GEOFENCE_TRANSITION_EXIT)
                 .setCircularRegion(mLatitude, mLongitude, mRadius)
                 .setExpirationDuration(Geofence.NEVER_EXPIRE)
@@ -72,7 +76,7 @@ public class SimpleGeofence implements Serializable {
 
     @Override
     public String toString() {
-        return mName + "-" + mLatitude + "-" + mLongitude + "-" + mRadius;
+        return mTaskId + "-" + mName + "-" + mLatitude + "-" + mLongitude + "-" + mRadius;
     }
 
     public static GeofencingRequest getGeofencingRequest(Geofence geofence) {

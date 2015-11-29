@@ -1,20 +1,11 @@
 package com.dhchoi.crowdsourcingapp.services;
 
-import android.app.NotificationManager;
-import android.app.PendingIntent;
-import android.content.Context;
-import android.content.Intent;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.Bundle;
-import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
-import com.dhchoi.crowdsourcingapp.R;
+import com.dhchoi.crowdsourcingapp.NotificationHelper;
 import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.google.android.gms.gcm.GcmListenerService;
-
-import static com.dhchoi.crowdsourcingapp.Constants.NOTIFICATION_TITLE;
 
 public class GcmMessageListenerService extends GcmListenerService {
 
@@ -32,20 +23,6 @@ public class GcmMessageListenerService extends GcmListenerService {
     public void onMessageReceived(String from, Bundle data) {
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Bundle Data: " + data);
-
-//        String name = data.getString("name", "DEFAULT");
-//        String id = data.getString("uid", "DEFAULT");
-//        String question = data.getString("question", "DEFAULT");
-//        double lat = Double.valueOf(data.getString("lat", "40.4472512"));
-//        double lng = Double.valueOf(data.getString("lng", "-79.9460148"));
-//        float radius = Float.valueOf(data.getString("radius", "60.0f"));
-//
-//        Log.d(TAG, "id: " + id);
-//        Log.d(TAG, "Name: " + name);
-//        //Log.d(TAG, "Question: " + question);
-//        Log.d(TAG, "Lat: " + lat);
-//        Log.d(TAG, "Lng: " + lng);
-//        Log.d(TAG, "Radius: " + radius);
 
         if (from.startsWith("/topics/")) {
             // message received from some topic.
@@ -72,32 +49,8 @@ public class GcmMessageListenerService extends GcmListenerService {
          * In some cases it may be useful to show a notification indicating to the user
          * that a message was received.
          */
-        sendNotification("New task available", data.getString("name", "Touch to check new task."));
+        NotificationHelper.createNotification("New task available", data.getString("name", "Touch to check new task."), this, MainActivity.class);
         // [END_EXCLUDE]
     }
     // [END receive_message]
-
-    /**
-     * Create and show a simple notification containing the received GCM message.
-     *
-     * @param message GCM message received.
-     */
-    private void sendNotification(String title, String message) {
-        Intent intent = new Intent(this, MainActivity.class);
-        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TOP);
-        PendingIntent pendingIntent = PendingIntent.getActivity(this, 0 /* Request code */, intent, PendingIntent.FLAG_ONE_SHOT);
-
-        Uri defaultSoundUri = RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(this)
-                .setSmallIcon(R.mipmap.ic_launcher)
-                .setContentTitle(title)
-                .setContentText(message)
-                .setAutoCancel(true)
-                .setSound(defaultSoundUri)
-                .setContentIntent(pendingIntent);
-
-        NotificationManager notificationManager = (NotificationManager) getSystemService(Context.NOTIFICATION_SERVICE);
-
-        notificationManager.notify(0 /* ID of notification */, notificationBuilder.build());
-    }
 }

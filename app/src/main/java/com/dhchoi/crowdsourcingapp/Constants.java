@@ -7,7 +7,6 @@ public class Constants {
 
     public static final String TAG = "CrowdsourcingApp";
     public static final String PACKAGE_NAME = "com.dhchoi.crowdsourcingapp";
-    public static final String NOTIFICATION_TITLE = "CrowdsourcingApp";
     public static final String DEFAULT_SHARED_PREF = PACKAGE_NAME + ".DEFAULT_SHARED_PREF";
     public static final String USER_ID_KEY = PACKAGE_NAME + ".USER_ID_KEY";
     public static final String USER_GCM_TOKEN_KEY = PACKAGE_NAME + ".USER_GCM_TOKEN_KEY";

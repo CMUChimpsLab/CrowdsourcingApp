@@ -77,6 +77,9 @@ public class RegisterUserIntentService extends IntentService {
         }
     }
 
+    /**
+     * Showing a toast message, using the Main thread
+     */
     private void showToast(final String message) {
         mMainThread.post(new Runnable() {
             @Override
