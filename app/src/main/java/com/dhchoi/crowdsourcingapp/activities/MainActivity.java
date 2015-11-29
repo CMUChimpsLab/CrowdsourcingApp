@@ -3,8 +3,10 @@ package com.dhchoi.crowdsourcingapp.activities;
 import android.accounts.AccountManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.NavigationView;
+import android.support.design.widget.Snackbar;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBarDrawerToggle;
@@ -12,6 +14,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.ProgressBar;
 import android.widget.TextView;
 
 import com.dhchoi.crowdsourcingapp.Constants;
@@ -29,6 +32,7 @@ public class MainActivity extends BaseGoogleApiActivity implements NavigationVie
 
     private SharedPreferences mSharedPreferences;
     private TextView mNoticeText;
+    private ProgressBar mSyncProgressBar;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -47,6 +51,7 @@ public class MainActivity extends BaseGoogleApiActivity implements NavigationVie
         NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
         navigationView.setNavigationItemSelectedListener(this);
         mNoticeText = (TextView) findViewById(R.id.notice_text);
+        mSyncProgressBar = (ProgressBar) findViewById(R.id.sync_progress_bar);
 
         // request user for email if it wasn't provided yet
         mSharedPreferences = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, MODE_PRIVATE);
@@ -122,7 +127,22 @@ public class MainActivity extends BaseGoogleApiActivity implements NavigationVie
         super.onConnected(bundle);
 
         // sync tasks with server
-        TaskManager.syncTasks(this, getGoogleApiClient());
+        mSyncProgressBar.setVisibility(ProgressBar.VISIBLE);
+        new AsyncTask<Void, Void, Boolean>() {
+            @Override
+            protected Boolean doInBackground(Void... params) {
+                return TaskManager.syncTasks(MainActivity.this, getGoogleApiClient());
+            }
+            @Override
+            protected void onPostExecute(Boolean syncSuccess) {
+                mSyncProgressBar.setVisibility(ProgressBar.GONE);
+                if (syncSuccess) {
+                    Snackbar.make(findViewById(android.R.id.content), "Sync success!", Snackbar.LENGTH_LONG).show();
+                } else {
+                    Snackbar.make(findViewById(android.R.id.content), "Failed to sync with server.", Snackbar.LENGTH_LONG).show();
+                }
+            }
+        }.execute();
     }
 
     @Override

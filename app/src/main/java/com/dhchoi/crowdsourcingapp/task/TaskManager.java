@@ -143,7 +143,7 @@ public class TaskManager {
         }
     }
 
-    public static void syncTasks(Context context, GoogleApiClient googleApiClient) {
+    public static boolean syncTasks(Context context, GoogleApiClient googleApiClient) {
         try {
             SharedPreferences sharedPreferences = getSharedPreferences(context);
             final long appLastUpdatedTime = getLastUpdatedTime(sharedPreferences);
@@ -199,12 +199,16 @@ public class TaskManager {
                     String fetchResponse = HttpClientCallable.Executor.execute(new HttpClientCallable(Constants.APP_SERVER_TASK_FETCH_URL, HttpClientCallable.GET, fetchParams));
                     if (fetchResponse != null) {
                         setTasks(context, sharedPreferences, googleApiClient, fetchResponse);
+                        return true;
                     }
                 }
+                return true;
             }
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage());
         }
+
+        return false;
     }
 
     private static SharedPreferences getSharedPreferences(Context context) {
