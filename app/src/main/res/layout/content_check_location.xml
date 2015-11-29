@@ -12,25 +12,19 @@
     tools:context="com.dhchoi.crowdsourcingapp.activities.CheckLocationActivity"
     tools:showIn="@layout/activity_check_location">
 
-    <TextView android:id="@+id/task_location" android:text="Location"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView3"
-        android:layout_alignParentStart="true" />
-
-    <TextView android:id="@+id/address_text" android:text="Address"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_below="@+id/textView4"
-        android:layout_alignParentStart="true" />
-
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Current Location (Raw)"
-        android:id="@+id/textView3"
+        android:id="@+id/current_location_raw_title"
         android:layout_alignParentTop="true"
+        android:layout_alignParentStart="true" />
+
+    <TextView android:id="@+id/current_location_raw" android:text="current location raw"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/current_location_raw_title"
         android:layout_alignParentStart="true" />
 
     <TextView
@@ -38,9 +32,31 @@
         android:layout_height="wrap_content"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Current Location (Address)"
-        android:id="@+id/textView4"
-        android:layout_below="@+id/task_location"
+        android:id="@+id/current_location_address_title"
+        android:layout_below="@id/current_location_raw"
         android:layout_alignParentStart="true"
         android:layout_marginTop="30dp" />
+
+    <TextView android:id="@+id/current_location_address" android:text="current location address"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/current_location_address_title"
+        android:layout_alignParentStart="true" />
+
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:textAppearance="?android:attr/textAppearanceLarge"
+        android:text="Last Update Time"
+        android:id="@+id/current_location_last_updated_title"
+        android:layout_below="@id/current_location_address"
+        android:layout_alignParentStart="true"
+        android:layout_marginTop="30dp" />
+
+    <TextView android:id="@+id/current_location_last_updated" android:text="last update time"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/current_location_last_updated_title"
+        android:layout_alignParentStart="true" />
 
 </RelativeLayout>

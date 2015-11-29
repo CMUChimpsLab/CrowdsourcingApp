@@ -25,8 +25,9 @@ public class CheckLocationActivity extends BaseGoogleApiActivity implements Loca
     ResultReceiver mFetchAddressResultReceiver;
 
     // TextViews
-    TextView mCurrentLocationTextView;
-    TextView mLocationAddressTextView;
+    TextView mCurrentLocationRaw;
+    TextView mCurrentLocationAddress;
+    TextView mCurrentLocationLastUpdated;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -34,16 +35,15 @@ public class CheckLocationActivity extends BaseGoogleApiActivity implements Loca
 
         // Receiver for data sent from FetchAddressIntentService
         mFetchAddressResultReceiver = new ResultReceiver(new Handler()) {
-
             // Receives data sent from FetchAddressIntentService and updates the UI in MainActivity
             @Override
             protected void onReceiveResult(int resultCode, Bundle resultData) {
                 // Show a toast message if an address was found.
                 if (resultCode == FetchAddressIntentService.FETCH_ADDRESS_SUCCESS_RESULT) {
                     // Display the address string or an error message sent from the intent service.
-                    mLocationAddressTextView.setText(resultData.getString(FetchAddressIntentService.FETCH_ADDRESS_RESULT_DATA_KEY));
+                    mCurrentLocationAddress.setText(resultData.getString(FetchAddressIntentService.FETCH_ADDRESS_RESULT_DATA_KEY));
                 } else {
-                    mLocationAddressTextView.setText(getString(R.string.no_address_found));
+                    mCurrentLocationAddress.setText(getString(R.string.no_address_found));
                 }
             }
         };
@@ -54,8 +54,9 @@ public class CheckLocationActivity extends BaseGoogleApiActivity implements Loca
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mCurrentLocationTextView = (TextView) findViewById(R.id.task_location);
-        mLocationAddressTextView = (TextView) findViewById(R.id.address_text);
+        mCurrentLocationRaw = (TextView) findViewById(R.id.current_location_raw);
+        mCurrentLocationAddress = (TextView) findViewById(R.id.current_location_address);
+        mCurrentLocationLastUpdated = (TextView) findViewById(R.id.current_location_last_updated);
     }
 
     /**
@@ -69,11 +70,10 @@ public class CheckLocationActivity extends BaseGoogleApiActivity implements Loca
 
     @Override
     public void onLocationChanged(Location location) {
-        Location currentLocation = location;
-        String lastUpdateTime = DateFormat.getTimeInstance().format(new Date());
-        mCurrentLocationTextView.setText(String.valueOf(currentLocation.toString()) + " (" + lastUpdateTime + ")");
+        mCurrentLocationRaw.setText(String.valueOf(location.toString()));
+        mCurrentLocationLastUpdated.setText(DateFormat.getTimeInstance().format(new Date()));
 
-        if (currentLocation != null) {
+        if (location != null) {
             // Determine whether a Geocoder is available.
             if (!Geocoder.isPresent()) {
                 Toast.makeText(this, R.string.no_geocoder_available, Toast.LENGTH_LONG).show();
@@ -88,7 +88,7 @@ public class CheckLocationActivity extends BaseGoogleApiActivity implements Loca
             // Pass the result receiver as an extra to the service.
             intent.putExtra(FetchAddressIntentService.FETCH_ADDRESS_RESULT_RECEIVER, mFetchAddressResultReceiver);
             // Pass the location data as an extra to the service.
-            intent.putExtra(FetchAddressIntentService.FETCH_ADDRESS_LOCATION_DATA_EXTRA, currentLocation);
+            intent.putExtra(FetchAddressIntentService.FETCH_ADDRESS_LOCATION_DATA_EXTRA, location);
             // Start the service. If the service isn't already running, it is instantiated and started
             // (creating a process for it if needed); if it is running then it remains running. The
             // service kills itself automatically once all intents are processed.
