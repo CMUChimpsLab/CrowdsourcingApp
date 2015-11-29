@@ -73,6 +73,10 @@ public class TaskManager {
         return tasks;
     }
 
+    public static void updateTask(Context context, Task task) {
+        getSharedPreferences(context).edit().putString(getTaskKeyById(task.getId()), new Gson().toJson(task)).apply();
+    }
+
     public static void setTasks(Context context, GoogleApiClient googleApiClient, String jsonArray) {
         setTasks(context, getSharedPreferences(context), googleApiClient, jsonArray);
     }

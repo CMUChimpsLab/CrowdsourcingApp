@@ -104,7 +104,7 @@ public class MainActivity extends BaseGoogleApiActivity implements NavigationVie
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_manage_tasks) {
+        if (id == R.id.nav_browse_tasks) {
             Intent intent = new Intent(this, TaskManagementActivity.class);
             startActivity(intent);
         } else if (id == R.id.nav_check_location) {

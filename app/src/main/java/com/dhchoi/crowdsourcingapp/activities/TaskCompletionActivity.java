@@ -1,7 +1,12 @@
 package com.dhchoi.crowdsourcingapp.activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
+import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.os.Bundle;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -18,6 +23,7 @@ import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientAsyncTask;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
 import com.dhchoi.crowdsourcingapp.R;
+import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskAction;
 
@@ -25,6 +31,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -33,6 +40,19 @@ public class TaskCompletionActivity extends AppCompatActivity {
 
     private List<ViewGroup> mTaskActionLayouts = new ArrayList<ViewGroup>();
     private SharedPreferences mSharedPreferences;
+    private Button mSubmitResponseButton;
+    private TextView mSubmissionNotice;
+    private Task mTask;
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            List<String> inactivatedTaskIds = Arrays.asList(intent.getStringArrayExtra(GeofenceTransitionsIntentService.INACTIVATED_TASK_ID_KEY));
+            List<String> activatedTaskIds = Arrays.asList(intent.getStringArrayExtra(GeofenceTransitionsIntentService.ACTIVATED_TASK_ID_KEY));
+            if (inactivatedTaskIds.contains(mTask.getId()) || activatedTaskIds.contains(mTask.getId())) {
+                updateSubmitResponseButtonStatus();
+            }
+        }
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -46,16 +66,17 @@ public class TaskCompletionActivity extends AppCompatActivity {
 
         mSharedPreferences = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, MODE_PRIVATE);
 
-        final Task task = (Task) getIntent().getSerializableExtra(Task.TASK_KEY_SERIALIZABLE);
-        Log.d(Constants.TAG, "serialized task: " + task);
+        mTask = (Task) getIntent().getSerializableExtra(Task.TASK_KEY_SERIALIZABLE);
+        Log.d(Constants.TAG, "creating activity with task: " + mTask);
 
         final ProgressBar submitResponseProgressBar = (ProgressBar) findViewById(R.id.submitResponseProgressBar);
-        final Button submitResponseButton = (Button) findViewById(R.id.submit_button);
-        ((TextView) findViewById(R.id.task_name)).setText(task.getName());
-        ((TextView) findViewById(R.id.task_location)).setText(task.getLocation().getName());
+        mSubmitResponseButton = (Button) findViewById(R.id.submit_button);
+        mSubmissionNotice = (TextView) findViewById(R.id.submission_notice);
+        ((TextView) findViewById(R.id.task_name)).setText(mTask.getName());
+        ((TextView) findViewById(R.id.task_location)).setText(mTask.getLocation().getName());
 
         final ViewGroup taskActionsLayout = (ViewGroup) findViewById(R.id.task_actions);
-        for (TaskAction taskAction : task.getTaskActions()) {
+        for (TaskAction taskAction : mTask.getTaskActions()) {
             if (taskAction.getType() == TaskAction.TaskActionType.TEXT) {
                 View taskActionLayout = LayoutInflater.from(this).inflate(R.layout.task_action_text, null);
                 ((TextView) taskActionLayout.findViewById(R.id.task_action_description)).setText(taskAction.getDescription());
@@ -65,20 +86,18 @@ public class TaskCompletionActivity extends AppCompatActivity {
             }
         }
 
-        if (!mSharedPreferences.getBoolean(Constants.USER_REGISTERED_KEY, false)) {
-            submitResponseButton.setEnabled(false);
-        }
+        updateSubmitResponseButtonStatus();
 
-        submitResponseButton.setOnClickListener(new View.OnClickListener() {
+        mSubmitResponseButton.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                submitResponseButton.setEnabled(false);
+                mSubmitResponseButton.setEnabled(false);
                 submitResponseProgressBar.setVisibility(ProgressBar.VISIBLE);
 
                 new HttpClientAsyncTask(Constants.APP_SERVER_TASK_RESPOND_URL, HttpClientCallable.POST, getUserResponses()) {
                     @Override
                     protected void onPostExecute(String response) {
-                        submitResponseButton.setEnabled(true);
+                        mSubmitResponseButton.setEnabled(true);
                         submitResponseProgressBar.setVisibility(ProgressBar.GONE);
 
                         try {
@@ -97,6 +116,35 @@ public class TaskCompletionActivity extends AppCompatActivity {
                 }.execute();
             }
         });
+
+        // Register to receive messages.
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceTransitionsIntentService.GEOFENCE_TRANSITION_BROADCAST));
+    }
+
+    @Override
+    protected void onDestroy() {
+        // Unregister since the activity is about to be closed.
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
+        super.onDestroy();
+    }
+
+    private void updateSubmitResponseButtonStatus() {
+        if (!mSharedPreferences.getBoolean(Constants.USER_REGISTERED_KEY, false)) {
+            mSubmitResponseButton.setEnabled(false);
+            mSubmissionNotice.setVisibility(TextView.VISIBLE);
+            mSubmissionNotice.setText("Please register your email in order to submit tasks.");
+            return;
+        }
+
+        if (!mTask.isActivated()) {
+            mSubmitResponseButton.setEnabled(false);
+            mSubmissionNotice.setVisibility(TextView.VISIBLE);
+            mSubmissionNotice.setText("Please be located where the task can be activated.");
+            return;
+        }
+
+        mSubmitResponseButton.setEnabled(true);
+        mSubmissionNotice.setVisibility(TextView.GONE);
     }
 
     private Map<String, String> getUserResponses() {

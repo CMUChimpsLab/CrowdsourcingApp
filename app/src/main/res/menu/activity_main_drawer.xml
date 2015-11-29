@@ -2,8 +2,8 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android">
 
     <group android:checkableBehavior="single">
-        <item android:id="@+id/nav_manage_tasks" android:icon="@android:drawable/ic_menu_manage"
-            android:title="Manage Tasks" />
+        <item android:id="@+id/nav_browse_tasks" android:icon="@android:drawable/ic_menu_search"
+            android:title="Browse Tasks" />
         <item android:id="@+id/nav_check_location" android:icon="@android:drawable/ic_menu_mylocation"
             android:title="Check Current Location" />
     </group>

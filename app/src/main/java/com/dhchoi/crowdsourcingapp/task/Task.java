@@ -23,6 +23,7 @@ public class Task implements Serializable {
     private SimpleGeofence mLocation;
     @SerializedName("taskactions")
     private List<TaskAction> mTaskActions = new ArrayList<TaskAction>();
+    private boolean mIsActivated = false;
 
     public Task(String id, String name, int cost, SimpleGeofence location) {
         mId = id;
@@ -49,6 +50,14 @@ public class Task implements Serializable {
 
     public List<TaskAction> getTaskActions() {
         return mTaskActions;
+    }
+
+    public boolean isActivated() {
+        return mIsActivated;
+    }
+
+    public void setActivated(boolean activated) {
+        mIsActivated = activated;
     }
 
     @Override

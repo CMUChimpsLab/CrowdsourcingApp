@@ -1,37 +1,31 @@
 <?xml version="1.0" encoding="utf-8"?>
-<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="match_parent">
 
-    <GridLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+    <TextView
+        android:id="@+id/task_name"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Task Name"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#000000" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Task Name"
-            android:id="@+id/task_name"
-            android:layout_row="0"
-            android:layout_column="0" />
+    <TextView
+        android:id="@+id/task_location"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@id/task_name"
+        android:text="Task Location"
+        android:textAppearance="?android:attr/textAppearanceSmall" />
 
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:text="Task Location"
-            android:id="@+id/task_location"
-            android:layout_row="1"
-            android:layout_column="0" />
-
-        <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Task Cost"
-            android:id="@+id/task_cost"
-            android:layout_row="0"
-            android:layout_column="14" />
-    </GridLayout>
-</LinearLayout>
+    <TextView
+        android:id="@+id/task_cost"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_above="@+id/task_location"
+        android:layout_alignParentEnd="true"
+        android:text="Task Cost"
+        android:textAppearance="?android:attr/textAppearanceMedium"
+        android:textColor="#000000" />
+</RelativeLayout>

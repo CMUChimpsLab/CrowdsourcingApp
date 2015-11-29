@@ -2,6 +2,7 @@ package com.dhchoi.crowdsourcingapp.services;
 
 import android.app.IntentService;
 import android.content.Intent;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import com.dhchoi.crowdsourcingapp.Constants;
@@ -12,7 +13,14 @@ import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class GeofenceTransitionsIntentService extends IntentService {
+
+    public static final String GEOFENCE_TRANSITION_BROADCAST = Constants.PACKAGE_NAME + ".GEOFENCE_TRANSITION_BROADCAST";
+    public static final String ACTIVATED_TASK_ID_KEY = Constants.PACKAGE_NAME + ".ACTIVATED_TASK_ID_KEY";
+    public static final String INACTIVATED_TASK_ID_KEY = Constants.PACKAGE_NAME + ".INACTIVATED_TASK_ID_KEY";
 
     public GeofenceTransitionsIntentService() {
         super(GeofenceTransitionsIntentService.class.getSimpleName());
@@ -38,7 +46,10 @@ public class GeofenceTransitionsIntentService extends IntentService {
             int errorCode = geoFenceEvent.getErrorCode();
             Log.e(Constants.TAG, "Location Services error: " + errorCode);
         } else {
+            List<String> activatedTaskIds = new ArrayList<String>();
+            List<String> inactivatedTaskIds = new ArrayList<String>();
             int transitionType = geoFenceEvent.getGeofenceTransition();
+
             for (Geofence triggeredGeofence : geoFenceEvent.getTriggeringGeofences()) {
                 // taskId and geofence.requestId are identical
                 Task triggeredTask = TaskManager.getTaskById(this, triggeredGeofence.getRequestId());
@@ -48,13 +59,26 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
                 Log.d(Constants.TAG, "Build notification for task: " + taskName);
                 if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType) {
-                    NotificationHelper.createNotification("Enabled: " + taskName, taskLocationName, taskId, this, TaskManagementActivity.class);
+                    NotificationHelper.createNotification("Activated: " + taskName, taskLocationName, taskId, this, TaskManagementActivity.class);
+                    triggeredTask.setActivated(true);
+                    activatedTaskIds.add(taskId);
                 } else if (Geofence.GEOFENCE_TRANSITION_EXIT == transitionType) {
-                    NotificationHelper.createNotification("Disabled: " + taskName, taskLocationName, taskId, this, TaskManagementActivity.class);
+                    NotificationHelper.createNotification("Inactivated: " + taskName, taskLocationName, taskId, this, TaskManagementActivity.class);
+                    triggeredTask.setActivated(false);
+                    inactivatedTaskIds.add(taskId);
                 } else {
                     Log.d(Constants.TAG, "Discarding Geofence transition type: " + transitionType);
                 }
+
+                TaskManager.updateTask(this, triggeredTask);
             }
+
+            // Notify any listener that geofence transition has occurred
+            Log.d(Constants.TAG, "Broadcast triggered taskIds");
+            Intent geofenceTransitionIntent = new Intent(GEOFENCE_TRANSITION_BROADCAST);
+            geofenceTransitionIntent.putExtra(ACTIVATED_TASK_ID_KEY, activatedTaskIds.toArray());
+            geofenceTransitionIntent.putExtra(INACTIVATED_TASK_ID_KEY, inactivatedTaskIds.toArray());
+            LocalBroadcastManager.getInstance(this).sendBroadcast(geofenceTransitionIntent);
         }
     }
 }
