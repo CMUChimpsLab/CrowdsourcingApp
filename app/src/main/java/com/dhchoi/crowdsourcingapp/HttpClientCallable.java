@@ -7,6 +7,7 @@ import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.UnsupportedEncodingException;
 import java.net.HttpURLConnection;
+import java.net.SocketTimeoutException;
 import java.net.URL;
 import java.net.URLEncoder;
 import java.util.Map;
@@ -25,6 +26,7 @@ public class HttpClientCallable implements Callable<String> {
     public static final String CHARSET = "UTF-8";
 
     private static final String TAG = "HttpClientCallable";
+    private static final int TIMEOUT_LENGTH = 5000;
 
     private String mUrl;
     private String mMethod;
@@ -46,20 +48,21 @@ public class HttpClientCallable implements Callable<String> {
 
             Log.d(TAG, "Initiating with url: " + mUrl + ", method: " + mMethod + ", data: " + mData);
 
+            String url = mMethod.equals(POST) ? mUrl : (data == null ? mUrl: mUrl + "?" + new String(data));
+            urlConnection = (HttpURLConnection) new URL(url).openConnection();
+            urlConnection.setRequestMethod(GET);
+            urlConnection.setRequestProperty("Content-Type", "text/plain");
+            urlConnection.setRequestProperty("Accept-Charset", CHARSET);
+            urlConnection.setConnectTimeout(TIMEOUT_LENGTH);
+            urlConnection.setReadTimeout(TIMEOUT_LENGTH);
+
             if (mMethod.equals(POST)) {
-                urlConnection = (HttpURLConnection) new URL(mUrl).openConnection();
                 urlConnection.setRequestMethod(POST);
-                urlConnection.setRequestProperty("Accept-Charset", CHARSET);
                 if (data != null) {
                     urlConnection.setRequestProperty("Content-Type", "application/x-www-form-urlencoded");
                     urlConnection.setRequestProperty("Content-Length", Integer.toString(data.length));
                     urlConnection.getOutputStream().write(data);
                 }
-            } else {
-                urlConnection = (HttpURLConnection) new URL(data != null ? mUrl + "?" + new String(data) : mUrl).openConnection();
-                urlConnection.setRequestMethod(GET);
-                urlConnection.setRequestProperty("Accept-Charset", CHARSET);
-                urlConnection.setRequestProperty("Content-Type", "text/plain");
             }
 
             if (urlConnection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
@@ -73,10 +76,10 @@ public class HttpClientCallable implements Callable<String> {
                 // Do response handling for bad response codes
                 Log.e(TAG, "Bad http response code: " + urlConnection.getResponseCode());
             }
-
+        } catch (SocketTimeoutException e) {
+            Log.e(TAG, e.getMessage());
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
-            // Handle problems
         } finally {
             if (urlConnection != null) {
                 urlConnection.disconnect();
