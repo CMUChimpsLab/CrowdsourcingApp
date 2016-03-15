@@ -1,6 +1,6 @@
-# Android App for Managing Geofences
+# Android App for Crowdsourcing Research
 
-Simple Android app for managing geofences. Created primarily to test out crowdsourcing concepts.
+Android app for researching effectiveness of different types of offline crowdsourcing. Created primarily to test out various crowdsourcing concepts.
 
 ## How to Run
 
@@ -10,11 +10,14 @@ OR
 
 Download the APK file within the `public/` folder directly.
 
-## Features
+## Primary Features
 
-- Manage geofences (e.g. adding, deleting) from the "Manage Locations" menu.
-- Get alerted whenever you enter or leave a saved geofence.
+- Let users create tasks to be completed by crowdsourcing.
+- Let users complete tasks already submitted for crowdsourcing.
+- Display tasks that are locally available.
+- Display activities of other users.
+- Get alerted whenever a user enters or leaves a location for a task.
 
 ## Issues
 
-- Once a new geofence is added, you need to go back to the main screen to have the new geofence start being tracked.
+- Check release log or change log.
