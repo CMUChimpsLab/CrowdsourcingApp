@@ -12,25 +12,46 @@
     <!-- [END location_permission] -->
     <uses-permission android:name="android.permission.INTERNET" />
 
+    <!-- To auto-complete the email text field in the login form with the user's emails -->
+    <uses-permission android:name="android.permission.GET_ACCOUNTS" />
+    <uses-permission android:name="android.permission.READ_PROFILE" />
+    <uses-permission android:name="android.permission.READ_CONTACTS" />
+
     <application
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
         android:supportsRtl="true"
         android:theme="@style/AppTheme">
+
+        <!-- [START activities] -->
         <activity
-            android:name=".activities.MainActivity"
+            android:name=".activities.CheckLoginActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
-
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
         <activity
-            android:name=".activities.TaskManagementActivity"
-            android:label="@string/title_activity_task_management"
+            android:name=".activities.LoginActivity"
+            android:label="@string/title_activity_login" />
+        <activity
+            android:name=".activities.MainActivity"
+            android:label="@string/app_name"
+            android:theme="@style/AppTheme.NoActionBar" />
+        <activity
+            android:name=".activities.TaskCompleteActivity"
+            android:label="@string/title_activity_task_complete"
+            android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.MainActivity" />
+        </activity>
+        <activity android:name=".activities.TaskCreateActivity"
+            android:label="@string/title_activity_task_create"
             android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
@@ -38,14 +59,15 @@
                 android:value=".activities.MainActivity" />
         </activity>
         <activity
-            android:name=".activities.TaskCompletionActivity"
-            android:label="@string/title_activity_task_completion"
-            android:parentActivityName=".activities.TaskManagementActivity"
+            android:name=".activities.CurrentLocationActivity"
+            android:label="@string/title_activity_current_location"
+            android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data
                 android:name="android.support.PARENT_ACTIVITY"
-                android:value=".activities.TaskManagementActivity" />
+                android:value=".activities.MainActivity" />
         </activity>
+        <!-- [END activities] -->
 
         <!-- [START gcm_receiver] -->
         <receiver
@@ -72,6 +94,7 @@
         <service
             android:name=".services.GcmRegistrationIntentService"
             android:exported="false" />
+
         <!-- [START gcm_listener] -->
         <service
             android:name=".services.GcmMessageListenerService"
@@ -81,6 +104,7 @@
             </intent-filter>
         </service>
         <!-- [END gcm_listener] -->
+
         <!-- [START instanceId_listener] -->
         <service
             android:name=".services.GcmInstanceIDListenerService"
@@ -95,15 +119,6 @@
             android:name="com.google.android.geo.API_KEY"
             android:value="AIzaSyDOx9RwakcaApU4sc1SbOwadHpsVwP5hAo" />
 
-        <activity
-            android:name=".activities.CheckLocationActivity"
-            android:label="@string/title_activity_check_location"
-            android:parentActivityName=".activities.MainActivity"
-            android:theme="@style/AppTheme.NoActionBar">
-            <meta-data
-                android:name="android.support.PARENT_ACTIVITY"
-                android:value="com.dhchoi.crowdsourcingapp.activities.MainActivity" />
-        </activity>
     </application>
 
 </manifest>

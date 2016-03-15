@@ -7,7 +7,7 @@ import android.util.Log;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.NotificationHelper;
-import com.dhchoi.crowdsourcingapp.activities.TaskManagementActivity;
+import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.google.android.gms.location.Geofence;
@@ -59,11 +59,11 @@ public class GeofenceTransitionsIntentService extends IntentService {
 
                 Log.d(Constants.TAG, "Build notification for task: " + taskName);
                 if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType) {
-                    NotificationHelper.createNotification("Activated: " + taskName, taskLocationName, taskId, this, TaskManagementActivity.class);
+                    NotificationHelper.createNotification("Activated: " + taskName, taskLocationName, taskId, this, MainActivity.class);
                     triggeredTask.setActivated(true);
                     activatedTaskIds.add(taskId);
                 } else if (Geofence.GEOFENCE_TRANSITION_EXIT == transitionType) {
-                    NotificationHelper.createNotification("Inactivated: " + taskName, taskLocationName, taskId, this, TaskManagementActivity.class);
+                    NotificationHelper.createNotification("Inactivated: " + taskName, taskLocationName, taskId, this, MainActivity.class);
                     triggeredTask.setActivated(false);
                     inactivatedTaskIds.add(taskId);
                 } else {

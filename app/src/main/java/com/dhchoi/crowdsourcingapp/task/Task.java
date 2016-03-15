@@ -18,7 +18,7 @@ public class Task implements Serializable {
     @SerializedName("name")
     private String mName;
     @SerializedName("cost")
-    private int mCost;
+    private double mCost;
     @SerializedName("location")
     private SimpleGeofence mLocation;
     @SerializedName("taskactions")
@@ -40,7 +40,7 @@ public class Task implements Serializable {
         return mName;
     }
 
-    public int getCost() {
+    public double getCost() {
         return mCost;
     }
 

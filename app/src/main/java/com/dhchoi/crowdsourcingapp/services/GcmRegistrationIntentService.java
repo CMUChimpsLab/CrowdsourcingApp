@@ -45,7 +45,7 @@ public class GcmRegistrationIntentService extends IntentService {
 
             // Persist registration to third-party servers.
             // Associate the user's GCM registration token with any server-side account maintained by application.
-            startService(new Intent(this, RegisterUserIntentService.class));
+            //startService(new Intent(this, RegisterUserIntentService.class));
 
             // [END register_for_gcm]
         } catch (Exception e) {

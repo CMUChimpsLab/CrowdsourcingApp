@@ -1,86 +1,87 @@
 package com.dhchoi.crowdsourcingapp.activities;
 
-import android.accounts.AccountManager;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.net.Uri;
 import android.os.AsyncTask;
-import android.os.Bundle;
-import android.support.design.widget.NavigationView;
 import android.support.design.widget.Snackbar;
-import android.support.v4.view.GravityCompat;
-import android.support.v4.widget.DrawerLayout;
-import android.support.v7.app.ActionBarDrawerToggle;
+import android.support.design.widget.TabLayout;
 import android.support.v7.widget.Toolbar;
-import android.util.Log;
+
+import android.support.v4.app.Fragment;
+import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.view.ViewPager;
+import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
-import android.widget.TextView;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.R;
-import com.dhchoi.crowdsourcingapp.services.GcmRegistrationIntentService;
-import com.dhchoi.crowdsourcingapp.services.RegisterUserIntentService;
+import com.dhchoi.crowdsourcingapp.fragments.CrowdActivityFragment;
+import com.dhchoi.crowdsourcingapp.fragments.UserInfoFragment;
+import com.dhchoi.crowdsourcingapp.fragments.TaskAvailableFragment;
+import com.dhchoi.crowdsourcingapp.crowdactivity.CrowdActivityItem;
+import com.dhchoi.crowdsourcingapp.fragments.TaskAvailableListFragment;
+import com.dhchoi.crowdsourcingapp.fragments.TaskAvailableMapFragment;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.common.AccountPicker;
 
-public class MainActivity extends BaseGoogleApiActivity implements NavigationView.OnNavigationItemSelectedListener {
+import java.util.ArrayList;
+import java.util.List;
 
-    private static final int USER_EMAIL_REQUEST = 100;
-    private static final String USER_EMAIL_PROVIDED_KEY = Constants.PACKAGE_NAME + "USER_EMAIL_PROVIDED_KEY";
+public class MainActivity extends BaseGoogleApiActivity implements
+        TaskAvailableFragment.OnNearbyFragmentInteractionListener,
+        UserInfoFragment.OnInfoFragmentInteractionListener,
+        CrowdActivityFragment.OnActivityListFragmentInteractionListener,
+        TaskAvailableListFragment.OnTaskListFragmentInteractionListener,
+        TaskAvailableMapFragment.OnTaskMapFragmentInteractionListener {
 
-    private SharedPreferences mSharedPreferences;
-    private TextView mNoticeText;
+    /**
+     * The {@link android.support.v4.view.PagerAdapter} that will provide
+     * fragments for each of the sections. We use a
+     * {@link FragmentPagerAdapter} derivative, which will keep every
+     * loaded fragment in memory. If this becomes too memory intensive, it
+     * may be best to switch to a
+     * {@link android.support.v4.app.FragmentStatePagerAdapter}.
+     */
+    private SectionsPagerAdapter mSectionsPagerAdapter;
+
     private ProgressBar mSyncProgressBar;
+
+    private TaskAvailableFragment mTaskAvailableFragment;
+    private CrowdActivityFragment mCrowdActivityFragment;
+    private UserInfoFragment mUserInfoFragment;
+
+    /**
+     * The {@link ViewPager} that will host the section contents.
+     */
+    private ViewPager mViewPager;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
-        // setup views
         setContentView(R.layout.activity_main);
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
-        drawer.setDrawerListener(toggle);
-        toggle.syncState();
+        // Create the adapter that will return a fragment for each of the three
+        // primary sections of the activity.
+        mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
-        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
-        navigationView.setNavigationItemSelectedListener(this);
-        mNoticeText = (TextView) findViewById(R.id.notice_text);
+        // Set up the ViewPager with the sections adapter.
+        mViewPager = (ViewPager) findViewById(R.id.container);
+        mViewPager.setAdapter(mSectionsPagerAdapter);
+
+        // Set up the Tab Layout
+        TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
+        tabLayout.setupWithViewPager(mViewPager);
+
+        // ProgressBar to show sync status
         mSyncProgressBar = (ProgressBar) findViewById(R.id.sync_progress_bar);
-
-        // request user for email if it wasn't provided yet
-        mSharedPreferences = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, MODE_PRIVATE);
-        if (!mSharedPreferences.getBoolean(USER_EMAIL_PROVIDED_KEY, false)) {
-            Log.d(Constants.TAG, "start requesting user email");
-            Intent emailRequestIntent = AccountPicker.newChooseAccountIntent(
-                    null, null, new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, false, null, null, null, null);
-            startActivityForResult(emailRequestIntent, USER_EMAIL_REQUEST);
-        } else {
-            String userEmail = mSharedPreferences.getString(Constants.USER_ID_KEY, "");
-            Log.d(Constants.TAG, "user email already provided: " + userEmail);
-            mNoticeText.setText(String.format(getResources().getString(R.string.notice_welcome), userEmail));
-
-            // register user if hasn't already been done so
-            if (!mSharedPreferences.getBoolean(Constants.USER_REGISTERED_KEY, false)) {
-                startService(new Intent(this, RegisterUserIntentService.class));
-            }
-        }
     }
 
-    @Override
-    public void onBackPressed() {
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        if (drawer.isDrawerOpen(GravityCompat.START)) {
-            drawer.closeDrawer(GravityCompat.START);
-        } else {
-            super.onBackPressed();
-        }
-    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -95,31 +96,22 @@ public class MainActivity extends BaseGoogleApiActivity implements NavigationVie
         // so long as you specify a parent activity in AndroidManifest.xml.
         int id = item.getItemId();
 
-        //noinspection SimplifiableIfStatement
         if (id == R.id.action_settings) {
+            return true;
+        }
+        else if (id == R.id.action_check_current_location) {
+            startActivity(new Intent(this, CurrentLocationActivity.class));
+            return true;
+        }
+        else if (id == R.id.action_logout) {
+            SharedPreferences sharedPreferences = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, this.MODE_PRIVATE);
+            sharedPreferences.edit().putBoolean(Constants.USER_LOGGED_IN, false).apply();
+            startActivity(new Intent(this, CheckLoginActivity.class));
+            finish();
             return true;
         }
 
         return super.onOptionsItemSelected(item);
-    }
-
-    @SuppressWarnings("StatementWithEmptyBody")
-    @Override
-    public boolean onNavigationItemSelected(MenuItem item) {
-        // Handle navigation view item clicks here.
-        int id = item.getItemId();
-
-        if (id == R.id.nav_browse_tasks) {
-            Intent intent = new Intent(this, TaskManagementActivity.class);
-            startActivity(intent);
-        } else if (id == R.id.nav_check_location) {
-            Intent intent = new Intent(this, CheckLocationActivity.class);
-            startActivity(intent);
-        }
-
-        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-        drawer.closeDrawer(GravityCompat.START);
-        return true;
     }
 
     @Override
@@ -146,18 +138,67 @@ public class MainActivity extends BaseGoogleApiActivity implements NavigationVie
     }
 
     @Override
-    protected void onActivityResult(int requestCode, int resultCode, Intent data) {
-        if (requestCode == USER_EMAIL_REQUEST && resultCode == RESULT_OK) {
-            String userEmail = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
-            Log.d(Constants.TAG, "received user email: " + userEmail);
+    public void onNearbyFragmentInteraction(Uri uri) {
 
-            mSharedPreferences.edit().putBoolean(USER_EMAIL_PROVIDED_KEY, true).apply();
-            mSharedPreferences.edit().putString(Constants.USER_ID_KEY, userEmail).apply();
+    }
 
-            mNoticeText.setText(String.format(getResources().getString(R.string.notice_welcome), mSharedPreferences.getString(Constants.USER_ID_KEY, "")));
+    @Override
+    public void onInfoFragmentInteraction(Uri uri) {
 
-            // start IntentService to register this application with GCM
-            startService(new Intent(this, GcmRegistrationIntentService.class));
+    }
+
+    @Override
+    public void onActivityListFragmentInteraction(CrowdActivityItem item) {
+
+    }
+
+    @Override
+    public void onTaskListFragmentInteraction(Uri uri) {
+
+    }
+
+    @Override
+    public void onTaskMapFragmentInteraction(Uri uri) {
+
+    }
+
+    /**
+     * A {@link FragmentPagerAdapter} that returns a fragment corresponding to one of the sections/tabs/pages.
+     */
+    public class SectionsPagerAdapter extends FragmentPagerAdapter {
+
+        List<FragmentWrapper> fragmentWrappers = new ArrayList<FragmentWrapper>();
+
+        public SectionsPagerAdapter(FragmentManager fm) {
+            super(fm);
+            fragmentWrappers.add(new FragmentWrapper(TaskAvailableFragment.NAME, mTaskAvailableFragment = TaskAvailableFragment.newInstance()));
+            fragmentWrappers.add(new FragmentWrapper(CrowdActivityFragment.NAME, mCrowdActivityFragment = CrowdActivityFragment.newInstance()));
+            fragmentWrappers.add(new FragmentWrapper(UserInfoFragment.NAME, mUserInfoFragment = UserInfoFragment.newInstance()));
+        }
+
+        @Override
+        public Fragment getItem(int position) {
+            return fragmentWrappers.get(position).fragment;
+        }
+
+        @Override
+        public int getCount() {
+            return fragmentWrappers.size();
+        }
+
+        @Override
+        public CharSequence getPageTitle(int position) {
+            return fragmentWrappers.get(position).fragmentName;
+        }
+
+        class FragmentWrapper {
+            String fragmentName;
+            Fragment fragment;
+
+            FragmentWrapper(String fragmentName, Fragment fragment) {
+                this.fragmentName = fragmentName;
+                this.fragment = fragment;
+            }
         }
     }
 }

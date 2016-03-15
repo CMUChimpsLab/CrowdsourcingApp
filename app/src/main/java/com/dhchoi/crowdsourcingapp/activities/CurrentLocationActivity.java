@@ -19,7 +19,7 @@ import com.google.android.gms.location.LocationServices;
 import java.text.DateFormat;
 import java.util.Date;
 
-public class CheckLocationActivity extends BaseGoogleApiActivity implements LocationListener {
+public class CurrentLocationActivity extends BaseGoogleApiActivity implements LocationListener {
 
     // Receiver registered with this activity to get the response from FetchAddressIntentService.
     ResultReceiver mFetchAddressResultReceiver;
@@ -49,7 +49,7 @@ public class CheckLocationActivity extends BaseGoogleApiActivity implements Loca
         };
 
         // setup views
-        setContentView(R.layout.activity_check_location);
+        setContentView(R.layout.activity_current_location);
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);

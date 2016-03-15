@@ -1,13 +1,13 @@
-package com.dhchoi.crowdsourcingapp.activities;
+package com.dhchoi.crowdsourcingapp.fragments;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
-import android.support.v7.app.AppCompatActivity;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -19,6 +19,7 @@ import android.widget.TextView;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.R;
+import com.dhchoi.crowdsourcingapp.activities.TaskCompleteActivity;
 import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
@@ -26,7 +27,17 @@ import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskManagementActivity extends AppCompatActivity {
+/**
+ * A simple {@link Fragment} subclass.
+ * Activities that contain this fragment must implement the
+ * {@link OnTaskListFragmentInteractionListener} interface
+ * to handle interaction events.
+ * Use the {@link TaskAvailableListFragment#newInstance} factory method to
+ * create an instance of this fragment.
+ */
+public class TaskAvailableListFragment extends Fragment {
+
+    private OnTaskListFragmentInteractionListener mListener;
 
     private ArrayAdapter<Task> mActiveTaskListAdapter;
     private ArrayAdapter<Task> mInactiveTaskListAdapter;
@@ -61,22 +72,19 @@ public class TaskManagementActivity extends AppCompatActivity {
         }
     };
 
+    public TaskAvailableListFragment() {
+        // Required empty public constructor
+    }
+
     @Override
-    protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View rootView = inflater.inflate(R.layout.fragment_task_available_list, container, false);
 
-        // setup views
-        setContentView(R.layout.activity_task_management);
-
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
-        getSupportActionBar().setDisplayHomeAsUpEnabled(true);
-
-        mActiveTasksNotice = (TextView) findViewById(R.id.active_tasks_notice);
-        mInactiveTasksNotice = (TextView) findViewById(R.id.inactive_tasks_notice);
+        mActiveTasksNotice = (TextView) rootView.findViewById(R.id.active_tasks_notice);
+        mInactiveTasksNotice = (TextView) rootView.findViewById(R.id.inactive_tasks_notice);
 
         // get task list
-        List<Task> allTasks = TaskManager.getAllTasks(this);
+        List<Task> allTasks = TaskManager.getAllTasks(getActivity());
         List<Task> activeTasks = new ArrayList<Task>();
         List<Task> inactiveTasks = new ArrayList<Task>();
         for (Task t : allTasks) {
@@ -88,30 +96,67 @@ public class TaskManagementActivity extends AppCompatActivity {
         }
 
         // setup task list views and adapters
-        ListView activeTaskListView = (ListView) findViewById(R.id.active_tasks);
-        activeTaskListView.setAdapter(mActiveTaskListAdapter = new TaskListAdapter(this, activeTasks));
+        ListView activeTaskListView = (ListView) rootView.findViewById(R.id.active_tasks);
+        activeTaskListView.setAdapter(mActiveTaskListAdapter = new TaskListAdapter(getActivity(), activeTasks));
         activeTaskListView.setOnItemClickListener(new OnTaskItemClickListener());
 
-        ListView inactiveTaskListView = (ListView) findViewById(R.id.inactive_tasks);
-        inactiveTaskListView.setAdapter(mInactiveTaskListAdapter = new TaskListAdapter(this, inactiveTasks));
+        ListView inactiveTaskListView = (ListView) rootView.findViewById(R.id.inactive_tasks);
+        inactiveTaskListView.setAdapter(mInactiveTaskListAdapter = new TaskListAdapter(getActivity(), inactiveTasks));
         inactiveTaskListView.setOnItemClickListener(new OnTaskItemClickListener());
 
         updateNoticeTextViews();
 
         // Register to receive messages.
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceTransitionsIntentService.GEOFENCE_TRANSITION_BROADCAST));
+        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceTransitionsIntentService.GEOFENCE_TRANSITION_BROADCAST));
+
+        // Inflate the layout for this fragment
+        return rootView;
+    }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onTaskListFragmentInteraction(uri);
+        }
     }
 
     @Override
-    protected void onDestroy() {
+    public void onAttach(Context context) {
+        super.onAttach(context);
+        if (context instanceof OnTaskListFragmentInteractionListener) {
+            mListener = (OnTaskListFragmentInteractionListener) context;
+        } else {
+            throw new RuntimeException(context.toString() + " must implement OnTaskListFragmentInteractionListener");
+        }
+    }
+
+    @Override
+    public void onDetach() {
+        super.onDetach();
+        mListener = null;
+
         // Unregister since the activity is about to be closed.
-        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
-        super.onDestroy();
+        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
     }
 
     private void updateNoticeTextViews() {
         mActiveTasksNotice.setVisibility(mActiveTaskListAdapter.getCount() > 0 ? TextView.GONE : TextView.VISIBLE);
         mInactiveTasksNotice.setVisibility(mInactiveTaskListAdapter.getCount() > 0 ? TextView.GONE : TextView.VISIBLE);
+    }
+
+    /**
+     * This interface must be implemented by activities that contain this
+     * fragment to allow an interaction in this fragment to be communicated
+     * to the activity and potentially other fragments contained in that
+     * activity.
+     * <p/>
+     * See the Android Training lesson <a href=
+     * "http://developer.android.com/training/basics/fragments/communicating.html"
+     * >Communicating with Other Fragments</a> for more information.
+     */
+    public interface OnTaskListFragmentInteractionListener {
+        // TODO: Update argument type and name
+        void onTaskListFragmentInteraction(Uri uri);
     }
 
     class TaskListAdapter extends ArrayAdapter<Task> {
@@ -127,7 +172,7 @@ public class TaskManagementActivity extends AppCompatActivity {
 
             // Check if an existing view is being reused, otherwise inflate the view
             if (convertView == null) {
-                convertView = LayoutInflater.from(getContext()).inflate(R.layout.task_list_line, parent, false);
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.listitem_task_available, parent, false);
             }
 
             ((TextView) convertView.findViewById(R.id.task_name)).setText(task.getName());
@@ -146,7 +191,7 @@ public class TaskManagementActivity extends AppCompatActivity {
             Task task = (Task) parent.getItemAtPosition(position);
             Log.d(Constants.TAG, "clicked task: " + task);
 
-            Intent intent = new Intent(TaskManagementActivity.this, TaskCompletionActivity.class);
+            Intent intent = new Intent(getActivity(), TaskCompleteActivity.class);
             intent.putExtra(Task.TASK_KEY_SERIALIZABLE, task);
 
             startActivity(intent);

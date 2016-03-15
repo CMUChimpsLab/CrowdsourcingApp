@@ -1,0 +1,219 @@
+<?xml version="1.0" encoding="utf-8"?>
+<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    android:orientation="vertical"
+    tools:context=".fragments.UserInfoFragment">
+    <!--tools:context=".activities.MainActivity$PlaceholderFragment" >-->
+
+    <GridLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:padding="10dp">
+
+        <LinearLayout
+            android:layout_width="100dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentStart="false"
+            android:layout_column="2"
+            android:layout_marginTop="10dp"
+            android:layout_row="0"
+            android:layout_rowSpan="2"
+            android:orientation="vertical"
+            android:paddingRight="20dp">
+
+            <TextView
+                android:id="@+id/textView7"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_column="3"
+                android:layout_row="1"
+                android:text="$4.70"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="30dp" />
+
+            <TextView
+                android:id="@+id/textView9"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Current Funds"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="13dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentStart="false"
+            android:layout_column="3"
+            android:layout_marginTop="10dp"
+            android:layout_row="0"
+            android:layout_rowSpan="2"
+            android:orientation="vertical"
+            android:paddingRight="20dp">
+
+            <TextView
+                android:id="@+id/textView8"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_column="3"
+                android:layout_row="1"
+                android:text="15"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="30dp" />
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Questions Asked"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="13dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="80dp"
+            android:layout_height="wrap_content"
+            android:layout_alignParentEnd="false"
+            android:layout_alignParentStart="false"
+            android:layout_column="4"
+            android:layout_marginTop="10dp"
+            android:layout_row="0"
+            android:layout_rowSpan="2"
+            android:orientation="vertical"
+            android:paddingRight="20dp">
+
+            <TextView
+                android:id="@+id/textView11"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:layout_column="3"
+                android:layout_row="1"
+                android:text="20"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="30dp" />
+
+            <TextView
+                android:id="@+id/textView12"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Questions Answered"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="13dp" />
+        </LinearLayout>
+
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_columnSpan="2"
+            android:layout_marginTop="10dp"
+            android:layout_row="0"
+            android:layout_rowSpan="3"
+            android:orientation="vertical"
+            android:paddingRight="15dp">
+
+            <ImageView
+                android:id="@+id/imageView3"
+                android:layout_width="80dp"
+                android:layout_height="80dp"
+                android:background="#ddd" />
+
+            <TextView
+                android:id="@+id/textView13"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="Alex Sciuto"
+                android:textAlignment="center"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textSize="12dp" />
+        </LinearLayout>
+
+        <FrameLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_column="2"
+            android:layout_columnSpan="3"
+            android:layout_row="2">
+
+            <Button
+                android:id="@+id/button"
+                style="?android:attr/buttonStyleSmall"
+                android:layout_width="247dp"
+                android:layout_height="wrap_content"
+                android:layout_column="2"
+                android:layout_columnSpan="3"
+                android:layout_row="2"
+                android:layout_weight="1"
+                android:text="Edit My Information" />
+        </FrameLayout>
+
+        <FrameLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_column="0"
+            android:layout_columnSpan="5"
+            android:layout_gravity="bottom"
+            android:layout_row="3">
+
+            <ListView
+                android:id="@+id/listView"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_column="0"
+                android:layout_gravity="center_horizontal"
+                android:layout_row="5"
+                android:divider="#ddd"
+                android:dividerHeight="1dp"
+                android:drawSelectorOnTop="true"
+                tools:listitem="@layout/listitem_task_created" />
+        </FrameLayout>
+
+    </GridLayout>
+
+    <android.support.design.widget.FloatingActionButton
+        android:id="@+id/fab"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="end|bottom"
+        android:layout_margin="@dimen/fab_margin"
+        android:baselineAlignBottom="false"
+        android:clickable="false"
+        android:src="@android:drawable/ic_input_add"
+        app:elevation="2dp" />
+
+</FrameLayout>
+
+<!--<FrameLayout xmlns:android="http://schemas.android.com/apk/res/android"-->
+<!--xmlns:tools="http://schemas.android.com/tools"-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="match_parent"-->
+<!--tools:context="com.dhchoi.crowdsourcingapp.fragments.UserInfoFragmentment">-->
+
+<!--&lt;!&ndash; TODO: Update blank fragment layout &ndash;&gt;-->
+<!--<TextView-->
+<!--android:layout_width="match_parent"-->
+<!--android:layout_height="match_parent"-->
+<!--android:textAppearance="?android:attr/textAppearanceLarge"-->
+<!--android:id="@+id/textView12"-->
+<!--android:text="User Info" />-->
+
+<!--<android.support.design.widget.FloatingActionButton-->
+<!--android:id="@+id/fab"-->
+<!--android:layout_width="wrap_content"-->
+<!--android:layout_height="wrap_content"-->
+<!--android:layout_gravity="end|bottom"-->
+<!--android:layout_margin="@dimen/fab_margin"-->
+<!--android:src="@android:drawable/ic_input_add" />-->
+
+<!--</FrameLayout>-->
