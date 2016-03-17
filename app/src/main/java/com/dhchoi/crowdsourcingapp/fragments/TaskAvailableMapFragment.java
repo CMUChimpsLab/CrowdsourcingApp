@@ -5,6 +5,7 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.graphics.Color;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -16,6 +17,7 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.dhchoi.crowdsourcingapp.SimpleGeofence;
+import com.dhchoi.crowdsourcingapp.activities.TaskCompleteActivity;
 import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
@@ -24,17 +26,30 @@ import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
 import com.google.android.gms.maps.SupportMapFragment;
 import com.google.android.gms.maps.UiSettings;
+import com.google.android.gms.maps.model.BitmapDescriptorFactory;
+import com.google.android.gms.maps.model.Circle;
+import com.google.android.gms.maps.model.CircleOptions;
 import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.Marker;
 import com.google.android.gms.maps.model.MarkerOptions;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class TaskAvailableMapFragment extends SupportMapFragment implements OnMapReadyCallback {
 
     private OnTaskMapFragmentInteractionListener mListener;
 
+    // map related
+    static final int BLUE_TRANSPARENT = 0x220000ff;
+    static final int RED_TRANSPARENT = 0x22ff0000;
     private GoogleMap mGoogleMap;
+    private Circle mCurrentVisibleCircle = null;
+    private Map<Marker, Task> mMarkerToTask = new HashMap<Marker, Task>();
+
+    // task related
     private List<Task> mAllTasks = new ArrayList<Task>();
     private List<Task> mActiveTasks = new ArrayList<Task>();
     private List<Task> mInactiveTasks = new ArrayList<Task>();
@@ -116,6 +131,47 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements OnMa
         settings.setAllGesturesEnabled(true);
         settings.setMyLocationButtonEnabled(true);
         mGoogleMap.setMyLocationEnabled(true);
+        mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
+            @Override
+            public boolean onMarkerClick(Marker marker) {
+                // remove any previous circle drawn
+                if (mCurrentVisibleCircle != null) {
+                    mCurrentVisibleCircle.remove();
+                }
+
+                // add circle to show region for which task can be activated
+                Task task = mMarkerToTask.get(marker);
+                CircleOptions circleOptions = new CircleOptions()
+                        .center(marker.getPosition())
+                        .radius(task.getLocation().getRadius())
+                        .strokeColor(Color.TRANSPARENT)
+                        .fillColor(BLUE_TRANSPARENT);
+                if (mInactiveTasks.contains(task)) {
+                    circleOptions.fillColor(RED_TRANSPARENT);
+                }
+                mCurrentVisibleCircle = mGoogleMap.addCircle(circleOptions);
+
+                return false;
+            }
+        });
+        mGoogleMap.setOnInfoWindowClickListener(new GoogleMap.OnInfoWindowClickListener() {
+            @Override
+            public void onInfoWindowClick(Marker marker) {
+                // start activity for task
+                Intent intent = new Intent(getActivity(), TaskCompleteActivity.class);
+                intent.putExtra(Task.TASK_KEY_SERIALIZABLE, mMarkerToTask.get(marker));
+                startActivity(intent);
+            }
+        });
+        mGoogleMap.setOnMapClickListener(new GoogleMap.OnMapClickListener() {
+            @Override
+            public void onMapClick(LatLng latLng) {
+                // remove any circles drawn
+                if (mCurrentVisibleCircle != null) {
+                    mCurrentVisibleCircle.remove();
+                }
+            }
+        });
 
         // TODO: zoom to current location
 //        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(((BaseGoogleApiActivity)getActivity()).getGoogleApiClient());
@@ -155,14 +211,17 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements OnMa
     }
 
     private void updateMarkers() {
+        // TODO: take care for case of too much clustered tasks in one region
         for (Task t : mAllTasks) {
             SimpleGeofence simpleGeofence = t.getLocation();
             LatLng latLng = new LatLng(simpleGeofence.getLatitude(), simpleGeofence.getLongitude());
-            mGoogleMap.addMarker(new MarkerOptions().position(latLng).title(t.getName()));
-            // TODO: set different markers depending on whether tasks are activated or not
-            // TODO: show activation region
-            // TODO: set click listeners on markers
-            // mGoogleMap.addMarker(new MarkerOptions().position(~).icon(BitmapDescriptorFactory.fromResource(R.drawable.marker)));
+            MarkerOptions markerOptions = new MarkerOptions()
+                    .position(latLng)
+                    .title(t.getName() + " ($" + t.getCost() + ") ->");
+            if (mInactiveTasks.contains(t)) {
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+            }
+            mMarkerToTask.put(mGoogleMap.addMarker(markerOptions), t);
         }
     }
 
