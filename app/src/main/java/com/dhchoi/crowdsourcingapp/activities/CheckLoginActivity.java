@@ -15,8 +15,8 @@ public class CheckLoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Check if user first needs to login
-        SharedPreferences sharedPreferences = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, this.MODE_PRIVATE);
-        boolean isLoggedIn = sharedPreferences.getBoolean(Constants.USER_LOGGED_IN, true);
+        SharedPreferences sharedPreferences = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, CheckLoginActivity.MODE_PRIVATE);
+        boolean isLoggedIn = sharedPreferences.getBoolean(Constants.USER_LOGGED_IN, false);
         if (isLoggedIn) {
             Log.d(Constants.TAG, "Already logged in. Directing to MainActivity.");
             startActivity(new Intent(this, MainActivity.class));
