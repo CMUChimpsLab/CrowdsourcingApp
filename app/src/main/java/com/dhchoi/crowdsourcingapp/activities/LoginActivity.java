@@ -1,24 +1,30 @@
 package com.dhchoi.crowdsourcingapp.activities;
 
+import android.Manifest;
 import android.accounts.AccountManager;
 import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AutoCompleteTextView;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientAsyncTask;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
+import com.dhchoi.crowdsourcingapp.PermissionUtils;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.services.GcmRegistrationIntentService;
 import com.google.android.gms.auth.GoogleAuthUtil;
@@ -35,11 +41,14 @@ import java.util.Map;
 public class LoginActivity extends AppCompatActivity {
 
     private static final int USER_EMAIL_REQUEST = 100;
+    private static final int LOCATION_PERMISSION_REQUEST = 200;
 
     // UI references.
     private AutoCompleteTextView mEmailView;
     private View mProgressView;
     private View mLoginFormView;
+    private Button mEmailSignInButton;
+    private Button mChooseEmailButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -51,8 +60,9 @@ public class LoginActivity extends AppCompatActivity {
         mLoginFormView = findViewById(R.id.login_form);
         mProgressView = findViewById(R.id.login_progress);
 
-        // Set SignIn button OnClickListener
-        findViewById(R.id.email_sign_in_button).setOnClickListener(new OnClickListener() {
+        // Set EmailSignIn button OnClickListener
+        mEmailSignInButton = (Button) findViewById(R.id.email_sign_in_button);
+        mEmailSignInButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 attemptLogin();
@@ -60,13 +70,22 @@ public class LoginActivity extends AppCompatActivity {
         });
 
         // Set EmailChoose button OnClickListener
-        findViewById(R.id.email_choose_button).setOnClickListener(new OnClickListener() {
+        mChooseEmailButton = (Button) findViewById(R.id.email_choose_button);
+        mChooseEmailButton.setOnClickListener(new OnClickListener() {
             @Override
             public void onClick(View view) {
                 Intent emailRequestIntent = AccountPicker.newChooseAccountIntent(null, null, new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, false, null, null, null, null);
                 startActivityForResult(emailRequestIntent, USER_EMAIL_REQUEST);
             }
         });
+
+        if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
+            // Permission to access the location is missing.
+            PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST, Manifest.permission.ACCESS_FINE_LOCATION, false);
+        }
+        else {
+            mEmailSignInButton.setEnabled(true);
+        }
 
         // start IntentService to register this application with GCM
         startService(new Intent(this, GcmRegistrationIntentService.class));
@@ -146,11 +165,6 @@ public class LoginActivity extends AppCompatActivity {
         return email.contains("@");
     }
 
-    //TODO: Replace this with your own logic
-    private boolean isPasswordValid(String password) {
-        return password.length() > 4;
-    }
-
     /**
      * Shows the progress UI and hides the login form.
      */
@@ -195,4 +209,18 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
+    @Override
+    public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
+        if (requestCode != LOCATION_PERMISSION_REQUEST) {
+            return;
+        }
+
+        if (PermissionUtils.isPermissionGranted(permissions, grantResults, Manifest.permission.ACCESS_FINE_LOCATION)) {
+            // Enable button if the permission has been granted.
+            mEmailSignInButton.setEnabled(true);
+        } else {
+            // Display the missing permission error message.
+            findViewById(R.id.location_required_notice).setVisibility(View.VISIBLE);
+        }
+    }
 }
