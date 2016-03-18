@@ -128,7 +128,7 @@ public class LoginActivity extends AppCompatActivity {
             Map<String, String> params = new HashMap<String, String>();
             params.put("userId", email);
             params.put("gcmToken", getSharedPreferences(Constants.DEFAULT_SHARED_PREF, MODE_PRIVATE).getString(Constants.USER_GCM_TOKEN_KEY, ""));
-            new HttpClientAsyncTask(Constants.APP_SERVER_TASK_RESPOND_URL, HttpClientCallable.POST, params) {
+            new HttpClientAsyncTask(Constants.APP_SERVER_USER_CREATE_URL, HttpClientCallable.POST, params) {
                 @Override
                 protected void onPostExecute(String response) {
                     showProgress(false);
@@ -136,6 +136,7 @@ public class LoginActivity extends AppCompatActivity {
                     try {
                         if (response != null) {
                             JSONObject responseObj = new JSONObject(response);
+                            Log.d(Constants.TAG, "User login server response: " + responseObj);
                             String errorMsg = responseObj.getString("error");
                             if (errorMsg.isEmpty()) {
                                 SharedPreferences sharedPreferences = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, LoginActivity.MODE_PRIVATE);
