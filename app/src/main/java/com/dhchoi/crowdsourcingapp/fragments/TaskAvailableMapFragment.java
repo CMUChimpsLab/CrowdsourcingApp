@@ -90,8 +90,11 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
                         .radius(task.getLocation().getRadius())
                         .strokeColor(Color.TRANSPARENT)
                         .fillColor(BLUE_TRANSPARENT);
-                if (mInactiveTasks.contains(task)) {
+                if (mActiveTasks.contains(task)) {
                     circleOptions.fillColor(RED_TRANSPARENT);
+                }
+                else {
+                    circleOptions.fillColor(BLUE_TRANSPARENT);
                 }
                 mCurrentVisibleCircle = mGoogleMap.addCircle(circleOptions);
 
@@ -177,7 +180,7 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
                     .position(latLng)
                     .title(t.getName() + " ($" + t.getCost() + ") ->");
             if (mInactiveTasks.contains(t)) {
-                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_RED));
+                markerOptions.icon(BitmapDescriptorFactory.defaultMarker(BitmapDescriptorFactory.HUE_CYAN));
             }
             mMarkerToTask.put(mGoogleMap.addMarker(markerOptions), t);
         }
