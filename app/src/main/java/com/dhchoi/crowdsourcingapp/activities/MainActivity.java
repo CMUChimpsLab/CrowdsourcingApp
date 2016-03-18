@@ -127,7 +127,7 @@ public class MainActivity extends BaseGoogleApiActivity implements
             }
         }.execute();
 
-        mTaskAvailableFragment.getTaskAvailableMapFragment().updateCurrentLocation();
+        mTaskAvailableFragment.getTaskAvailableMapFragment().updateCurrentLocation(this);
     }
 
     @Override

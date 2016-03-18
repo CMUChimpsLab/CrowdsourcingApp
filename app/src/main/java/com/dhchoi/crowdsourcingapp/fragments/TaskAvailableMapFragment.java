@@ -11,6 +11,7 @@ import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
@@ -182,8 +183,9 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements OnMa
                 Log.d(Constants.TAG, "No lastLocation found.");
             }
 
-            if (((BaseGoogleApiActivity) getActivity()).getGoogleApiClient().isConnected()) {
-                updateCurrentLocation();
+            BaseGoogleApiActivity baseGoogleApiActivity = (BaseGoogleApiActivity) getActivity();
+            if (baseGoogleApiActivity.getGoogleApiClient().isConnected()) {
+                updateCurrentLocation(baseGoogleApiActivity);
             }
         } else {
             Log.d(Constants.TAG, "ACCESS_FINE_LOCATION not granted and will not perform setMyLocationEnabled(true)");
@@ -198,13 +200,13 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements OnMa
         mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL));
     }
 
-    public void updateCurrentLocation() {
-        if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+    public void updateCurrentLocation(@NonNull BaseGoogleApiActivity baseGoogleApiActivity) {
+        if (ContextCompat.checkSelfPermission(baseGoogleApiActivity, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             LocationRequest locationRequest = new LocationRequest()
                     .setNumUpdates(1)
                     .setInterval(100)
                     .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
-            LocationServices.FusedLocationApi.requestLocationUpdates(((BaseGoogleApiActivity) getActivity()).getGoogleApiClient(), locationRequest, this);
+            LocationServices.FusedLocationApi.requestLocationUpdates(baseGoogleApiActivity.getGoogleApiClient(), locationRequest, this);
         } else {
             Log.d(Constants.TAG, "ACCESS_FINE_LOCATION not granted and will not recenter map to current location");
         }
