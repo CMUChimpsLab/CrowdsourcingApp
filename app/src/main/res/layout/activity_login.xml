@@ -60,20 +60,22 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:enabled="false"
                 android:text="@string/action_sign_in"
-                android:textStyle="bold"
-                android:enabled="false" />
+                android:textStyle="bold" />
 
             <TextView
                 android:id="@+id/location_required_notice"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_horizontal"
                 android:layout_marginTop="16dp"
                 android:text="@string/location_permission_denied"
-                android:layout_gravity="center_horizontal"
                 android:textColor="#ff0000"
                 android:visibility="gone" />
 
         </LinearLayout>
+
     </ScrollView>
+
 </LinearLayout>

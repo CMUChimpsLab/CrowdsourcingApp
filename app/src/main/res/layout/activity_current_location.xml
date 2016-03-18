@@ -21,65 +21,67 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:paddingBottom="@dimen/activity_vertical_margin"
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
-        app:layout_behavior="@string/appbar_scrolling_view_behavior"
-        tools:context=".activities.CurrentLocationActivity"
-        tools:showIn="@layout/activity_current_location">
+        app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Current Location (Raw)"
             android:id="@+id/current_location_raw_title"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
             android:layout_alignParentTop="true"
-            android:layout_alignParentStart="true" />
+            android:text="Current Location (Raw)"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
-        <TextView android:id="@+id/current_location_raw" android:text="current location raw"
+        <TextView
+            android:id="@+id/current_location_raw"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
             android:layout_below="@id/current_location_raw_title"
-            android:layout_alignParentStart="true" />
+            android:text="current location raw" />
 
         <TextView
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Current Location (Address)"
             android:id="@+id/current_location_address_title"
-            android:layout_below="@id/current_location_raw"
-            android:layout_alignParentStart="true"
-            android:layout_marginTop="30dp" />
-
-        <TextView android:id="@+id/current_location_address" android:text="current location address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:layout_below="@id/current_location_address_title"
-            android:layout_alignParentStart="true" />
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/current_location_raw"
+            android:layout_marginTop="30dp"
+            android:text="Current Location (Address)"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
 
         <TextView
+            android:id="@+id/current_location_address"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:text="Last Update Time"
-            android:id="@+id/current_location_last_updated_title"
-            android:layout_below="@id/current_location_address"
             android:layout_alignParentStart="true"
-            android:layout_marginTop="30dp" />
+            android:layout_below="@id/current_location_address_title"
+            android:text="current location address" />
 
-        <TextView android:id="@+id/current_location_last_updated" android:text="last update time"
+        <TextView
+            android:id="@+id/current_location_last_updated_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
+            android:layout_below="@id/current_location_address"
+            android:layout_marginTop="30dp"
+            android:text="Last Update Time"
+            android:textAppearance="?android:attr/textAppearanceLarge" />
+
+        <TextView
+            android:id="@+id/current_location_last_updated"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_alignParentStart="true"
             android:layout_below="@id/current_location_last_updated_title"
-            android:layout_alignParentStart="true" />
+            android:text="last update time" />
 
     </RelativeLayout>
 

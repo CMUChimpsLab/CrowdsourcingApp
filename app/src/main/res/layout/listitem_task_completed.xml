@@ -30,43 +30,20 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="10dp"
-                android:text="Answered:"
-                android:textAppearance="?android:attr/textAppearanceSmall" />
-
-            <TextView
-                android:id="@+id/last_submitted_time"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="XX minutes ago"
+                android:text="Task Location"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
         </LinearLayout>
 
     </LinearLayout>
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/task_cost"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_gravity="center"
         android:layout_weight="1"
-        android:orientation="vertical">
-
-        <TextView
-            android:id="@+id/task_cost"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="00"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-
-        <TextView
-            android:id="@+id/num_answers_submitted_title"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="answers"
-            android:textAppearance="?android:attr/textAppearanceSmall" />
-
-    </LinearLayout>
+        android:text="$0.00"
+        android:textAppearance="?android:attr/textAppearanceMedium" />
 
 </LinearLayout>

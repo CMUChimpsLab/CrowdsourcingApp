@@ -91,7 +91,6 @@ public class MainActivity extends BaseGoogleApiActivity implements
     private TaskAvailableFragment mTaskAvailableFragment = TaskAvailableFragment.newInstance();
     private CrowdActivityFragment mCrowdActivityFragment = CrowdActivityFragment.newInstance();
     private UserInfoFragment mUserInfoFragment = UserInfoFragment.newInstance();
-
     {
         onTasksUpdatedListeners.add(mTaskAvailableFragment.getTaskAvailableListFragment());
         onTasksUpdatedListeners.add(mTaskAvailableFragment.getTaskAvailableMapFragment());
@@ -169,7 +168,8 @@ public class MainActivity extends BaseGoogleApiActivity implements
             protected void onPostExecute(Boolean syncSuccess) {
                 mSyncProgressBar.setVisibility(ProgressBar.GONE);
                 if (syncSuccess) {
-                    Snackbar.make(findViewById(android.R.id.content), "Sync success!", Snackbar.LENGTH_LONG).show();
+                    Fragment currentFragment = mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
+                    Snackbar.make(currentFragment.getView().findViewById(R.id.fragment_content), "Sync success!", Snackbar.LENGTH_LONG).show();
 
                     // broadcast tasks to listeners
                     List<Task> allTasks = TaskManager.getAllTasks(MainActivity.this);
