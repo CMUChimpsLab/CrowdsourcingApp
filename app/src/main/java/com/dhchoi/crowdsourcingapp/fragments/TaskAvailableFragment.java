@@ -25,8 +25,8 @@ public class TaskAvailableFragment extends Fragment {
 
     private OnNearbyFragmentInteractionListener mListener;
     private boolean isMapShown = true;
-    // private TaskAvailableMapFragment mTaskMapFragment = new TaskAvailableMapFragment();
-    // private TaskAvailableListFragment mTaskListFragment = new TaskAvailableListFragment();
+    private TaskAvailableMapFragment mTaskAvailableMapFragment;
+    private TaskAvailableListFragment mTaskAvailableListFragment;
 
     public TaskAvailableFragment() {
         // Required empty public constructor
@@ -65,17 +65,19 @@ public class TaskAvailableFragment extends Fragment {
 //            }
 //        }
 //        else {
-//            getFragmentManager().beginTransaction().add(R.id.task_view_container, mTaskMapFragment).commit();
+//            getFragmentManager().beginTransaction().add(R.id.task_view_container, mTaskAvailableMapFragment).commit();
 //        }
 
-//        if (!mTaskMapFragment.isAdded()) {
-//            getFragmentManager().beginTransaction().add(R.id.task_view_container, mTaskMapFragment).commit();
+//        if (!mTaskAvailableMapFragment.isAdded()) {
+//            getFragmentManager().beginTransaction().add(R.id.task_view_container, mTaskAvailableMapFragment).commit();
 //        }
 //        if (!isMapShown) {
 //            swapFragments();
 //        }
 
-        getFragmentManager().beginTransaction().add(R.id.task_view_container, isMapShown ? new TaskAvailableMapFragment() : new TaskAvailableListFragment()).commit();
+        mTaskAvailableMapFragment = new TaskAvailableMapFragment();
+        mTaskAvailableListFragment = new TaskAvailableListFragment();
+        getFragmentManager().beginTransaction().add(R.id.task_view_container, isMapShown ? mTaskAvailableMapFragment : mTaskAvailableListFragment).commit();
 
         FloatingActionButton fab = (FloatingActionButton) mRootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
@@ -87,23 +89,6 @@ public class TaskAvailableFragment extends Fragment {
         });
 
         return mRootView;
-    }
-
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onNearbyFragmentInteraction(uri);
-        }
-    }
-
-    private void swapFragments() {
-        // Fragment fragmentToSwapTo = isMapShown ? mTaskListFragment : mTaskMapFragment;
-        getFragmentManager().beginTransaction()
-                    // .setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
-                    .replace(R.id.task_view_container, !isMapShown ? new TaskAvailableMapFragment() : new TaskAvailableListFragment())
-                    .commit();
-        // fragmentTransaction.hide();
-        // fragmentTransaction.add(R.id.task_view_container, new TaskAvailableListFragment())
     }
 
     @Override
@@ -126,6 +111,35 @@ public class TaskAvailableFragment extends Fragment {
     public void onDetach() {
         super.onDetach();
         mListener = null;
+    }
+
+    // TODO: Rename method, update argument and hook method into UI event
+    public void onButtonPressed(Uri uri) {
+        if (mListener != null) {
+            mListener.onNearbyFragmentInteraction(uri);
+        }
+    }
+
+    private void swapFragments() {
+        // TODO: reuse old ones instead of creating new ones
+        mTaskAvailableMapFragment = new TaskAvailableMapFragment();
+        mTaskAvailableListFragment = new TaskAvailableListFragment();
+
+        // Fragment fragmentToSwapTo = isMapShown ? mTaskAvailableListFragment : mTaskAvailableMapFragment;
+        getFragmentManager().beginTransaction()
+                // .setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
+                .replace(R.id.task_view_container, !isMapShown ? mTaskAvailableMapFragment : mTaskAvailableListFragment)
+                .commit();
+        // fragmentTransaction.hide();
+        // fragmentTransaction.add(R.id.task_view_container, new TaskAvailableListFragment())
+    }
+
+    public TaskAvailableMapFragment getTaskAvailableMapFragment() {
+        return mTaskAvailableMapFragment;
+    }
+
+    public TaskAvailableListFragment getTaskAvailableListFragment() {
+        return mTaskAvailableListFragment;
     }
 
     /**

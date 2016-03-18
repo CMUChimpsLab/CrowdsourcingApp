@@ -5,22 +5,30 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.pm.PackageManager;
 import android.graphics.Color;
+import android.location.Criteria;
 import android.location.Location;
-import android.location.LocationListener;
 import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 
+import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.SimpleGeofence;
+import com.dhchoi.crowdsourcingapp.activities.BaseGoogleApiActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskCompleteActivity;
 import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
+import com.google.android.gms.location.LocationListener;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.OnMapReadyCallback;
@@ -38,13 +46,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TaskAvailableMapFragment extends SupportMapFragment implements OnMapReadyCallback {
+public class TaskAvailableMapFragment extends SupportMapFragment implements OnMapReadyCallback, LocationListener {
 
     private OnTaskMapFragmentInteractionListener mListener;
 
     // map related
-    static final int BLUE_TRANSPARENT = 0x220000ff;
-    static final int RED_TRANSPARENT = 0x22ff0000;
+    private final int BLUE_TRANSPARENT = 0x220000ff;
+    private final int RED_TRANSPARENT = 0x22ff0000;
+    private final int ZOOM_LEVEL = 15;
     private GoogleMap mGoogleMap;
     private Circle mCurrentVisibleCircle = null;
     private Map<Marker, Task> mMarkerToTask = new HashMap<Marker, Task>();
@@ -129,8 +138,6 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements OnMa
         mGoogleMap = googleMap;
         UiSettings settings = mGoogleMap.getUiSettings();
         settings.setAllGesturesEnabled(true);
-        settings.setMyLocationButtonEnabled(true);
-        mGoogleMap.setMyLocationEnabled(true);
         mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -173,41 +180,43 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements OnMa
             }
         });
 
-        // TODO: zoom to current location
-//        Location lastLocation = LocationServices.FusedLocationApi.getLastLocation(((BaseGoogleApiActivity)getActivity()).getGoogleApiClient());
-//        if (lastLocation != null) {
-//            LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
-//            mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
-//        }
+        // if ACCESS_FINE_LOCATION is granted
+        if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            mGoogleMap.setMyLocationEnabled(true);
 
-        final LocationListener mLocationListener = new LocationListener() {
-            @Override
-            public void onLocationChanged(final Location location) {
-                LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, 16));
+            LocationManager locationManager = (LocationManager) getActivity().getSystemService(getActivity().LOCATION_SERVICE);
+            Criteria criteria = new Criteria();
+            criteria.setAccuracy(Criteria.ACCURACY_FINE);
+            Location lastLocation = locationManager.getLastKnownLocation(locationManager.getBestProvider(criteria, false));
+            if (lastLocation != null) {
+                Log.d(Constants.TAG, "Moving map camera to lastLocation.");
+                LatLng latLng = new LatLng(lastLocation.getLatitude(), lastLocation.getLongitude());
+                mGoogleMap.moveCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL));
+            } else {
+                Log.d(Constants.TAG, "No lastLocation found.");
             }
 
-            @Override
-            public void onStatusChanged(String provider, int status, Bundle extras) {
-
+            if (((BaseGoogleApiActivity) getActivity()).getGoogleApiClient().isConnected()) {
+                updateCurrentLocation();
             }
+        } else {
+            Log.d(Constants.TAG, "ACCESS_FINE_LOCATION not granted and will not perform setMyLocationEnabled(true)");
+        }
 
-            @Override
-            public void onProviderEnabled(String provider) {
-
-            }
-
-            @Override
-            public void onProviderDisabled(String provider) {
-
-            }
-        };
-        long LOCATION_REFRESH_TIME = 1000;
-        float LOCATION_REFRESH_DISTANCE = 60f;
-        LocationManager locationManager = (LocationManager) getActivity().getSystemService(getActivity().LOCATION_SERVICE);
-        locationManager.requestLocationUpdates(LocationManager.GPS_PROVIDER, LOCATION_REFRESH_TIME, LOCATION_REFRESH_DISTANCE, mLocationListener);
 
         updateMarkers();
+    }
+
+    public void updateCurrentLocation() {
+        if (ContextCompat.checkSelfPermission(getActivity(), android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            LocationRequest locationRequest = new LocationRequest()
+                    .setNumUpdates(1)
+                    .setInterval(100)
+                    .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY);
+            LocationServices.FusedLocationApi.requestLocationUpdates(((BaseGoogleApiActivity) getActivity()).getGoogleApiClient(), locationRequest, this);
+        } else {
+            Log.d(Constants.TAG, "ACCESS_FINE_LOCATION not granted and will not recenter map to current location");
+        }
     }
 
     private void updateMarkers() {
@@ -223,6 +232,12 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements OnMa
             }
             mMarkerToTask.put(mGoogleMap.addMarker(markerOptions), t);
         }
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL));
     }
 
     public interface OnTaskMapFragmentInteractionListener {

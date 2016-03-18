@@ -1,11 +1,13 @@
 package com.dhchoi.crowdsourcingapp.activities;
 
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.location.Geocoder;
 import android.location.Location;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.ResultReceiver;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.widget.Toolbar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -65,7 +67,10 @@ public class CurrentLocationActivity extends BaseGoogleApiActivity implements Lo
     @Override
     public void onConnected(Bundle bundle) {
         super.onConnected(bundle);
-        LocationServices.FusedLocationApi.requestLocationUpdates(getGoogleApiClient(), createLocationRequest(), this);
+
+        if (ContextCompat.checkSelfPermission(this, android.Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            LocationServices.FusedLocationApi.requestLocationUpdates(getGoogleApiClient(), createLocationRequest(), this);
+        }
     }
 
     @Override

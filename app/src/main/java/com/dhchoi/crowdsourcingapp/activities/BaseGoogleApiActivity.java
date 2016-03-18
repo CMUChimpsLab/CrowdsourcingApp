@@ -9,6 +9,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 import android.widget.Toast;
 
+import com.dhchoi.crowdsourcingapp.PermissionUtils;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -74,7 +75,8 @@ public class BaseGoogleApiActivity extends AppCompatActivity implements
         if (requestCode == APP_PERMISSIONS_REQUEST) {
             if (!(grantResults.length == 1 && grantResults[0] == PackageManager.PERMISSION_GRANTED)) {
                 // Permission was denied or request was cancelled
-                Toast.makeText(this, "The app needs the proper permissions to run properly!", Toast.LENGTH_SHORT).show();
+                super.onPostResume();
+                PermissionUtils.PermissionDeniedDialog.newInstance(true).show(getSupportFragmentManager(), "dialog");
             } else {
                 // else, we can now safely use the API we requested access to
                 buildGoogleApiClient();

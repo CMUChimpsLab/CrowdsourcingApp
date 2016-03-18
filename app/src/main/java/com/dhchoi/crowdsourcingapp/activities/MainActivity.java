@@ -4,27 +4,26 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
+import android.os.Bundle;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
-import android.support.v7.widget.Toolbar;
-
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.view.ViewPager;
-import android.os.Bundle;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.R;
-import com.dhchoi.crowdsourcingapp.fragments.CrowdActivityFragment;
-import com.dhchoi.crowdsourcingapp.fragments.UserInfoFragment;
-import com.dhchoi.crowdsourcingapp.fragments.TaskAvailableFragment;
 import com.dhchoi.crowdsourcingapp.crowdactivity.CrowdActivityItem;
+import com.dhchoi.crowdsourcingapp.fragments.CrowdActivityFragment;
+import com.dhchoi.crowdsourcingapp.fragments.TaskAvailableFragment;
 import com.dhchoi.crowdsourcingapp.fragments.TaskAvailableListFragment;
 import com.dhchoi.crowdsourcingapp.fragments.TaskAvailableMapFragment;
+import com.dhchoi.crowdsourcingapp.fragments.UserInfoFragment;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 
 import java.util.ArrayList;
@@ -74,12 +73,12 @@ public class MainActivity extends BaseGoogleApiActivity implements
         mViewPager = (ViewPager) findViewById(R.id.container);
         mViewPager.setAdapter(mSectionsPagerAdapter);
 
+        // ProgressBar to show sync status
+        mSyncProgressBar = (ProgressBar) findViewById(R.id.sync_progress_bar);
+
         // Set up the Tab Layout
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-
-        // ProgressBar to show sync status
-        mSyncProgressBar = (ProgressBar) findViewById(R.id.sync_progress_bar);
     }
 
 
@@ -98,12 +97,10 @@ public class MainActivity extends BaseGoogleApiActivity implements
 
         if (id == R.id.action_settings) {
             return true;
-        }
-        else if (id == R.id.action_check_current_location) {
+        } else if (id == R.id.action_check_current_location) {
             startActivity(new Intent(this, CurrentLocationActivity.class));
             return true;
-        }
-        else if (id == R.id.action_logout) {
+        } else if (id == R.id.action_logout) {
             SharedPreferences sharedPreferences = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, this.MODE_PRIVATE);
             sharedPreferences.edit().putBoolean(Constants.USER_LOGGED_IN, false).apply();
             startActivity(new Intent(this, CheckLoginActivity.class));
@@ -125,6 +122,7 @@ public class MainActivity extends BaseGoogleApiActivity implements
             protected Boolean doInBackground(Void... params) {
                 return TaskManager.syncTasks(MainActivity.this, getGoogleApiClient());
             }
+
             @Override
             protected void onPostExecute(Boolean syncSuccess) {
                 mSyncProgressBar.setVisibility(ProgressBar.GONE);
@@ -135,6 +133,8 @@ public class MainActivity extends BaseGoogleApiActivity implements
                 }
             }
         }.execute();
+
+        mTaskAvailableFragment.getTaskAvailableMapFragment().updateCurrentLocation();
     }
 
     @Override
