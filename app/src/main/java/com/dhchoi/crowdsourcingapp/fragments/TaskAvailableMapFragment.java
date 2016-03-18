@@ -146,8 +146,10 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
 
     @Override
     public void onLocationChanged(Location location) {
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL));
+        if(getView() != null) {
+            LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+            mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL));
+        }
     }
 
     public void updateCurrentLocation(@NonNull BaseGoogleApiActivity baseGoogleApiActivity) {
@@ -186,6 +188,8 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
         mActiveTasks = activatedTasks;
         mInactiveTasks = inactivatedTasks;
 
-        updateMarkers();
+        if(getView() != null) {
+            updateMarkers();
+        }
     }
 }
