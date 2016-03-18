@@ -93,7 +93,7 @@ public class TaskCompleteActivity extends AppCompatActivity {
                 mSubmitResponseButton.setEnabled(false);
                 submitResponseProgressBar.setVisibility(ProgressBar.VISIBLE);
 
-                new HttpClientAsyncTask(Constants.APP_SERVER_TASK_RESPOND_URL, HttpClientCallable.POST, getUserResponses()) {
+                new HttpClientAsyncTask(Constants.APP_SERVER_TASK_COMPLETE_URL, HttpClientCallable.POST, getUserResponses()) {
                     @Override
                     protected void onPostExecute(String response) {
                         mSubmitResponseButton.setEnabled(true);
@@ -128,13 +128,6 @@ public class TaskCompleteActivity extends AppCompatActivity {
     }
 
     private void updateSubmitResponseButtonStatus() {
-        if (!mSharedPreferences.getBoolean(Constants.USER_REGISTERED_KEY, false)) {
-            mSubmitResponseButton.setEnabled(false);
-            mSubmissionNotice.setVisibility(TextView.VISIBLE);
-            mSubmissionNotice.setText("Please register your email in order to submit tasks.");
-            return;
-        }
-
         if (!mTask.isActivated()) {
             mSubmitResponseButton.setEnabled(false);
             mSubmissionNotice.setVisibility(TextView.VISIBLE);

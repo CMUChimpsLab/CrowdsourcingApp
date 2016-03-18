@@ -140,6 +140,8 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
         } else {
             Log.d(Constants.TAG, "ACCESS_FINE_LOCATION not granted and will not perform setMyLocationEnabled(true)");
         }
+
+        updateMarkers();
     }
 
     @Override
