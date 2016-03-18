@@ -13,7 +13,7 @@ public class TaskAvailableFragment extends Fragment {
 
     public static final String NAME = "NEARBY";
 
-    private boolean isMapShown = true;
+    private boolean isMapShown = false;
     private TaskAvailableMapFragment mTaskAvailableMapFragment = new TaskAvailableMapFragment();
     private TaskAvailableListFragment mTaskAvailableListFragment = new TaskAvailableListFragment();
 
