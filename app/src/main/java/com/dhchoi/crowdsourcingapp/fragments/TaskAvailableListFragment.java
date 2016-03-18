@@ -149,7 +149,7 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
             Log.d(Constants.TAG, "clicked task: " + task);
 
             Intent intent = new Intent(getActivity(), TaskCompleteActivity.class);
-            intent.putExtra(Task.TASK_KEY_SERIALIZABLE, task);
+            intent.putExtra(Task.TASK_KEY_SERIALIZABLE, task.getId());
 
             startActivity(intent);
         }

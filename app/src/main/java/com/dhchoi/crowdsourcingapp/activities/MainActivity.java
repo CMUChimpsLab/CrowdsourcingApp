@@ -16,6 +16,7 @@ import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.widget.ProgressBar;
@@ -30,6 +31,7 @@ import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class MainActivity extends BaseGoogleApiActivity implements
@@ -56,6 +58,8 @@ public class MainActivity extends BaseGoogleApiActivity implements
         public void onReceive(Context context, Intent intent) {
             // TODO: what if geofence trigger activated first before syncing for first time
 
+            String[] activatedTaskIds = intent.getStringArrayExtra(GeofenceTransitionsIntentService.ACTIVATED_TASK_ID_KEY);
+            Log.d(Constants.TAG, "activatedTaskIds: " + Arrays.toString(activatedTaskIds));
             for (String activatedTaskId : intent.getStringArrayExtra(GeofenceTransitionsIntentService.ACTIVATED_TASK_ID_KEY)) {
                 for (int i = 0; i < mInactiveTasks.size(); i++) {
                     Task inactiveTask = mInactiveTasks.get(i);
@@ -66,7 +70,9 @@ public class MainActivity extends BaseGoogleApiActivity implements
                 }
             }
 
-            for (String inactivatedTaskId : intent.getStringArrayExtra(GeofenceTransitionsIntentService.INACTIVATED_TASK_ID_KEY)) {
+            String[] inactivatedTaskIds = intent.getStringArrayExtra(GeofenceTransitionsIntentService.INACTIVATED_TASK_ID_KEY);
+            Log.d(Constants.TAG, "inactivatedTaskIds: " + Arrays.toString(inactivatedTaskIds));
+            for (String inactivatedTaskId : inactivatedTaskIds) {
                 for (int i = 0; i < mActiveTasks.size(); i++) {
                     Task activeTask = mActiveTasks.get(i);
                     if (activeTask.getId().equals(inactivatedTaskId)) {

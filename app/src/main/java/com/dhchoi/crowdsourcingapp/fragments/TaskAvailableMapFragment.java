@@ -106,7 +106,7 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
             public void onInfoWindowClick(Marker marker) {
                 // start activity for task
                 Intent intent = new Intent(getActivity(), TaskCompleteActivity.class);
-                intent.putExtra(Task.TASK_KEY_SERIALIZABLE, mMarkerToTask.get(marker));
+                intent.putExtra(Task.TASK_KEY_SERIALIZABLE, mMarkerToTask.get(marker).getId());
                 startActivity(intent);
             }
         });
@@ -168,6 +168,9 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
     }
 
     private void updateMarkers() {
+        // remove previous markers
+        mGoogleMap.clear();
+
         List<Task> allTasks = new ArrayList<Task>();
         allTasks.addAll(mActiveTasks);
         allTasks.addAll(mInactiveTasks);

@@ -26,6 +26,7 @@ import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskAction;
+import com.dhchoi.crowdsourcingapp.task.TaskManager;
 
 import org.json.JSONObject;
 
@@ -65,7 +66,7 @@ public class TaskCompleteActivity extends AppCompatActivity {
 
         mSharedPreferences = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, MODE_PRIVATE);
 
-        mTask = (Task) getIntent().getSerializableExtra(Task.TASK_KEY_SERIALIZABLE);
+        mTask = TaskManager.getTaskById(this, getIntent().getStringExtra(Task.TASK_KEY_SERIALIZABLE));
         Log.d(Constants.TAG, "creating activity with task: " + mTask);
 
         final ProgressBar submitResponseProgressBar = (ProgressBar) findViewById(R.id.submitResponseProgressBar);
@@ -128,6 +129,8 @@ public class TaskCompleteActivity extends AppCompatActivity {
     }
 
     private void updateSubmitResponseButtonStatus() {
+        // TODO: think about what to do if user leaves region on this screen
+
         if (!mTask.isActivated()) {
             mSubmitResponseButton.setEnabled(false);
             mSubmissionNotice.setVisibility(TextView.VISIBLE);

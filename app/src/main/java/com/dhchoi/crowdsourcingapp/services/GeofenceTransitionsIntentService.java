@@ -14,6 +14,7 @@ import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingEvent;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 public class GeofenceTransitionsIntentService extends IntentService {
@@ -74,10 +75,13 @@ public class GeofenceTransitionsIntentService extends IntentService {
             }
 
             // Notify any listener that geofence transition has occurred
-            Log.d(Constants.TAG, "Broadcast triggered taskIds");
+            String[] activatedTaskIdsToStringArr = activatedTaskIds.toArray(new String[activatedTaskIds.size()]);
+            String[] inactivatedTaskIdsToStringArr = inactivatedTaskIds.toArray(new String[inactivatedTaskIds.size()]);
+            Log.d(Constants.TAG, "Broadcast triggered activatedTaskIds" + Arrays.toString(activatedTaskIdsToStringArr));
+            Log.d(Constants.TAG, "Broadcast triggered inactivatedTaskIds" + Arrays.toString(inactivatedTaskIdsToStringArr));
             Intent geofenceTransitionIntent = new Intent(GEOFENCE_TRANSITION_BROADCAST);
-            geofenceTransitionIntent.putExtra(ACTIVATED_TASK_ID_KEY, activatedTaskIds.toArray());
-            geofenceTransitionIntent.putExtra(INACTIVATED_TASK_ID_KEY, inactivatedTaskIds.toArray());
+            geofenceTransitionIntent.putExtra(ACTIVATED_TASK_ID_KEY, activatedTaskIdsToStringArr);
+            geofenceTransitionIntent.putExtra(INACTIVATED_TASK_ID_KEY, inactivatedTaskIdsToStringArr);
             LocalBroadcastManager.getInstance(this).sendBroadcast(geofenceTransitionIntent);
         }
     }
