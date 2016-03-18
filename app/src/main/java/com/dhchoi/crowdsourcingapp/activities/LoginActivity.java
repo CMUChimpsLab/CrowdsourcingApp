@@ -101,7 +101,7 @@ public class LoginActivity extends AppCompatActivity {
         mEmailView.setError(null);
 
         // Store values at the time of the login attempt.
-        String email = mEmailView.getText().toString();
+        final String email = mEmailView.getText().toString();
 
         boolean cancel = false;
         View focusView = null;
@@ -141,7 +141,7 @@ public class LoginActivity extends AppCompatActivity {
                             if (errorMsg.isEmpty()) {
                                 SharedPreferences sharedPreferences = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, LoginActivity.MODE_PRIVATE);
                                 sharedPreferences.edit().putBoolean(Constants.USER_LOGGED_IN, true).apply();
-                                sharedPreferences.edit().putString(Constants.USER_ID_KEY, "").apply();
+                                sharedPreferences.edit().putString(Constants.USER_ID_KEY, email).apply();
                                 Log.d(Constants.TAG, "Successfully logged in. Directing to MainActivity.");
                                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                 finish();
