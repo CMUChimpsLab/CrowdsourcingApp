@@ -1,10 +1,7 @@
 package com.dhchoi.crowdsourcingapp.fragments;
 
 
-import android.content.BroadcastReceiver;
-import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.content.pm.PackageManager;
 import android.graphics.Color;
 import android.location.Criteria;
@@ -13,7 +10,6 @@ import android.location.LocationManager;
 import android.os.Bundle;
 import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -22,10 +18,9 @@ import android.view.ViewGroup;
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.SimpleGeofence;
 import com.dhchoi.crowdsourcingapp.activities.BaseGoogleApiActivity;
+import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskCompleteActivity;
-import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.task.Task;
-import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
@@ -46,46 +41,22 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TaskAvailableMapFragment extends SupportMapFragment implements OnMapReadyCallback, LocationListener {
+public class TaskAvailableMapFragment extends SupportMapFragment implements
+        OnMapReadyCallback,
+        LocationListener,
+        MainActivity.OnTasksUpdatedListener {
 
     // map related
     private final int BLUE_TRANSPARENT = 0x220000ff;
     private final int RED_TRANSPARENT = 0x22ff0000;
-    private final int ZOOM_LEVEL = 15;
+    private final int ZOOM_LEVEL = 13;
     private GoogleMap mGoogleMap;
     private Circle mCurrentVisibleCircle = null;
     private Map<Marker, Task> mMarkerToTask = new HashMap<Marker, Task>();
 
     // task related
-    private List<Task> mAllTasks = new ArrayList<Task>();
     private List<Task> mActiveTasks = new ArrayList<Task>();
     private List<Task> mInactiveTasks = new ArrayList<Task>();
-    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            for (String activatedTaskId : intent.getStringArrayExtra(GeofenceTransitionsIntentService.ACTIVATED_TASK_ID_KEY)) {
-                for (int i = 0; i < mInactiveTasks.size(); i++) {
-                    Task inactiveTask = mInactiveTasks.get(i);
-                    if (inactiveTask.getId().equals(activatedTaskId)) {
-                        mInactiveTasks.remove(inactiveTask);
-                        mActiveTasks.add(inactiveTask);
-                    }
-                }
-            }
-
-            for (String inactivatedTaskId : intent.getStringArrayExtra(GeofenceTransitionsIntentService.INACTIVATED_TASK_ID_KEY)) {
-                for (int i = 0; i < mActiveTasks.size(); i++) {
-                    Task activeTask = mActiveTasks.get(i);
-                    if (activeTask.getId().equals(inactivatedTaskId)) {
-                        mActiveTasks.remove(activeTask);
-                        mInactiveTasks.add(activeTask);
-                    }
-                }
-            }
-
-            updateMarkers();
-        }
-    };
 
     public TaskAvailableMapFragment() {
         super();
@@ -96,28 +67,7 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements OnMa
         View rootView = super.onCreateView(inflater, container, savedInstanceState);
         getMapAsync(this);
 
-        // get task list
-        mAllTasks = TaskManager.getAllTasks(getActivity());
-        for (Task t : mAllTasks) {
-            if (t.isActivated()) {
-                mActiveTasks.add(t);
-            } else {
-                mInactiveTasks.add(t);
-            }
-        }
-
-        // Register to receive messages.
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceTransitionsIntentService.GEOFENCE_TRANSITION_BROADCAST));
-
         return rootView;
-    }
-
-    @Override
-    public void onDetach() {
-        super.onDetach();
-
-        // Unregister since the activity is about to be closed.
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
     }
 
     @Override
@@ -190,8 +140,6 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements OnMa
         } else {
             Log.d(Constants.TAG, "ACCESS_FINE_LOCATION not granted and will not perform setMyLocationEnabled(true)");
         }
-
-        updateMarkers();
     }
 
     @Override
@@ -213,8 +161,12 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements OnMa
     }
 
     private void updateMarkers() {
+        List<Task> allTasks = new ArrayList<Task>();
+        allTasks.addAll(mActiveTasks);
+        allTasks.addAll(mInactiveTasks);
+
         // TODO: take care for case of too much clustered tasks in one region
-        for (Task t : mAllTasks) {
+        for (Task t : allTasks) {
             SimpleGeofence simpleGeofence = t.getLocation();
             LatLng latLng = new LatLng(simpleGeofence.getLatitude(), simpleGeofence.getLongitude());
             MarkerOptions markerOptions = new MarkerOptions()
@@ -225,5 +177,13 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements OnMa
             }
             mMarkerToTask.put(mGoogleMap.addMarker(markerOptions), t);
         }
+    }
+
+    @Override
+    public void onTasksActivationUpdated(List<Task> activatedTasks, List<Task> inactivatedTasks) {
+        mActiveTasks = activatedTasks;
+        mInactiveTasks = inactivatedTasks;
+
+        updateMarkers();
     }
 }

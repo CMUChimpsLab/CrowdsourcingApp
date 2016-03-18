@@ -1,12 +1,9 @@
 package com.dhchoi.crowdsourcingapp.fragments;
 
-import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.IntentFilter;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
-import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -18,48 +15,23 @@ import android.widget.TextView;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.R;
+import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskCompleteActivity;
-import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.task.Task;
-import com.dhchoi.crowdsourcingapp.task.TaskManager;
 
 import java.util.ArrayList;
 import java.util.List;
 
-public class TaskAvailableListFragment extends Fragment {
+public class TaskAvailableListFragment extends Fragment implements MainActivity.OnTasksUpdatedListener {
 
     private ArrayAdapter<Task> mActiveTaskListAdapter;
     private ArrayAdapter<Task> mInactiveTaskListAdapter;
     private TextView mActiveTasksNotice;
     private TextView mInactiveTasksNotice;
-    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            for (String activatedTaskId : intent.getStringArrayExtra(GeofenceTransitionsIntentService.ACTIVATED_TASK_ID_KEY)) {
-                for (int i = 0; i < mInactiveTaskListAdapter.getCount(); i++) {
-                    Task inactiveTask = mInactiveTaskListAdapter.getItem(i);
-                    if (inactiveTask.getId().equals(activatedTaskId)) {
-                        mInactiveTaskListAdapter.remove(inactiveTask);
-                        mActiveTaskListAdapter.add(inactiveTask);
-                    }
-                }
-            }
 
-            for (String inactivatedTaskId : intent.getStringArrayExtra(GeofenceTransitionsIntentService.INACTIVATED_TASK_ID_KEY)) {
-                for (int i = 0; i < mActiveTaskListAdapter.getCount(); i++) {
-                    Task activeTask = mActiveTaskListAdapter.getItem(i);
-                    if (activeTask.getId().equals(inactivatedTaskId)) {
-                        mActiveTaskListAdapter.remove(activeTask);
-                        mInactiveTaskListAdapter.add(activeTask);
-                    }
-                }
-            }
-
-            mActiveTaskListAdapter.notifyDataSetChanged();
-            mInactiveTaskListAdapter.notifyDataSetChanged();
-            updateNoticeTextViews();
-        }
-    };
+    // task related
+    private List<Task> mActiveTasks = new ArrayList<Task>();
+    private List<Task> mInactiveTasks = new ArrayList<Task>();
 
     public TaskAvailableListFragment() {
         // Required empty public constructor
@@ -72,42 +44,31 @@ public class TaskAvailableListFragment extends Fragment {
         mActiveTasksNotice = (TextView) rootView.findViewById(R.id.active_tasks_notice);
         mInactiveTasksNotice = (TextView) rootView.findViewById(R.id.inactive_tasks_notice);
 
-        // get task list
-        List<Task> allTasks = TaskManager.getAllTasks(getActivity());
-        List<Task> activeTasks = new ArrayList<Task>();
-        List<Task> inactiveTasks = new ArrayList<Task>();
-        for (Task t : allTasks) {
-            if (t.isActivated()) {
-                activeTasks.add(t);
-            } else {
-                inactiveTasks.add(t);
-            }
-        }
-
         // setup task list views and adapters
         ListView activeTaskListView = (ListView) rootView.findViewById(R.id.active_tasks);
-        activeTaskListView.setAdapter(mActiveTaskListAdapter = new TaskListAdapter(getActivity(), activeTasks));
+        activeTaskListView.setAdapter(mActiveTaskListAdapter = new TaskListAdapter(getActivity(), mActiveTasks));
         activeTaskListView.setOnItemClickListener(new OnTaskItemClickListener());
 
         ListView inactiveTaskListView = (ListView) rootView.findViewById(R.id.inactive_tasks);
-        inactiveTaskListView.setAdapter(mInactiveTaskListAdapter = new TaskListAdapter(getActivity(), inactiveTasks));
+        inactiveTaskListView.setAdapter(mInactiveTaskListAdapter = new TaskListAdapter(getActivity(), mInactiveTasks));
         inactiveTaskListView.setOnItemClickListener(new OnTaskItemClickListener());
 
         updateNoticeTextViews();
-
-        // Register to receive messages.
-        LocalBroadcastManager.getInstance(getActivity()).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceTransitionsIntentService.GEOFENCE_TRANSITION_BROADCAST));
 
         // Inflate the layout for this fragment
         return rootView;
     }
 
     @Override
-    public void onDetach() {
-        super.onDetach();
+    public void onTasksActivationUpdated(List<Task> activatedTasks, List<Task> inactivatedTasks) {
+        mActiveTasks = activatedTasks;
+        mInactiveTasks = inactivatedTasks;
 
-        // Unregister since the activity is about to be closed.
-        LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
+        if (getView() != null) {
+            mActiveTaskListAdapter.notifyDataSetChanged();
+            mInactiveTaskListAdapter.notifyDataSetChanged();
+            updateNoticeTextViews();
+        }
     }
 
     private void updateNoticeTextViews() {

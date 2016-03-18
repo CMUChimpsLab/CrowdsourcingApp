@@ -1,6 +1,9 @@
 package com.dhchoi.crowdsourcingapp.activities;
 
+import android.content.BroadcastReceiver;
+import android.content.Context;
 import android.content.Intent;
+import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.net.Uri;
 import android.os.AsyncTask;
@@ -10,6 +13,7 @@ import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
 import android.support.v7.widget.Toolbar;
 import android.view.Menu;
@@ -21,6 +25,8 @@ import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.fragments.CrowdActivityFragment;
 import com.dhchoi.crowdsourcingapp.fragments.TaskAvailableFragment;
 import com.dhchoi.crowdsourcingapp.fragments.UserInfoFragment;
+import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
+import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 
 import java.util.ArrayList;
@@ -38,17 +44,52 @@ public class MainActivity extends BaseGoogleApiActivity implements
      * {@link android.support.v4.app.FragmentStatePagerAdapter}.
      */
     private SectionsPagerAdapter mSectionsPagerAdapter;
-
     private ProgressBar mSyncProgressBar;
+    private ViewPager mViewPager; // The {@link ViewPager} that will host the section contents.
 
-    private TaskAvailableFragment mTaskAvailableFragment;
-    private CrowdActivityFragment mCrowdActivityFragment;
-    private UserInfoFragment mUserInfoFragment;
+    // task related
+    private List<OnTasksUpdatedListener> onTasksUpdatedListeners = new ArrayList<OnTasksUpdatedListener>();
+    private List<Task> mActiveTasks = new ArrayList<Task>();
+    private List<Task> mInactiveTasks = new ArrayList<Task>();
+    private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
+        @Override
+        public void onReceive(Context context, Intent intent) {
+            // TODO: what if geofence trigger activated first before syncing for first time
 
-    /**
-     * The {@link ViewPager} that will host the section contents.
-     */
-    private ViewPager mViewPager;
+            for (String activatedTaskId : intent.getStringArrayExtra(GeofenceTransitionsIntentService.ACTIVATED_TASK_ID_KEY)) {
+                for (int i = 0; i < mInactiveTasks.size(); i++) {
+                    Task inactiveTask = mInactiveTasks.get(i);
+                    if (inactiveTask.getId().equals(activatedTaskId)) {
+                        mInactiveTasks.remove(inactiveTask);
+                        mActiveTasks.add(inactiveTask);
+                    }
+                }
+            }
+
+            for (String inactivatedTaskId : intent.getStringArrayExtra(GeofenceTransitionsIntentService.INACTIVATED_TASK_ID_KEY)) {
+                for (int i = 0; i < mActiveTasks.size(); i++) {
+                    Task activeTask = mActiveTasks.get(i);
+                    if (activeTask.getId().equals(inactivatedTaskId)) {
+                        mActiveTasks.remove(activeTask);
+                        mInactiveTasks.add(activeTask);
+                    }
+                }
+            }
+
+            for (OnTasksUpdatedListener onTasksUpdatedListener : onTasksUpdatedListeners) {
+                onTasksUpdatedListener.onTasksActivationUpdated(mActiveTasks, mInactiveTasks);
+            }
+        }
+    };
+
+    private TaskAvailableFragment mTaskAvailableFragment = TaskAvailableFragment.newInstance();
+    private CrowdActivityFragment mCrowdActivityFragment = CrowdActivityFragment.newInstance();
+    private UserInfoFragment mUserInfoFragment = UserInfoFragment.newInstance();
+
+    {
+        onTasksUpdatedListeners.add(mTaskAvailableFragment.getTaskAvailableListFragment());
+        onTasksUpdatedListeners.add(mTaskAvailableFragment.getTaskAvailableMapFragment());
+    }
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -72,8 +113,10 @@ public class MainActivity extends BaseGoogleApiActivity implements
         // Set up the Tab Layout
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
         tabLayout.setupWithViewPager(mViewPager);
-    }
 
+        // Register to receive messages.
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceTransitionsIntentService.GEOFENCE_TRANSITION_BROADCAST));
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -121,6 +164,23 @@ public class MainActivity extends BaseGoogleApiActivity implements
                 mSyncProgressBar.setVisibility(ProgressBar.GONE);
                 if (syncSuccess) {
                     Snackbar.make(findViewById(android.R.id.content), "Sync success!", Snackbar.LENGTH_LONG).show();
+
+                    // broadcast tasks to listeners
+                    List<Task> allTasks = TaskManager.getAllTasks(MainActivity.this);
+                    mActiveTasks = new ArrayList<Task>();
+                    mInactiveTasks = new ArrayList<Task>();
+                    for (Task t : allTasks) {
+                        if (t.isActivated()) {
+                            mActiveTasks.add(t);
+                        } else {
+                            mInactiveTasks.add(t);
+                        }
+                    }
+
+                    for (OnTasksUpdatedListener onTasksUpdatedListener : onTasksUpdatedListeners) {
+                        onTasksUpdatedListener.onTasksActivationUpdated(mActiveTasks, mInactiveTasks);
+                    }
+
                 } else {
                     Snackbar.make(findViewById(android.R.id.content), "Failed to sync with server.", Snackbar.LENGTH_LONG).show();
                 }
@@ -128,6 +188,13 @@ public class MainActivity extends BaseGoogleApiActivity implements
         }.execute();
 
         mTaskAvailableFragment.getTaskAvailableMapFragment().updateCurrentLocation(this);
+    }
+
+    @Override
+    public void onDestroy() {
+        // Unregister since the activity is about to be closed.
+        LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
+        super.onDestroy();
     }
 
     @Override
@@ -144,9 +211,9 @@ public class MainActivity extends BaseGoogleApiActivity implements
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
-            fragmentWrappers.add(new FragmentWrapper(TaskAvailableFragment.NAME, mTaskAvailableFragment = TaskAvailableFragment.newInstance()));
-            fragmentWrappers.add(new FragmentWrapper(CrowdActivityFragment.NAME, mCrowdActivityFragment = CrowdActivityFragment.newInstance()));
-            fragmentWrappers.add(new FragmentWrapper(UserInfoFragment.NAME, mUserInfoFragment = UserInfoFragment.newInstance()));
+            fragmentWrappers.add(new FragmentWrapper(TaskAvailableFragment.NAME, mTaskAvailableFragment));
+            fragmentWrappers.add(new FragmentWrapper(CrowdActivityFragment.NAME, mCrowdActivityFragment));
+            fragmentWrappers.add(new FragmentWrapper(UserInfoFragment.NAME, mUserInfoFragment));
         }
 
         @Override
@@ -173,5 +240,9 @@ public class MainActivity extends BaseGoogleApiActivity implements
                 this.fragment = fragment;
             }
         }
+    }
+
+    public interface OnTasksUpdatedListener {
+        void onTasksActivationUpdated(List<Task> activatedTasks, List<Task> inactivatedTasks);
     }
 }
