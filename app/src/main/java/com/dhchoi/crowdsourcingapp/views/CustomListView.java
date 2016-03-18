@@ -1,4 +1,4 @@
-package com.dhchoi.crowdsourcingapp;
+package com.dhchoi.crowdsourcingapp.views;
 
 import android.content.Context;
 import android.util.AttributeSet;

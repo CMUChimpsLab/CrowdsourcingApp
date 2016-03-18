@@ -133,9 +133,9 @@ public class MainActivity extends BaseGoogleApiActivity implements
 
         if (id == R.id.action_settings) {
             return true;
-        } else if (id == R.id.action_check_current_location) {
-            startActivity(new Intent(this, CurrentLocationActivity.class));
-            return true;
+//        } else if (id == R.id.action_check_current_location) {
+//            startActivity(new Intent(this, CurrentLocationActivity.class));
+//            return true;
         } else if (id == R.id.action_logout) {
             SharedPreferences sharedPreferences = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, this.MODE_PRIVATE);
             sharedPreferences.edit().putBoolean(Constants.USER_LOGGED_IN, false).apply();
@@ -212,7 +212,7 @@ public class MainActivity extends BaseGoogleApiActivity implements
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
             fragmentWrappers.add(new FragmentWrapper(TaskAvailableFragment.NAME, mTaskAvailableFragment));
-            fragmentWrappers.add(new FragmentWrapper(CrowdActivityFragment.NAME, mCrowdActivityFragment));
+            // fragmentWrappers.add(new FragmentWrapper(CrowdActivityFragment.NAME, mCrowdActivityFragment));
             fragmentWrappers.add(new FragmentWrapper(UserInfoFragment.NAME, mUserInfoFragment));
         }
 
