@@ -104,6 +104,7 @@ public class TaskCompleteActivity extends AppCompatActivity {
                             JSONObject responseObj = new JSONObject(response);
                             if (responseObj.getBoolean("result")) {
                                 Toast.makeText(TaskCompleteActivity.this, "Response submitted!", Toast.LENGTH_LONG).show();
+                                TaskCompleteActivity.this.finish();
                             } else {
                                 Toast.makeText(TaskCompleteActivity.this, "Response was not accepted.", Toast.LENGTH_LONG).show();
                             }
