@@ -10,7 +10,6 @@ import android.graphics.Color;
 import android.location.Criteria;
 import android.location.Location;
 import android.location.LocationManager;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.ContextCompat;
 import android.support.v4.content.LocalBroadcastManager;
@@ -47,8 +46,6 @@ import java.util.List;
 import java.util.Map;
 
 public class TaskAvailableMapFragment extends SupportMapFragment implements OnMapReadyCallback, LocationListener {
-
-    private OnTaskMapFragmentInteractionListener mListener;
 
     // map related
     private final int BLUE_TRANSPARENT = 0x220000ff;
@@ -115,19 +112,8 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements OnMa
     }
 
     @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnTaskMapFragmentInteractionListener) {
-            mListener = (OnTaskMapFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement OnTaskListFragmentInteractionListener");
-        }
-    }
-
-    @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
 
         // Unregister since the activity is about to be closed.
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
@@ -203,8 +189,13 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements OnMa
             Log.d(Constants.TAG, "ACCESS_FINE_LOCATION not granted and will not perform setMyLocationEnabled(true)");
         }
 
-
         updateMarkers();
+    }
+
+    @Override
+    public void onLocationChanged(Location location) {
+        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
+        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL));
     }
 
     public void updateCurrentLocation() {
@@ -232,15 +223,5 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements OnMa
             }
             mMarkerToTask.put(mGoogleMap.addMarker(markerOptions), t);
         }
-    }
-
-    @Override
-    public void onLocationChanged(Location location) {
-        LatLng latLng = new LatLng(location.getLatitude(), location.getLongitude());
-        mGoogleMap.animateCamera(CameraUpdateFactory.newLatLngZoom(latLng, ZOOM_LEVEL));
-    }
-
-    public interface OnTaskMapFragmentInteractionListener {
-        void onTaskMapFragmentInteraction(Uri uri);
     }
 }

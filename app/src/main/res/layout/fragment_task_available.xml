@@ -5,27 +5,10 @@
     android:id="@+id/fragment_nearby"
     tools:context=".fragments.TaskAvailableFragment">
 
-    <!-- TODO: Update blank fragment layout -->
-    <!--<TextView-->
-        <!--android:layout_width="match_parent"-->
-        <!--android:layout_height="match_parent"-->
-        <!--android:text="@string/hello_blank_fragment" />-->
     <RelativeLayout
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:id="@+id/task_view_container">
-
-        <!--<fragment xmlns:android="http://schemas.android.com/apk/res/android"-->
-            <!--xmlns:map="http://schemas.android.com/apk/res-auto"-->
-            <!--xmlns:tools="http://schemas.android.com/tools"-->
-            <!--android:name="com.google.android.gms.maps.SupportMapFragment"-->
-            <!--android:layout_width="match_parent"-->
-            <!--android:layout_height="match_parent"-->
-            <!--android:id="@+id/map"-->
-            <!--map:cameraZoom="13"-->
-            <!--map:mapType="normal" />-->
-
-    </RelativeLayout>
+        android:id="@+id/task_view_container" />
 
     <android.support.design.widget.FloatingActionButton
         android:id="@+id/fab"

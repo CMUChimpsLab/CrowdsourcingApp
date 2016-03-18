@@ -18,11 +18,8 @@ import android.widget.ProgressBar;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.R;
-import com.dhchoi.crowdsourcingapp.crowdactivity.CrowdActivityItem;
 import com.dhchoi.crowdsourcingapp.fragments.CrowdActivityFragment;
 import com.dhchoi.crowdsourcingapp.fragments.TaskAvailableFragment;
-import com.dhchoi.crowdsourcingapp.fragments.TaskAvailableListFragment;
-import com.dhchoi.crowdsourcingapp.fragments.TaskAvailableMapFragment;
 import com.dhchoi.crowdsourcingapp.fragments.UserInfoFragment;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 
@@ -30,11 +27,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class MainActivity extends BaseGoogleApiActivity implements
-        TaskAvailableFragment.OnNearbyFragmentInteractionListener,
-        UserInfoFragment.OnInfoFragmentInteractionListener,
-        CrowdActivityFragment.OnActivityListFragmentInteractionListener,
-        TaskAvailableListFragment.OnTaskListFragmentInteractionListener,
-        TaskAvailableMapFragment.OnTaskMapFragmentInteractionListener {
+        UserInfoFragment.OnInfoFragmentInteractionListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -138,27 +131,7 @@ public class MainActivity extends BaseGoogleApiActivity implements
     }
 
     @Override
-    public void onNearbyFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
     public void onInfoFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onActivityListFragmentInteraction(CrowdActivityItem item) {
-
-    }
-
-    @Override
-    public void onTaskListFragmentInteraction(Uri uri) {
-
-    }
-
-    @Override
-    public void onTaskMapFragmentInteraction(Uri uri) {
 
     }
 

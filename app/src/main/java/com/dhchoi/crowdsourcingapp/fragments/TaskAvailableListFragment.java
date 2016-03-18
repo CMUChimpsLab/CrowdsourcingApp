@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.app.Fragment;
 import android.support.v4.content.LocalBroadcastManager;
@@ -27,17 +26,7 @@ import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import java.util.ArrayList;
 import java.util.List;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnTaskListFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link TaskAvailableListFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
 public class TaskAvailableListFragment extends Fragment {
-
-    private OnTaskListFragmentInteractionListener mListener;
 
     private ArrayAdapter<Task> mActiveTaskListAdapter;
     private ArrayAdapter<Task> mInactiveTaskListAdapter;
@@ -113,27 +102,9 @@ public class TaskAvailableListFragment extends Fragment {
         return rootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onTaskListFragmentInteraction(uri);
-        }
-    }
-
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnTaskListFragmentInteractionListener) {
-            mListener = (OnTaskListFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString() + " must implement OnTaskListFragmentInteractionListener");
-        }
-    }
-
     @Override
     public void onDetach() {
         super.onDetach();
-        mListener = null;
 
         // Unregister since the activity is about to be closed.
         LocalBroadcastManager.getInstance(getActivity()).unregisterReceiver(mBroadcastReceiver);
@@ -142,21 +113,6 @@ public class TaskAvailableListFragment extends Fragment {
     private void updateNoticeTextViews() {
         mActiveTasksNotice.setVisibility(mActiveTaskListAdapter.getCount() > 0 ? TextView.GONE : TextView.VISIBLE);
         mInactiveTasksNotice.setVisibility(mInactiveTaskListAdapter.getCount() > 0 ? TextView.GONE : TextView.VISIBLE);
-    }
-
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnTaskListFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onTaskListFragmentInteraction(Uri uri);
     }
 
     class TaskListAdapter extends ArrayAdapter<Task> {
@@ -177,6 +133,7 @@ public class TaskAvailableListFragment extends Fragment {
 
             ((TextView) convertView.findViewById(R.id.task_name)).setText(task.getName());
             ((TextView) convertView.findViewById(R.id.task_location)).setText(task.getLocation().getName());
+            // BitmapDescriptorFactory.fromResource(R.drawable.marker))
             ((TextView) convertView.findViewById(R.id.task_cost)).setText("$" + task.getCost());
 
             // Return the completed view to render on screen
