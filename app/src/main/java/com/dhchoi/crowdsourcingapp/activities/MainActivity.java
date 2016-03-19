@@ -5,7 +5,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
-import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -34,8 +33,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends BaseGoogleApiActivity implements
-        UserInfoFragment.OnInfoFragmentInteractionListener {
+public class MainActivity extends BaseGoogleApiActivity {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -91,6 +89,7 @@ public class MainActivity extends BaseGoogleApiActivity implements
     private TaskAvailableFragment mTaskAvailableFragment = TaskAvailableFragment.newInstance();
     private CrowdActivityFragment mCrowdActivityFragment = CrowdActivityFragment.newInstance();
     private UserInfoFragment mUserInfoFragment = UserInfoFragment.newInstance();
+
     {
         onTasksUpdatedListeners.add(mTaskAvailableFragment.getTaskAvailableListFragment());
         onTasksUpdatedListeners.add(mTaskAvailableFragment.getTaskAvailableMapFragment());
@@ -201,11 +200,6 @@ public class MainActivity extends BaseGoogleApiActivity implements
         // Unregister since the activity is about to be closed.
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         super.onDestroy();
-    }
-
-    @Override
-    public void onInfoFragmentInteraction(Uri uri) {
-
     }
 
     /**

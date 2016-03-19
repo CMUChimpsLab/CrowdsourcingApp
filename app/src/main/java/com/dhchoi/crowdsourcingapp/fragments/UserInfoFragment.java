@@ -2,38 +2,49 @@ package com.dhchoi.crowdsourcingapp.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.net.Uri;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.AdapterView;
+import android.widget.ArrayAdapter;
+import android.widget.LinearLayout;
+import android.widget.ListView;
+import android.widget.TextView;
 
+import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.activities.TaskCreateActivity;
+import com.dhchoi.crowdsourcingapp.task.Task;
+import com.dhchoi.crowdsourcingapp.task.TaskManager;
 
-/**
- * A simple {@link Fragment} subclass.
- * Activities that contain this fragment must implement the
- * {@link OnInfoFragmentInteractionListener} interface
- * to handle interaction events.
- * Use the {@link UserInfoFragment#newInstance} factory method to
- * create an instance of this fragment.
- */
+import java.util.ArrayList;
+import java.util.List;
+
 public class UserInfoFragment extends Fragment {
 
     public static final String NAME = "MY INFO";
+    private final int COLOR_ON = 0xffffffff;
+    private final int COLOR_OFF = 0x22000000;
 
-    // TODO: Rename parameter arguments, choose names that match
-    // the fragment initialization parameters, e.g. ARG_ITEM_NUMBER
-    private static final String ARG_PARAM1 = "param1";
-    private static final String ARG_PARAM2 = "param2";
-    // TODO: Rename and change types of parameters
-    private String mParam1;
-    private String mParam2;
+    // task related
+    private List<Task> mCreatedTasks = new ArrayList<Task>();
+    private List<Task> mCompletedTasks = new ArrayList<Task>();
 
-    private OnInfoFragmentInteractionListener mListener;
+    private ArrayAdapter<Task> mCreatedTaskListAdapter;
+    private ArrayAdapter<Task> mCompletedTaskListAdapter;
+
+    private TextView mUserId;
+    private TextView mCreatedTasksNotice;
+    private TextView mCompletedTasksNotice;
+    private ListView mListCreatedTasks;
+    private ListView mListCompletedTasks;
+    private TextView mNumCreatedTasks;
+    private TextView mNumCompletedTasks;
+    private LinearLayout mNumCreatedTasksTitle;
+    private LinearLayout mNumCompletedTasksTitle;
 
     public UserInfoFragment() {
     }
@@ -42,39 +53,12 @@ public class UserInfoFragment extends Fragment {
         return new UserInfoFragment();
     }
 
-    /**
-     * Use this factory method to create a new instance of
-     * this fragment using the provided parameters.
-     *
-     * @param param1 Parameter 1.
-     * @param param2 Parameter 2.
-     * @return A new instance of fragment TaskAvailableListFragment.
-     */
-    // TODO: Rename and change types and number of parameters
-    public static TaskAvailableListFragment newInstance(String param1, String param2) {
-        TaskAvailableListFragment fragment = new TaskAvailableListFragment();
-        Bundle args = new Bundle();
-        args.putString(ARG_PARAM1, param1);
-        args.putString(ARG_PARAM2, param2);
-        fragment.setArguments(args);
-        return fragment;
-    }
-
-    @Override
-    public void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        if (getArguments() != null) {
-            mParam1 = getArguments().getString(ARG_PARAM1);
-            mParam2 = getArguments().getString(ARG_PARAM2);
-        }
-    }
-
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         // Inflate the layout for this fragment
-        View mRootView = inflater.inflate(R.layout.fragment_user_info, container, false);
+        View rootView = inflater.inflate(R.layout.fragment_user_info, container, false);
 
-        FloatingActionButton fab = (FloatingActionButton) mRootView.findViewById(R.id.fab);
+        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -83,45 +67,129 @@ public class UserInfoFragment extends Fragment {
             }
         });
 
-        return mRootView;
+        final LinearLayout createdTasksContainer = (LinearLayout) rootView.findViewById(R.id.created_tasks_container);
+        final LinearLayout completedTasksContainer = (LinearLayout) rootView.findViewById(R.id.completed_tasks_container);
+
+        // setup created-tasks related lists
+        mListCreatedTasks = (ListView) rootView.findViewById(R.id.list_created_tasks);
+        mListCreatedTasks.setAdapter(mCreatedTaskListAdapter = new CreatedTaskListAdapter(getActivity(), mCreatedTasks));
+        mListCreatedTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+        });
+        mNumCreatedTasksTitle = (LinearLayout) rootView.findViewById(R.id.num_created_tasks_title_layout);
+        mNumCreatedTasksTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (createdTasksContainer.getVisibility() == View.GONE) {
+                    // enable task created
+                    createdTasksContainer.setVisibility(View.VISIBLE);
+                    mNumCreatedTasksTitle.setBackgroundColor(COLOR_ON);
+                    // disable task completed
+                    completedTasksContainer.setVisibility(View.GONE);
+                    mNumCompletedTasksTitle.setBackgroundColor(COLOR_OFF);
+                }
+            }
+        });
+
+        // setup completed-tasks related lists
+        mListCompletedTasks = (ListView) rootView.findViewById(R.id.list_completed_tasks);
+        mListCompletedTasks.setAdapter(mCompletedTaskListAdapter = new CompletedTaskListAdapter(getActivity(), mCompletedTasks));
+        mListCompletedTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
+            @Override
+            public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+
+            }
+        });
+        mNumCompletedTasksTitle = (LinearLayout) rootView.findViewById(R.id.num_completed_tasks_title_layout);
+        mNumCompletedTasksTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if (completedTasksContainer.getVisibility() == View.GONE) {
+                    // disable task created
+                    createdTasksContainer.setVisibility(View.GONE);
+                    mNumCreatedTasksTitle.setBackgroundColor(COLOR_OFF);
+                    // enable task completed
+                    completedTasksContainer.setVisibility(View.VISIBLE);
+                    mNumCompletedTasksTitle.setBackgroundColor(COLOR_ON);
+                }
+            }
+        });
+
+        // fetch tasks
+        List<Task> allTasks = TaskManager.getAllTasks(getActivity());
+        //mCreatedTasks.addAll(allTasks);
+        mCreatedTaskListAdapter.notifyDataSetChanged();
+        //mCompletedTasks.addAll(allTasks);
+        mCompletedTaskListAdapter.notifyDataSetChanged();
+
+        // update views
+        mNumCreatedTasks = (TextView) rootView.findViewById(R.id.num_created_tasks);
+        mNumCreatedTasks.setText(String.valueOf(mCreatedTasks.size()));
+        mNumCompletedTasks = (TextView) rootView.findViewById(R.id.num_completed_tasks);
+        mNumCompletedTasks.setText(String.valueOf(mCompletedTasks.size()));
+        mCreatedTasksNotice = (TextView) rootView.findViewById(R.id.created_tasks_notice);
+        mCompletedTasksNotice = (TextView) rootView.findViewById(R.id.completed_tasks_notice);
+
+        String userId = getActivity().getSharedPreferences(Constants.DEFAULT_SHARED_PREF, getActivity().MODE_PRIVATE).getString(Constants.USER_ID_KEY, "");
+        mUserId = (TextView) rootView.findViewById(R.id.user_id);
+        mUserId.setText(userId);
+
+        updateNoticeTextViews();
+
+        return rootView;
     }
 
-    // TODO: Rename method, update argument and hook method into UI event
-    public void onButtonPressed(Uri uri) {
-        if (mListener != null) {
-            mListener.onInfoFragmentInteraction(uri);
+    private void updateNoticeTextViews() {
+        mCreatedTasksNotice.setVisibility(mCreatedTaskListAdapter.getCount() > 0 ? TextView.GONE : TextView.VISIBLE);
+        mCompletedTasksNotice.setVisibility(mCompletedTaskListAdapter.getCount() > 0 ? TextView.GONE : TextView.VISIBLE);
+    }
+
+    class CreatedTaskListAdapter extends ArrayAdapter<Task> {
+
+        public CreatedTaskListAdapter(Context context, List<Task> tasks) {
+            super(context, 0, tasks);
+        }
+
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            Task task = getItem(position);
+
+            // Check if an existing view is being reused, otherwise inflate the view
+            if (convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.listitem_task_created, parent, false);
+            }
+
+            ((TextView) convertView.findViewById(R.id.task_name)).setText(task.getName());
+            //((TextView) convertView.findViewById(R.id.last_answer_time)).setText();
+            //((TextView) convertView.findViewById(R.id.num_answers)).setText();
+
+            return convertView;
         }
     }
 
-    @Override
-    public void onAttach(Context context) {
-        super.onAttach(context);
-        if (context instanceof OnInfoFragmentInteractionListener) {
-            mListener = (OnInfoFragmentInteractionListener) context;
-        } else {
-            throw new RuntimeException(context.toString()
-                    + " must implement OnInfoFragmentInteractionListener");
+    class CompletedTaskListAdapter extends ArrayAdapter<Task> {
+
+        public CompletedTaskListAdapter(Context context, List<Task> tasks) {
+            super(context, 0, tasks);
         }
-    }
 
-    @Override
-    public void onDetach() {
-        super.onDetach();
-        mListener = null;
-    }
+        @Override
+        public View getView(int position, View convertView, ViewGroup parent) {
+            Task task = getItem(position);
 
-    /**
-     * This interface must be implemented by activities that contain this
-     * fragment to allow an interaction in this fragment to be communicated
-     * to the activity and potentially other fragments contained in that
-     * activity.
-     * <p/>
-     * See the Android Training lesson <a href=
-     * "http://developer.android.com/training/basics/fragments/communicating.html"
-     * >Communicating with Other Fragments</a> for more information.
-     */
-    public interface OnInfoFragmentInteractionListener {
-        // TODO: Update argument type and name
-        void onInfoFragmentInteraction(Uri uri);
+            // Check if an existing view is being reused, otherwise inflate the view
+            if (convertView == null) {
+                convertView = LayoutInflater.from(getContext()).inflate(R.layout.listitem_task_completed, parent, false);
+            }
+
+            ((TextView) convertView.findViewById(R.id.task_name)).setText(task.getName());
+            ((TextView) convertView.findViewById(R.id.task_location)).setText(task.getLocation().getName());
+            ((TextView) convertView.findViewById(R.id.task_cost)).setText("$" + task.getCost());
+
+            return convertView;
+        }
     }
 }

@@ -34,7 +34,7 @@
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <TextView
-                android:id="@+id/last_submitted_time"
+                android:id="@+id/last_answer_time"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:text="XX minutes ago"
@@ -52,7 +52,7 @@
         android:orientation="vertical">
 
         <TextView
-            android:id="@+id/task_cost"
+            android:id="@+id/num_answers"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"
@@ -60,7 +60,7 @@
             android:textAppearance="?android:attr/textAppearanceSmall" />
 
         <TextView
-            android:id="@+id/num_answers_submitted_title"
+            android:id="@+id/num_answers_title"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_gravity="center"

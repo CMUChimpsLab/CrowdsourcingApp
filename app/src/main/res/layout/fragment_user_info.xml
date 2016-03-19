@@ -62,7 +62,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/num_questions_created_layout"
+                android:id="@+id/num_created_tasks_title_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -73,7 +73,7 @@
                 android:paddingTop="10dp">
 
                 <TextView
-                    android:id="@+id/num_questions_created"
+                    android:id="@+id/num_created_tasks"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="00"
@@ -82,10 +82,10 @@
                     android:textSize="30sp" />
 
                 <TextView
-                    android:id="@+id/num_questions_created_title"
+                    android:id="@+id/num_created_tasks_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Questions Asked"
+                    android:text="Tasks Created"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="#777777"
                     android:textSize="13sp" />
@@ -93,7 +93,7 @@
             </LinearLayout>
 
             <LinearLayout
-                android:id="@+id/num_questions_completed_layout"
+                android:id="@+id/num_completed_tasks_title_layout"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_weight="1"
@@ -104,7 +104,7 @@
                 android:paddingTop="10dp">
 
                 <TextView
-                    android:id="@+id/num_questions_completed"
+                    android:id="@+id/num_completed_tasks"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:text="00"
@@ -113,10 +113,10 @@
                     android:textSize="30sp" />
 
                 <TextView
-                    android:id="@+id/num_questions_completed_title"
+                    android:id="@+id/num_completed_tasks_title"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text="Questions Answered"
+                    android:text="Tasks Completed"
                     android:textAppearance="?android:attr/textAppearanceSmall"
                     android:textColor="#777777"
                     android:textSize="13sp" />
@@ -125,25 +125,58 @@
 
         </LinearLayout>
 
-        <ListView
-            android:id="@+id/list_task_created"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="center_horizontal"
-            android:divider="#ddd"
-            android:dividerHeight="1dp"
-            android:drawSelectorOnTop="true"
-            tools:listitem="@layout/listitem_task_created" />
+        <LinearLayout
+            android:id="@+id/created_tasks_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical">
 
-        <ListView
-            android:id="@+id/list_task_completed"
-            android:layout_width="fill_parent"
-            android:layout_height="fill_parent"
-            android:layout_gravity="center_horizontal"
-            android:divider="#ddd"
-            android:dividerHeight="1dp"
-            android:drawSelectorOnTop="true"
-            tools:listitem="@layout/listitem_task_completed" />
+            <TextView
+                android:id="@+id/created_tasks_notice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:text="No tasks were created yet." />
+
+            <ListView
+                android:id="@+id/list_created_tasks"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center_horizontal"
+                android:divider="#ddd"
+                android:dividerHeight="1dp"
+                android:drawSelectorOnTop="true"
+                tools:listitem="@layout/listitem_task_created" />
+
+        </LinearLayout>
+
+        <LinearLayout
+            android:id="@+id/completed_tasks_container"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:orientation="vertical"
+            android:visibility="gone">
+
+            <TextView
+                android:id="@+id/completed_tasks_notice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_gravity="center"
+                android:layout_marginTop="15dp"
+                android:text="No tasks were completed yet." />
+
+            <ListView
+                android:id="@+id/list_completed_tasks"
+                android:layout_width="fill_parent"
+                android:layout_height="fill_parent"
+                android:layout_gravity="center_horizontal"
+                android:divider="#ddd"
+                android:dividerHeight="1dp"
+                android:drawSelectorOnTop="true"
+                tools:listitem="@layout/listitem_task_completed" />
+
+        </LinearLayout>
 
     </LinearLayout>
 
