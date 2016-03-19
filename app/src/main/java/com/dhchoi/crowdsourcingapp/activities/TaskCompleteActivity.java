@@ -78,7 +78,7 @@ public class TaskCompleteActivity extends AppCompatActivity {
         final ViewGroup taskActionsLayout = (ViewGroup) findViewById(R.id.task_actions);
         for (TaskAction taskAction : mTask.getTaskActions()) {
             if (taskAction.getType() == TaskAction.TaskActionType.TEXT) {
-                View taskActionLayout = LayoutInflater.from(this).inflate(R.layout.task_action_text, null);
+                View taskActionLayout = LayoutInflater.from(this).inflate(R.layout.task_action_text_complete, null);
                 ((TextView) taskActionLayout.findViewById(R.id.task_action_description)).setText(taskAction.getDescription());
                 taskActionLayout.findViewById(R.id.task_action_response).setTag(taskAction.getId());
                 mTaskActionLayouts.add((ViewGroup) taskActionLayout);
@@ -103,15 +103,15 @@ public class TaskCompleteActivity extends AppCompatActivity {
                         try {
                             JSONObject responseObj = new JSONObject(response);
                             if (responseObj.getBoolean("result")) {
-                                Toast.makeText(TaskCompleteActivity.this, "Response submitted!", Toast.LENGTH_LONG).show();
+                                Toast.makeText(TaskCompleteActivity.this, "Response submitted!", Toast.LENGTH_SHORT).show();
                                 TaskCompleteActivity.this.finish();
                             } else {
-                                Toast.makeText(TaskCompleteActivity.this, "Response was not accepted.", Toast.LENGTH_LONG).show();
+                                Toast.makeText(TaskCompleteActivity.this, "Your request was ill-formatted. Please check inputs again.", Toast.LENGTH_SHORT).show();
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
                             Log.e(Constants.TAG, e.getMessage());
-                            Toast.makeText(TaskCompleteActivity.this, "Failed to submit response.", Toast.LENGTH_LONG).show();
+                            Toast.makeText(TaskCompleteActivity.this, "Failed to submit request.", Toast.LENGTH_SHORT).show();
                         }
                     }
                 }.execute();

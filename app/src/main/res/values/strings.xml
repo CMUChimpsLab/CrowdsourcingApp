@@ -28,4 +28,7 @@
     <string name="location_permission_denied">This app requires location permission to enable \'task\' related features. Please try again and grant access to use the location.\nIf the permission has been permanently denied, it can be enabled from the System Settings &gt; Apps &gt; \'Google Maps API Demos\'.</string>
     <string name="permission_required_toast">Location permission is required for this app.</string>
 
+    <string-array name="action_types">
+        <item>text</item>
+    </string-array>
 </resources>
