@@ -18,6 +18,11 @@ Download the APK file within the `public/` folder directly.
 - Display activities of other users.
 - Get alerted whenever a user enters or leaves a location for a task.
 
+## Creating How to Create an APK
+ 
+- Create new build configuration with task `assemble`
+- Compiled APK will be located at `app/build/outputs/apk/app-debug.apk`
+
 ## Issues
 
 - Check release log or change log.
