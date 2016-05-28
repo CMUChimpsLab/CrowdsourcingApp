@@ -50,14 +50,14 @@
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <TextView
-                android:id="@+id/task_timeleft"
+                android:id="@+id/task_expires_at"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_alignParentEnd="true"
                 android:layout_alignTop="@+id/task_location"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
-                android:text="Time Left"
+                android:text="Expires At"
                 android:textAppearance="?android:attr/textAppearanceSmall" />
 
             <TextView

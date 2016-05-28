@@ -23,6 +23,8 @@ import com.dhchoi.crowdsourcingapp.activities.TaskCompleteActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
 
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -109,9 +111,26 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.listitem_task_available, parent, false);
             }
 
+            // set texts
             ((TextView) convertView.findViewById(R.id.task_name)).setText(task.getName());
             ((TextView) convertView.findViewById(R.id.task_location)).setText(task.getLocation().getName());
             ((TextView) convertView.findViewById(R.id.task_cost)).setText("$" + task.getCost());
+            // set remaining time
+            String expiresAtText = "";
+            Calendar currentTime = Calendar.getInstance();
+            Calendar expiresAt = Calendar.getInstance();
+            expiresAt.setTimeInMillis((long)task.getExpiresAt());
+            if (expiresAt.getTimeInMillis() - currentTime.getTimeInMillis() < 60 * 60 * 1000) { // 1 hour
+                expiresAtText = (expiresAt.getTimeInMillis() - currentTime.getTimeInMillis()) / (60 * 1000) + " minute(s) left";
+            }
+            else if (expiresAt.getTimeInMillis() - currentTime.getTimeInMillis() < 24 * 60 * 60 * 1000) { // 24 hours
+                expiresAtText = (expiresAt.getTimeInMillis() - currentTime.getTimeInMillis()) / (60 * 60 * 1000) + " hour(s) left";
+            }
+            else {
+                expiresAtText = (expiresAt.getTimeInMillis() - currentTime.getTimeInMillis()) / (60 * 60 * 60 * 1000) + " day(s) left";
+            }
+            ((TextView) convertView.findViewById(R.id.task_expires_at)).setText(expiresAtText);
+
             final ImageView taskImage = (ImageView) convertView.findViewById(R.id.task_image);
             Random random = new Random();
             taskImage.setBackgroundColor(0xff000000 + 256 * 256 * random.nextInt(256) + 256 * random.nextInt(256) + random.nextInt(256));
