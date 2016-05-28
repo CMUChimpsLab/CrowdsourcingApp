@@ -19,6 +19,10 @@ public class Task implements Serializable {
     private String mName;
     @SerializedName("cost")
     private double mCost;
+    @SerializedName("expiresAt")
+    private double mExpiresAt;
+    @SerializedName("refreshRate")
+    private int mRefreshRate;
     @SerializedName("location")
     private SimpleGeofence mLocation;
     @SerializedName("taskactions")
@@ -42,6 +46,14 @@ public class Task implements Serializable {
 
     public double getCost() {
         return mCost;
+    }
+
+    public double getExpiresAt() {
+        return mExpiresAt;
+    }
+
+    public int getRefreshRate() {
+        return mRefreshRate;
     }
 
     public SimpleGeofence getLocation() {
