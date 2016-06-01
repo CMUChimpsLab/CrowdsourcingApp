@@ -28,6 +28,7 @@ import com.dhchoi.crowdsourcingapp.fragments.UserInfoFragment;
 import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
+import com.dhchoi.crowdsourcingapp.user.UserManager;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -141,8 +142,7 @@ public class MainActivity extends BaseGoogleApiActivity {
 //            startActivity(new Intent(this, CurrentLocationActivity.class));
 //            return true;
         } else if (id == R.id.action_logout) {
-            SharedPreferences sharedPreferences = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, this.MODE_PRIVATE);
-            sharedPreferences.edit().putBoolean(Constants.USER_LOGGED_IN, false).apply();
+            UserManager.setUserLoggedIn(this, false);
             startActivity(new Intent(this, CheckLoginActivity.class));
             finish();
             return true;

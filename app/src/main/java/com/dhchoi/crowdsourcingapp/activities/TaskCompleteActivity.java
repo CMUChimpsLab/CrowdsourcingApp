@@ -27,6 +27,7 @@ import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskAction;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
+import com.dhchoi.crowdsourcingapp.user.UserManager;
 
 import org.json.JSONObject;
 
@@ -145,7 +146,7 @@ public class TaskCompleteActivity extends AppCompatActivity {
 
     private Map<String, String> getUserResponses() {
         Map<String, String> userResponses = new HashMap<String, String>();
-        userResponses.put("userId", mSharedPreferences.getString(Constants.USER_ID_KEY, ""));
+        userResponses.put("userId", UserManager.getUserId(this));
         userResponses.put("taskId", mTask.getId());
         String taskActionIds = "["; // [id, id, ..., id]
         String taskActionResponses = "{"; // {id: response, id: response, ..., id: response}

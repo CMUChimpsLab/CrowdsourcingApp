@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.R;
+import com.dhchoi.crowdsourcingapp.user.UserManager;
 import com.google.android.gms.gcm.GcmPubSub;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 import com.google.android.gms.iid.InstanceID;
@@ -38,7 +39,7 @@ public class GcmRegistrationIntentService extends IntentService {
             Log.i(TAG, "GCM Registration Token: " + token);
 
             // save token to shared preferences
-            getSharedPreferences(Constants.DEFAULT_SHARED_PREF, MODE_PRIVATE).edit().putString(Constants.USER_GCM_TOKEN_KEY, token).apply();
+            UserManager.setUserGcmToken(this, token);
 
             // Subscribe to topic channels
             subscribeTopics(token);

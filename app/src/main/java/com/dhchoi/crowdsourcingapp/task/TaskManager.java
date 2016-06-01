@@ -7,6 +7,7 @@ import android.util.Log;
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
 import com.dhchoi.crowdsourcingapp.SimpleGeofence;
+import com.dhchoi.crowdsourcingapp.user.UserManager;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
@@ -104,7 +105,7 @@ public class TaskManager {
         try {
             SharedPreferences.Editor prefsEditor = getSharedPreferences(context).edit();
             Set<String> savedTaskIdsSet = getSavedTaskIdsSet(context);
-            String userId = getSharedPreferences(context).getString(Constants.USER_ID_KEY, "");
+            String userId = UserManager.getUserId(context);
 
             // create list of tasks from json string
             List<Task> allTasks = new Gson().fromJson(jsonArray, new TypeToken<ArrayList<Task>>() {

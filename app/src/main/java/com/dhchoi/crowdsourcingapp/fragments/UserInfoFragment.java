@@ -19,6 +19,7 @@ import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.activities.TaskCreateActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
+import com.dhchoi.crowdsourcingapp.user.UserManager;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -133,7 +134,7 @@ public class UserInfoFragment extends Fragment {
         mCreatedTasksNotice = (TextView) rootView.findViewById(R.id.created_tasks_notice);
         mCompletedTasksNotice = (TextView) rootView.findViewById(R.id.completed_tasks_notice);
 
-        String userId = getActivity().getSharedPreferences(Constants.DEFAULT_SHARED_PREF, getActivity().MODE_PRIVATE).getString(Constants.USER_ID_KEY, "");
+        String userId = UserManager.getUserId(getActivity());
         mUserId = (TextView) rootView.findViewById(R.id.user_id);
         mUserId.setText(userId);
 

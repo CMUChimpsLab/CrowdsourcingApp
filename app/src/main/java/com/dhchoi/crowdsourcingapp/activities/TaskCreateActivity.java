@@ -22,6 +22,7 @@ import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientAsyncTask;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
 import com.dhchoi.crowdsourcingapp.R;
+import com.dhchoi.crowdsourcingapp.user.UserManager;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
@@ -80,7 +81,7 @@ public class TaskCreateActivity extends AppCompatActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        userId = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, MODE_PRIVATE).getString(Constants.USER_ID_KEY, "");
+        userId = UserManager.getUserId(this);
 
         // views
         mTaskName = (EditText) findViewById(R.id.task_name);

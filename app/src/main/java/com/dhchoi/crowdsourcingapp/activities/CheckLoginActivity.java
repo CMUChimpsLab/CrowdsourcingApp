@@ -1,12 +1,12 @@
 package com.dhchoi.crowdsourcingapp.activities;
 
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.dhchoi.crowdsourcingapp.Constants;
+import com.dhchoi.crowdsourcingapp.user.UserManager;
 
 public class CheckLoginActivity extends AppCompatActivity {
 
@@ -15,8 +15,7 @@ public class CheckLoginActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
 
         // Check if user first needs to login
-        SharedPreferences sharedPreferences = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, CheckLoginActivity.MODE_PRIVATE);
-        boolean isLoggedIn = sharedPreferences.getBoolean(Constants.USER_LOGGED_IN, false);
+        boolean isLoggedIn = UserManager.isUserLoggedIn(this);
         if (isLoggedIn) {
             Log.d(Constants.TAG, "Already logged in. Directing to MainActivity.");
             startActivity(new Intent(this, MainActivity.class));

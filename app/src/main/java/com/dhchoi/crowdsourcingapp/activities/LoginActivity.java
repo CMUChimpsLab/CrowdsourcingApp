@@ -6,7 +6,6 @@ import android.animation.Animator;
 import android.animation.AnimatorListenerAdapter;
 import android.annotation.TargetApi;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.os.Build;
 import android.os.Bundle;
@@ -27,6 +26,7 @@ import com.dhchoi.crowdsourcingapp.HttpClientCallable;
 import com.dhchoi.crowdsourcingapp.PermissionUtils;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.services.GcmRegistrationIntentService;
+import com.dhchoi.crowdsourcingapp.user.UserManager;
 import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.common.AccountPicker;
 
@@ -82,8 +82,7 @@ public class LoginActivity extends AppCompatActivity {
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Permission to access the location is missing.
             PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST, Manifest.permission.ACCESS_FINE_LOCATION, false);
-        }
-        else {
+        } else {
             mEmailSignInButton.setEnabled(true);
         }
 
@@ -127,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
             // Register user to server.
             Map<String, String> params = new HashMap<String, String>();
             params.put("userId", email);
-            params.put("gcmToken", getSharedPreferences(Constants.DEFAULT_SHARED_PREF, MODE_PRIVATE).getString(Constants.USER_GCM_TOKEN_KEY, ""));
+            params.put("gcmToken", UserManager.getGcmToken(this));
             new HttpClientAsyncTask(Constants.APP_SERVER_USER_CREATE_URL, HttpClientCallable.POST, params) {
                 @Override
                 protected void onPostExecute(String response) {
@@ -139,9 +138,8 @@ public class LoginActivity extends AppCompatActivity {
                             Log.d(Constants.TAG, "User login server response: " + responseObj);
                             String errorMsg = responseObj.getString("error");
                             if (errorMsg.isEmpty()) {
-                                SharedPreferences sharedPreferences = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, LoginActivity.MODE_PRIVATE);
-                                sharedPreferences.edit().putBoolean(Constants.USER_LOGGED_IN, true).apply();
-                                sharedPreferences.edit().putString(Constants.USER_ID_KEY, email).apply();
+                                UserManager.setUserLoggedIn(LoginActivity.this, true);
+                                UserManager.setUserId(LoginActivity.this, email);
                                 Log.d(Constants.TAG, "Successfully logged in. Directing to MainActivity.");
                                 startActivity(new Intent(LoginActivity.this, MainActivity.class));
                                 finish();
