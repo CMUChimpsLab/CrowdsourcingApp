@@ -146,15 +146,30 @@ public class TaskCompleteActivity extends AppCompatActivity {
     private Map<String, String> getUserResponses() {
         Map<String, String> userResponses = new HashMap<String, String>();
         userResponses.put("userId", mSharedPreferences.getString(Constants.USER_ID_KEY, ""));
+        userResponses.put("taskId", mTask.getId());
+        String taskActionIds = "["; // [id, id, ..., id]
+        String taskActionResponses = "{"; // {id: response, id: response, ..., id: response}
 
         for (ViewGroup viewGroup : mTaskActionLayouts) {
             for (int i = 0; i < viewGroup.getChildCount(); i++) {
                 View childView = viewGroup.getChildAt(i);
                 if (childView instanceof EditText) {
-                    userResponses.put((String) childView.getTag(), ((EditText) childView).getText().toString());
+                    String taskActionId = (String) childView.getTag();
+                    String taskActionResponse = ((EditText) childView).getText().toString();
+
+                    taskActionIds += taskActionId + ",";
+                    taskActionResponses += "\"" + taskActionId + "\": \"" + taskActionResponse + "\",";
                 }
             }
         }
+
+        taskActionIds = taskActionIds.substring(0, taskActionIds.length()-1);
+        taskActionIds += "]";
+        userResponses.put("taskActionIds", taskActionIds);
+
+        taskActionResponses = taskActionResponses.substring(0, taskActionResponses.length()-1);
+        taskActionResponses += "}";
+        userResponses.put("responses", taskActionResponses);
 
         Log.d(Constants.TAG, "userResponses: " + userResponses);
 
