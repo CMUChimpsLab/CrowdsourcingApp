@@ -15,6 +15,8 @@ public class Task implements Serializable {
 
     @SerializedName("id")
     private String mId;
+    @SerializedName("userId")
+    private String mUserId;
     @SerializedName("name")
     private String mName;
     @SerializedName("cost")
@@ -38,6 +40,10 @@ public class Task implements Serializable {
 
     public String getId() {
         return mId;
+    }
+
+    public String getOwner() {
+        return mUserId;
     }
 
     public String getName() {
