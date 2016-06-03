@@ -185,7 +185,7 @@ public class TaskCreateActivity extends AppCompatActivity {
                         try {
                             JSONObject responseObj = new JSONObject(response);
                             Log.d(Constants.TAG, "Server response: " + responseObj);
-                            if (responseObj.getBoolean("result")) {
+                            if (!responseObj.getString("createdTaskId").isEmpty()) {
                                 Toast.makeText(TaskCreateActivity.this, "Task created!", Toast.LENGTH_SHORT).show();
                                 TaskCreateActivity.this.finish();
                             } else {
