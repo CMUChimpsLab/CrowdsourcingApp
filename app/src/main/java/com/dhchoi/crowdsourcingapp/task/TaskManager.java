@@ -84,6 +84,17 @@ public class TaskManager {
     }
 
     /**
+     * Removes all {@link Task}s from the app and resets the last time that the app synced with the server.
+     *
+     * @param context         of the app
+     * @param googleApiClient to be used for Google services
+     */
+    public static void reset(Context context, GoogleApiClient googleApiClient) {
+        saveLastUpdatedTime(context, 0);
+        removeTasks(context, googleApiClient, new ArrayList<String>(getSavedTaskIdsSet(context)));
+    }
+
+    /**
      * Updates a {@link Task} by rewriting it with the new data.
      *
      * @param context of the app
@@ -167,7 +178,7 @@ public class TaskManager {
                 // cancel geofence
                 List<String> geofenceId = new ArrayList<String>();
                 geofenceId.add(task.getLocation().getTaskId());
-                LocationServices.GeofencingApi.removeGeofences(googleApiClient, geofenceId);
+                LocationServices.GeofencingApi.removeGeofences(googleApiClient, geofenceId); // TODO: check if working
             }
         }
 

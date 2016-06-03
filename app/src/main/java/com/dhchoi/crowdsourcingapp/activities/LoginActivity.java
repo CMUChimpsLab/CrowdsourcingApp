@@ -126,7 +126,7 @@ public class LoginActivity extends AppCompatActivity {
             // Register user to server.
             Map<String, String> params = new HashMap<String, String>();
             params.put("userId", email);
-            params.put("gcmToken", UserManager.getGcmToken(this));
+            params.put("gcmToken", UserManager.getUserGcmToken(this));
             new HttpClientAsyncTask(Constants.APP_SERVER_USER_CREATE_URL, HttpClientCallable.POST, params) {
                 @Override
                 protected void onPostExecute(String response) {

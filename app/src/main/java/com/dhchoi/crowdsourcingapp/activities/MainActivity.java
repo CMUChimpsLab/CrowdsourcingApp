@@ -4,7 +4,6 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
-import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -142,7 +141,11 @@ public class MainActivity extends BaseGoogleApiActivity {
 //            startActivity(new Intent(this, CurrentLocationActivity.class));
 //            return true;
         } else if (id == R.id.action_logout) {
-            UserManager.setUserLoggedIn(this, false);
+            // reset or remove all data
+            UserManager.reset(this);
+            TaskManager.reset(this, getGoogleApiClient());
+
+            // go back to login page
             startActivity(new Intent(this, CheckLoginActivity.class));
             finish();
             return true;
