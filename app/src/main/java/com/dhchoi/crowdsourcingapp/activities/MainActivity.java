@@ -17,6 +17,7 @@ import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 import android.widget.ProgressBar;
 
 import com.dhchoi.crowdsourcingapp.Constants;
@@ -80,9 +81,7 @@ public class MainActivity extends BaseGoogleApiActivity {
                 }
             }
 
-            for (OnTasksUpdatedListener onTasksUpdatedListener : onTasksUpdatedListeners) {
-                onTasksUpdatedListener.onTasksActivationUpdated(mActiveTasks, mInactiveTasks);
-            }
+            triggerOnTasksUpdatedEvent();
         }
     };
 
@@ -169,15 +168,17 @@ public class MainActivity extends BaseGoogleApiActivity {
             @Override
             protected void onPostExecute(Boolean syncSuccess) {
                 mSyncProgressBar.setVisibility(ProgressBar.GONE);
+                Fragment currentFragment = mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
+                View currentFragmentView = currentFragment.getView().findViewById(R.id.fragment_content);
+
                 if (syncSuccess) {
-                    Fragment currentFragment = mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
-                    Snackbar.make(currentFragment.getView().findViewById(R.id.fragment_content), "Sync success!", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(currentFragmentView, "Sync success!", Snackbar.LENGTH_LONG).show();
 
                     // broadcast tasks to listeners
-                    List<Task> allTasks = TaskManager.getAllTasks(MainActivity.this);
+                    List<Task> allIncompleteTasks = TaskManager.getAllUnownedIncompleteTasks(MainActivity.this);
                     mActiveTasks = new ArrayList<Task>();
                     mInactiveTasks = new ArrayList<Task>();
-                    for (Task t : allTasks) {
+                    for (Task t : allIncompleteTasks) {
                         if (t.isActivated()) {
                             mActiveTasks.add(t);
                         } else {
@@ -185,12 +186,10 @@ public class MainActivity extends BaseGoogleApiActivity {
                         }
                     }
 
-                    for (OnTasksUpdatedListener onTasksUpdatedListener : onTasksUpdatedListeners) {
-                        onTasksUpdatedListener.onTasksActivationUpdated(mActiveTasks, mInactiveTasks);
-                    }
+                    triggerOnTasksUpdatedEvent();
 
                 } else {
-                    Snackbar.make(findViewById(android.R.id.content), "Failed to sync with server.", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(currentFragmentView, "Failed to sync with server.", Snackbar.LENGTH_LONG).show();
                 }
             }
         }.execute();
@@ -245,6 +244,33 @@ public class MainActivity extends BaseGoogleApiActivity {
         }
     }
 
+    /**
+     *
+     */
+    private void triggerOnTasksUpdatedEvent() {
+        // TODO: remove geofence tracking if task is completed
+        // ignore completed tasks
+        for (Task t : mActiveTasks) {
+            if (t.isCompleted()) {
+                mActiveTasks.remove(t);
+            }
+        }
+        for (Task t : mInactiveTasks) {
+            if (t.isCompleted()) {
+                mInactiveTasks.remove(t);
+            }
+        }
+
+        for (OnTasksUpdatedListener onTasksUpdatedListener : onTasksUpdatedListeners) {
+            onTasksUpdatedListener.onTasksActivationUpdated(mActiveTasks, mInactiveTasks);
+        }
+    }
+
+    /**
+     * Interface for listening to near real-time TasksUpdated events.
+     * Activated tasks are tasks that were activated by the geofence.
+     * Inactivated tasks are tasks that were inactivated by the geofence.
+     */
     public interface OnTasksUpdatedListener {
         void onTasksActivationUpdated(List<Task> activatedTasks, List<Task> inactivatedTasks);
     }

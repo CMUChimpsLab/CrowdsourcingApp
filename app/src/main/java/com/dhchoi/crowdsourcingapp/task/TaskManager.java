@@ -43,19 +43,12 @@ public class TaskManager {
     private static final String JSON_FIELD_STATUS = "status";
     private static final String JSON_FIELD_STATUS_CREATED = "created";
     private static final String JSON_FIELD_STATUS_DELETED = "deleted";
+    // TODO: add UPDATE status to task changeLog
     private static final String JSON_FIELD_TASK_ID = "taskId";
 
     private static List<OnTasksUpdatedListener> mOnTasksUpdatedListeners = new ArrayList<OnTasksUpdatedListener>();
 
     private TaskManager() {
-    }
-
-    public static void addOnTaskUpdatedListener(OnTasksUpdatedListener listener) {
-        mOnTasksUpdatedListeners.add(listener);
-    }
-
-    public static void removeOnTaskUpdatedListener(OnTasksUpdatedListener listener) {
-        mOnTasksUpdatedListeners.remove(listener);
     }
 
     /**
@@ -70,16 +63,71 @@ public class TaskManager {
     }
 
     /**
-     * Returns a list of all {@link Task}s that have been created by all users.
+     * Returns a list of all {@link Task}s that have been created by other users and have not been completed.
      *
      * @param context of the app
-     * @return a list of all {@link Task}s that have been created
+     * @return a list of all {@link Task}s that have been created by other users and have not been completed
      */
-    public static List<Task> getAllTasks(Context context) {
+    public static List<Task> getAllUnownedIncompleteTasks(Context context) {
+        String userId = UserManager.getUserId(context);
+        if (userId.isEmpty()) {
+            return new ArrayList<Task>();
+        }
+
         List<Task> tasks = new ArrayList<Task>();
         for (String id : getSavedTaskIdsSet(context)) {
-            tasks.add(getTaskById(context, id));
+            Task t = getTaskById(context, id);
+            if (!t.getOwner().equals(userId)) {
+                tasks.add(t);
+            }
         }
+
+        return tasks;
+    }
+
+    /**
+     * Returns a list of all {@link Task}s that have been created by other users and have been completed.
+     *
+     * @param context of the app
+     * @return a list of all {@link Task}s that have been created by other users and have been completed
+     */
+    public static List<Task> getAllUnownedCompletedTasks(Context context) {
+        String userId = UserManager.getUserId(context);
+        if (userId.isEmpty()) {
+            return new ArrayList<Task>();
+        }
+
+        List<Task> tasks = new ArrayList<Task>();
+        for (String id : getSavedTaskIdsSet(context)) {
+            Task t = getTaskById(context, id);
+            if (!t.getOwner().equals(userId) && t.isCompleted()) {
+                tasks.add(t);
+            }
+        }
+
+        return tasks;
+    }
+
+    /**
+     * Returns a list of all {@link Task}s that have been created by the current user.
+     *
+     * @param context of the app
+     * @return a list of all {@link Task}s that have been created by the current user
+     */
+    public static List<Task> getAllOwnedTasks(Context context) {
+        String userId = UserManager.getUserId(context);
+        if (userId.isEmpty()) {
+            return new ArrayList<Task>();
+        }
+
+        List<Task> tasks = new ArrayList<Task>();
+        for (String id : getSavedTaskIdsSet(context)) {
+            Task t = getTaskById(context, id);
+            if (t.getOwner().equals(userId)) {
+                tasks.add(t);
+            }
+        }
+
         return tasks;
     }
 
@@ -146,8 +194,8 @@ public class TaskManager {
             prefsEditor.putStringSet(TASK_KEY_ID_SET, savedTaskIdsSet).apply();
 
             for (OnTasksUpdatedListener listener : mOnTasksUpdatedListeners) {
-                listener.onTasksAdded(addedTasks);
-                listener.onTasksCreated(ownedTasks);
+                listener.onTasksCreatedByOthers(addedTasks);
+                listener.onTasksCreatedByUser(ownedTasks);
             }
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
@@ -318,10 +366,34 @@ public class TaskManager {
     }
 
     public interface OnTasksUpdatedListener {
-        void onTasksAdded(List<Task> addedTasks); // tasks added by other users
 
-        void onTasksCreated(List<Task> createdTasks); // tasks owned by current user // TODO: should refresh when user logs in with different id
+        /**
+         * Callback when receiving info about tasks created by other users.
+         *
+         * @param createdTasksByOthers tasks created by other users
+         */
+        void onTasksCreatedByOthers(List<Task> createdTasksByOthers);
 
+        /**
+         * Callback when receiving info about tasks created by current user.
+         *
+         * @param createdTasksByUser tasks created by current user
+         */
+        void onTasksCreatedByUser(List<Task> createdTasksByUser);
+
+        /**
+         * Callback when receiving info about deleted tasks.
+         *
+         * @param deletedTaskIds deleted task ids
+         */
         void onTasksDeleted(List<String> deletedTaskIds);
+    }
+
+    public static void addOnTaskUpdatedListener(OnTasksUpdatedListener listener) {
+        mOnTasksUpdatedListeners.add(listener);
+    }
+
+    public static void removeOnTaskUpdatedListener(OnTasksUpdatedListener listener) {
+        mOnTasksUpdatedListeners.remove(listener);
     }
 }
