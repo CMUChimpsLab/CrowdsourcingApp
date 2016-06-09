@@ -76,7 +76,7 @@ public class UserInfoFragment extends Fragment {
         mListCreatedTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                // TODO: create activity where user can check submitted responses or manage task (delete, etc.)
             }
         });
         mNumCreatedTasksTitle = (LinearLayout) rootView.findViewById(R.id.num_created_tasks_title_layout);
@@ -100,7 +100,7 @@ public class UserInfoFragment extends Fragment {
         mListCompletedTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                // TODO: create activity where user can view details of completed task (what he responded, etc.)
             }
         });
         mNumCompletedTasksTitle = (LinearLayout) rootView.findViewById(R.id.num_completed_tasks_title_layout);
