@@ -5,6 +5,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 import static com.dhchoi.crowdsourcingapp.Constants.PACKAGE_NAME;
@@ -30,6 +31,7 @@ public class Task implements Serializable {
     @SerializedName("taskactions")
     private List<TaskAction> mTaskActions = new ArrayList<TaskAction>();
     private boolean mIsActivated = false;
+    private long mCompletionTime = 0;
 
     public Task(String id, String name, int cost, SimpleGeofence location) {
         mId = id;
@@ -74,8 +76,17 @@ public class Task implements Serializable {
         return mIsActivated;
     }
 
+    public boolean isCompleted() {
+        long currentTime = new Date().getTime();
+        return mCompletionTime > 0 && (currentTime - mCompletionTime) < mRefreshRate;
+    }
+
     public void setActivated(boolean activated) {
         mIsActivated = activated;
+    }
+
+    public void setCompletionTime(long completionTime) {
+        mCompletionTime = completionTime;
     }
 
     @Override

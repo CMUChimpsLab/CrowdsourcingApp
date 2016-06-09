@@ -14,7 +14,6 @@ import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
 
-import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.activities.TaskCreateActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
@@ -77,7 +76,7 @@ public class UserInfoFragment extends Fragment {
         mListCreatedTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                // TODO: create activity where user can check submitted responses or manage task (delete, etc.)
             }
         });
         mNumCreatedTasksTitle = (LinearLayout) rootView.findViewById(R.id.num_created_tasks_title_layout);
@@ -101,7 +100,7 @@ public class UserInfoFragment extends Fragment {
         mListCompletedTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-
+                // TODO: create activity where user can view details of completed task (what he responded, etc.)
             }
         });
         mNumCompletedTasksTitle = (LinearLayout) rootView.findViewById(R.id.num_completed_tasks_title_layout);
@@ -120,10 +119,9 @@ public class UserInfoFragment extends Fragment {
         });
 
         // fetch tasks
-        List<Task> allTasks = TaskManager.getAllTasks(getActivity());
-        //mCreatedTasks.addAll(allTasks);
+        mCreatedTasks.addAll(TaskManager.getAllOwnedTasks(getActivity()));
         mCreatedTaskListAdapter.notifyDataSetChanged();
-        //mCompletedTasks.addAll(allTasks);
+        mCompletedTasks.addAll(TaskManager.getAllUnownedCompletedTasks(getActivity()));
         mCompletedTaskListAdapter.notifyDataSetChanged();
 
         // update views
@@ -193,4 +191,6 @@ public class UserInfoFragment extends Fragment {
             return convertView;
         }
     }
+
+    // TODO: add listener to get user created tasks
 }

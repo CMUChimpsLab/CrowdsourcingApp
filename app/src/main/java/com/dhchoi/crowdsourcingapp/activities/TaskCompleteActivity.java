@@ -33,6 +33,7 @@ import org.json.JSONObject;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -105,6 +106,10 @@ public class TaskCompleteActivity extends AppCompatActivity {
                             JSONObject responseObj = new JSONObject(response);
                             if (responseObj.getBoolean("result")) {
                                 Toast.makeText(TaskCompleteActivity.this, "Response submitted!", Toast.LENGTH_SHORT).show();
+                                // update the time when the task was completed
+                                mTask.setCompletionTime(new Date().getTime()); // TODO: use same value from server
+                                TaskManager.updateTask(TaskCompleteActivity.this, mTask);
+                                // exit activity
                                 TaskCompleteActivity.this.finish();
                             } else {
                                 Toast.makeText(TaskCompleteActivity.this, "Your request was ill-formatted. Please check inputs again.", Toast.LENGTH_SHORT).show();
@@ -164,11 +169,11 @@ public class TaskCompleteActivity extends AppCompatActivity {
             }
         }
 
-        taskActionIds = taskActionIds.substring(0, taskActionIds.length()-1);
+        taskActionIds = taskActionIds.substring(0, taskActionIds.length() - 1);
         taskActionIds += "]";
         userResponses.put("taskActionIds", taskActionIds);
 
-        taskActionResponses = taskActionResponses.substring(0, taskActionResponses.length()-1);
+        taskActionResponses = taskActionResponses.substring(0, taskActionResponses.length() - 1);
         taskActionResponses += "}";
         userResponses.put("responses", taskActionResponses);
 
