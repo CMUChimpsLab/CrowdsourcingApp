@@ -13,15 +13,20 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.activities.TaskCreateActivity;
+import com.dhchoi.crowdsourcingapp.activities.TaskInfoActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
+import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
+
+import static com.dhchoi.crowdsourcingapp.activities.TaskInfoActivity.TASK_REMOVED;
 
 public class UserInfoFragment extends Fragment {
 
@@ -45,6 +50,8 @@ public class UserInfoFragment extends Fragment {
     private TextView mNumCompletedTasks;
     private LinearLayout mNumCreatedTasksTitle;
     private LinearLayout mNumCompletedTasksTitle;
+
+    private static final int TASK_INFO_REQUEST_CODE = 100;
 
     public UserInfoFragment() {
     }
@@ -77,6 +84,15 @@ public class UserInfoFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // TODO: create activity where user can check submitted responses or manage task (delete, etc.)
+                Toast.makeText(getActivity(), "Task Clicked", Toast.LENGTH_SHORT).show();
+
+                // pass clicked task to info screen
+                Task clickedTask = (Task) mListCreatedTasks.getAdapter().getItem(position);
+                String taskJson = new Gson().toJson(clickedTask);
+
+                Intent intent = new Intent(getActivity(), TaskInfoActivity.class);
+                intent.putExtra("task", taskJson);
+                startActivityForResult(intent, TASK_INFO_REQUEST_CODE);
 
             }
         });
@@ -145,6 +161,22 @@ public class UserInfoFragment extends Fragment {
     private void updateNoticeTextViews() {
         mCreatedTasksNotice.setVisibility(mCreatedTaskListAdapter.getCount() > 0 ? TextView.GONE : TextView.VISIBLE);
         mCompletedTasksNotice.setVisibility(mCompletedTaskListAdapter.getCount() > 0 ? TextView.GONE : TextView.VISIBLE);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        switch (requestCode) {
+            case TASK_INFO_REQUEST_CODE:
+                // TODO: deal with user's action on the task
+                switch (resultCode) {
+                    case TASK_REMOVED:
+
+                        break;
+                }
+                return;
+        }
+
+        super.onActivityResult(requestCode, resultCode, data);
     }
 
     class CreatedTaskListAdapter extends ArrayAdapter<Task> {
