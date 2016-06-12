@@ -77,6 +77,7 @@ public class UserInfoFragment extends Fragment {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // TODO: create activity where user can check submitted responses or manage task (delete, etc.)
+
             }
         });
         mNumCreatedTasksTitle = (LinearLayout) rootView.findViewById(R.id.num_created_tasks_title_layout);

@@ -136,7 +136,7 @@ public class TaskCreateActivity extends AppCompatActivity {
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         mExpirationHour = hourOfDay;
                         mExpirationMinute = minute;
-                        mTimeText.setText(mExpirationHour + ":" + mExpirationMinute);
+                        mTimeText.setText(mExpirationHour + ":" + (mExpirationMinute < 10 ? "0" + mExpirationMinute : mExpirationMinute + ""));    // add padding
                     }
                 }, currentHour, currentMinute, false);
                 timePickerDialog.show();
