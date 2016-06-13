@@ -1,3 +1,6 @@
+# Keys and secrets
+app/src/main/java/com/dhchoi/crowdsourcingapp/Constants.java
+
 ### Android template
 # Built application files
 *.apk
@@ -78,6 +81,3 @@ crashlytics-build.properties
 
 # Built application files for releasing to public
 !public/*.apk
-
-# Keys and secrets
-app/src/main/java/com/dhchoi/crowdsourcingapp/Constants.java
