@@ -78,3 +78,6 @@ crashlytics-build.properties
 
 # Built application files for releasing to public
 !public/*.apk
+
+# Keys and secrets
+app/src/main/java/com/dhchoi/crowdsourcingapp/Constants.java
