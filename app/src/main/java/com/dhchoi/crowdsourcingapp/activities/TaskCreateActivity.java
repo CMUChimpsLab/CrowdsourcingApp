@@ -3,6 +3,7 @@ package com.dhchoi.crowdsourcingapp.activities;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.hardware.input.InputManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -11,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -202,6 +205,8 @@ public class TaskCreateActivity extends AppCompatActivity {
                 }.execute();
             }
         });
+
+        hideSoftKeyboard();
     }
 
     @Override
@@ -294,6 +299,10 @@ public class TaskCreateActivity extends AppCompatActivity {
         userEntries.put(typeKey, "text");
 
         return userEntries;
+    }
+
+    private void hideSoftKeyboard() {
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
     @Override

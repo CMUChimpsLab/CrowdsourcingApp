@@ -15,7 +15,6 @@ import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientAsyncTask;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
 import com.dhchoi.crowdsourcingapp.R;
-import com.dhchoi.crowdsourcingapp.fragments.UserInfoFragment;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.google.gson.Gson;
 
@@ -29,8 +28,6 @@ public class TaskInfoActivity extends AppCompatActivity {
     private TextView mTaskName;
     private Button mManageTask;
     private Button mDeleteTask;
-
-    public static final int TASK_REMOVED = 201;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -64,8 +61,6 @@ public class TaskInfoActivity extends AppCompatActivity {
                 deleteTask();
             }
         });
-
-
 
     }
 

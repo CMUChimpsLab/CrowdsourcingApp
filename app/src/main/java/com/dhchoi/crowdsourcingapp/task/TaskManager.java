@@ -43,7 +43,8 @@ public class TaskManager {
     private static final String JSON_FIELD_STATUS = "status";
     private static final String JSON_FIELD_STATUS_CREATED = "created";
     private static final String JSON_FIELD_STATUS_DELETED = "deleted";
-    // TODO: add UPDATE status to task changeLog
+    // TODO: add UPDATE status in web code
+    private static final String JSON_FIELD_STATUS_UPDATED = "updated";
     private static final String JSON_FIELD_TASK_ID = "taskId";
 
     private static List<OnTasksUpdatedListener> mOnTasksUpdatedListeners = new ArrayList<OnTasksUpdatedListener>();

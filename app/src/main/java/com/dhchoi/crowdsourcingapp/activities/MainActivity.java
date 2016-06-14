@@ -134,8 +134,6 @@ public class MainActivity extends BaseGoogleApiActivity {
         // Handle action bar item clicks here. The action bar will automatically handle clicks on the Home/Up button,
         // so long as you specify a parent activity in AndroidManifest.xml.
 
-        // TODO: might want to overwrite the default Home/Up button to make sure single top navigation
-
         int id = item.getItemId();
 
         if (id == R.id.action_settings) {

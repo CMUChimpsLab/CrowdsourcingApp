@@ -29,8 +29,6 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.dhchoi.crowdsourcingapp.activities.TaskInfoActivity.TASK_REMOVED;
-
 public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUpdatedListener {
 
     public static final String NAME = "MY INFO";
@@ -95,7 +93,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
 
                 Intent intent = new Intent(getActivity(), TaskInfoActivity.class);
                 intent.putExtra("task", taskJson);
-                startActivityForResult(intent, TASK_INFO_REQUEST_CODE);
+                startActivity(intent);
             }
         });
         mNumCreatedTasksTitle = (LinearLayout) rootView.findViewById(R.id.num_created_tasks_title_layout);
@@ -185,23 +183,6 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
     @Override
     public void onTasksActivationUpdated(List<Task> activatedTasks, List<Task> inactivatedTasks) {
         fetchTasks();
-    }
-
-    @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case TASK_INFO_REQUEST_CODE:
-                switch (resultCode) {
-                    case TASK_REMOVED:
-                        
-                        break;
-                    // TODO: deal with other user's action on the task
-
-                }
-                return;
-        }
-
-        super.onActivityResult(requestCode, resultCode, data);
     }
 
     class CreatedTaskListAdapter extends ArrayAdapter<Task> {
