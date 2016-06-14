@@ -92,6 +92,7 @@ public class MainActivity extends BaseGoogleApiActivity {
     {
         onTasksUpdatedListeners.add(mTaskAvailableFragment.getTaskAvailableListFragment());
         onTasksUpdatedListeners.add(mTaskAvailableFragment.getTaskAvailableMapFragment());
+        onTasksUpdatedListeners.add(mUserInfoFragment);
     }
 
     @Override
@@ -190,7 +191,6 @@ public class MainActivity extends BaseGoogleApiActivity {
                     }
 
                     triggerOnTasksUpdatedEvent();
-
                 } else {
                     Snackbar.make(currentFragmentView, "Failed to sync with server.", Snackbar.LENGTH_LONG).show();
                 }

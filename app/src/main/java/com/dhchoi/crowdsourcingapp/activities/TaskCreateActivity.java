@@ -169,10 +169,11 @@ public class TaskCreateActivity extends AppCompatActivity {
                 Map<String, String> userEntries = getUserEntries();
                 Log.d(Constants.TAG, "User attempting to submit: " + userEntries.toString());
 
-                if (!hasAllFieldsEntered(userEntries)) {
-                    Toast.makeText(TaskCreateActivity.this, "Please check if all fields have been completed.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                // TODO: uncomment
+//                if (!hasAllFieldsEntered(userEntries)) {
+//                    Toast.makeText(TaskCreateActivity.this, "Please check if all fields have been completed.", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
 
                 mSubmit.setEnabled(false);
                 mSubmitProgressBar.setVisibility(ProgressBar.VISIBLE);
@@ -249,31 +250,48 @@ public class TaskCreateActivity extends AppCompatActivity {
 
     private Map<String, String> getUserEntries() {
         Map<String, String> userEntries = new HashMap<String, String>();
+//        userEntries.put("userId", userId);
+//        userEntries.put("taskName", mTaskName.getText().toString());
+//        userEntries.put("cost", mTaskCost.getText().toString());
+//        String expiresAt = getExpiresAt();
+//        if (expiresAt != null) {
+//            userEntries.put("expiresAt", expiresAt);
+//        }
+//        userEntries.put("refreshRate", mRefreshRate.getText().toString());
+//        userEntries.put("locationName", mLocationName.getText().toString());
+//        userEntries.put("lat", mLocationLat.getText().toString());
+//        userEntries.put("lng", mLocationLng.getText().toString());
+//        userEntries.put("radius", mLocationRadius.getText().toString());
+
+//        int tagId = 0;
+//        for (ViewGroup taskActionViewGroup : mTaskActionLayouts) {
+//            String descriptionKey = "taskActions[" + tagId + "][description]";
+//            String typeKey = "taskActions[" + tagId + "][type]";
+//            String descriptionValue = ((EditText) taskActionViewGroup.findViewById(R.id.action_description)).getText().toString();
+//            String typeValue = ((Spinner) taskActionViewGroup.findViewById(R.id.action_type)).getSelectedItem().toString();
+//            if (!descriptionValue.isEmpty() && !typeValue.isEmpty()) {
+//                userEntries.put(descriptionKey, descriptionValue);
+//                userEntries.put(typeKey, typeValue);
+//                tagId++;
+//            }
+//        }
+
+        // TODO: remove
         userEntries.put("userId", userId);
-        userEntries.put("taskName", mTaskName.getText().toString());
-        userEntries.put("cost", mTaskCost.getText().toString());
-        String expiresAt = getExpiresAt();
-        if (expiresAt != null) {
-            userEntries.put("expiresAt", expiresAt);
-        }
-        userEntries.put("refreshRate", mRefreshRate.getText().toString());
-        userEntries.put("locationName", mLocationName.getText().toString());
-        userEntries.put("lat", mLocationLat.getText().toString());
-        userEntries.put("lng", mLocationLng.getText().toString());
-        userEntries.put("radius", mLocationRadius.getText().toString());
+        userEntries.put("taskName", "Default task");
+        userEntries.put("cost", "1");
+        userEntries.put("expiresAt", null);
+        userEntries.put("refreshRate", "60");
+        userEntries.put("locationName", "Carnegie Mellon University");
+        userEntries.put("lat", "40");
+        userEntries.put("lng", "-80");
+        userEntries.put("radius", "5");
 
         int tagId = 0;
-        for (ViewGroup taskActionViewGroup : mTaskActionLayouts) {
-            String descriptionKey = "taskActions[" + tagId + "][description]";
-            String typeKey = "taskActions[" + tagId + "][type]";
-            String descriptionValue = ((EditText) taskActionViewGroup.findViewById(R.id.action_description)).getText().toString();
-            String typeValue = ((Spinner) taskActionViewGroup.findViewById(R.id.action_type)).getSelectedItem().toString();
-            if (!descriptionValue.isEmpty() && !typeValue.isEmpty()) {
-                userEntries.put(descriptionKey, descriptionValue);
-                userEntries.put(typeKey, typeValue);
-                tagId++;
-            }
-        }
+        String descriptionKey = "taskActions[" + tagId + "][description]";
+        String typeKey = "taskActions[" + tagId + "][type]";
+        userEntries.put(descriptionKey, "Default description");
+        userEntries.put(typeKey, "text");
 
         return userEntries;
     }

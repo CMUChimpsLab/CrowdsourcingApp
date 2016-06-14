@@ -16,6 +16,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dhchoi.crowdsourcingapp.R;
+import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskCreateActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskInfoActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
@@ -28,7 +29,7 @@ import java.util.List;
 
 import static com.dhchoi.crowdsourcingapp.activities.TaskInfoActivity.TASK_REMOVED;
 
-public class UserInfoFragment extends Fragment {
+public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUpdatedListener {
 
     public static final String NAME = "MY INFO";
     private final int COLOR_ON = 0xffffffff;
@@ -133,17 +134,9 @@ public class UserInfoFragment extends Fragment {
             }
         });
 
-        // fetch tasks
-        mCreatedTasks.addAll(TaskManager.getAllOwnedTasks(getActivity()));
-        mCreatedTaskListAdapter.notifyDataSetChanged();
-        mCompletedTasks.addAll(TaskManager.getAllUnownedCompletedTasks(getActivity()));
-        mCompletedTaskListAdapter.notifyDataSetChanged();
-
         // update views
         mNumCreatedTasks = (TextView) rootView.findViewById(R.id.num_created_tasks);
-        mNumCreatedTasks.setText(String.valueOf(mCreatedTasks.size()));
         mNumCompletedTasks = (TextView) rootView.findViewById(R.id.num_completed_tasks);
-        mNumCompletedTasks.setText(String.valueOf(mCompletedTasks.size()));
         mCreatedTasksNotice = (TextView) rootView.findViewById(R.id.created_tasks_notice);
         mCompletedTasksNotice = (TextView) rootView.findViewById(R.id.completed_tasks_notice);
 
@@ -159,6 +152,24 @@ public class UserInfoFragment extends Fragment {
     private void updateNoticeTextViews() {
         mCreatedTasksNotice.setVisibility(mCreatedTaskListAdapter.getCount() > 0 ? TextView.GONE : TextView.VISIBLE);
         mCompletedTasksNotice.setVisibility(mCompletedTaskListAdapter.getCount() > 0 ? TextView.GONE : TextView.VISIBLE);
+    }
+
+    private void fetchTasks() {
+        // fetch tasks
+        mCreatedTasks.clear();
+        mCreatedTasks.addAll(TaskManager.getAllOwnedTasks(getActivity()));
+        mCreatedTaskListAdapter.notifyDataSetChanged();
+        mNumCreatedTasks.setText(String.valueOf(mCreatedTasks.size()));
+
+        mCompletedTasks.clear();
+        mCompletedTasks.addAll(TaskManager.getAllUnownedCompletedTasks(getActivity()));
+        mCompletedTaskListAdapter.notifyDataSetChanged();
+        mNumCompletedTasks.setText(String.valueOf(mCompletedTasks.size()));
+    }
+
+    @Override
+    public void onTasksActivationUpdated(List<Task> activatedTasks, List<Task> inactivatedTasks) {
+        fetchTasks();
     }
 
     @Override
@@ -224,5 +235,4 @@ public class UserInfoFragment extends Fragment {
         }
     }
 
-    // TODO: add listener to get user created tasks
 }
