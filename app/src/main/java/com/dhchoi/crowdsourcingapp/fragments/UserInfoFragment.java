@@ -83,7 +83,6 @@ public class UserInfoFragment extends Fragment {
         mListCreatedTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // TODO: create activity where user can check submitted responses or manage task (delete, etc.)
                 Toast.makeText(getActivity(), "Task Clicked", Toast.LENGTH_SHORT).show();
 
                 // pass clicked task to info screen
@@ -182,7 +181,7 @@ public class UserInfoFragment extends Fragment {
     class CreatedTaskListAdapter extends ArrayAdapter<Task> {
 
         public CreatedTaskListAdapter(Context context, List<Task> tasks) {
-            super(context, 0, tasks);
+            super(context, android.R.layout.simple_list_item_1, tasks);
         }
 
         @Override

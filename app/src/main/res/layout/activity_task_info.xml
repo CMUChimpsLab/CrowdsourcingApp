@@ -66,12 +66,27 @@
 
             </LinearLayout>
 
-            <Button
-                android:id="@+id/btn_manage_task"
-                android:layout_width="wrap_content"
+            <!--Manage buttons-->
+            <RelativeLayout
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_gravity="center_horizontal"
-                android:text="Manage"/>
+                android:layout_gravity="bottom">
+
+                <Button
+                    android:id="@+id/btn_manage_task"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentLeft="true"
+                    android:text="Manage"/>
+                
+                <Button
+                    android:id="@+id/btn_delete_task"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_alignParentRight="true"
+                    android:text="Delete"/>
+
+            </RelativeLayout>
 
         </LinearLayout>
 
