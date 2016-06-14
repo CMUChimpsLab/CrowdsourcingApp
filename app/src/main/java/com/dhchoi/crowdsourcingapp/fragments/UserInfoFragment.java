@@ -2,9 +2,11 @@ package com.dhchoi.crowdsourcingapp.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -51,6 +53,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
     private TextView mNumCompletedTasks;
     private LinearLayout mNumCreatedTasksTitle;
     private LinearLayout mNumCompletedTasksTitle;
+    private SwipeRefreshLayout mSwipeRefresh;
 
     private static final int TASK_INFO_REQUEST_CODE = 100;
 
@@ -66,7 +69,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_user_info, container, false);
 
-        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        final FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -144,6 +147,15 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         mUserId = (TextView) rootView.findViewById(R.id.user_id);
         mUserId.setText(userId);
 
+        // swipe refresh layout
+        mSwipeRefresh = (SwipeRefreshLayout) rootView.findViewById(R.id.layout_swipe_refresh);
+        mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchTasks();
+            }
+        });
+
         updateNoticeTextViews();
 
         return rootView;
@@ -165,6 +177,9 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         mCompletedTasks.addAll(TaskManager.getAllUnownedCompletedTasks(getActivity()));
         mCompletedTaskListAdapter.notifyDataSetChanged();
         mNumCompletedTasks.setText(String.valueOf(mCompletedTasks.size()));
+
+        if (mSwipeRefresh.isRefreshing())
+            mSwipeRefresh.setRefreshing(false);
     }
 
     @Override
