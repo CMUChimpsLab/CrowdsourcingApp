@@ -280,7 +280,7 @@ public class TaskCreateActivity extends AppCompatActivity {
         userEntries.put("userId", userId);
         userEntries.put("taskName", "Default task");
         userEntries.put("cost", "1");
-        userEntries.put("expiresAt", null);
+        userEntries.put("expiresAt", "Tomorrow");
         userEntries.put("refreshRate", "60");
         userEntries.put("locationName", "Carnegie Mellon University");
         userEntries.put("lat", "40");
@@ -300,7 +300,6 @@ public class TaskCreateActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                // TODO: maybe setResult()?
                 onBackPressed();
                 return true;
         }

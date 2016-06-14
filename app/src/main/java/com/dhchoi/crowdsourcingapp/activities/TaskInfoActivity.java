@@ -75,12 +75,12 @@ public class TaskInfoActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(String response) {
                 // showProgress(false);
-
                 try {
                     if (response != null) {
                         Log.d("TaskInfoActivity", response);
                         onBackPressed();
                     } else {
+                        Toast.makeText(TaskInfoActivity.this, "Failed to delete task", Toast.LENGTH_SHORT).show();
                         Log.d("TaskInfoActivity", "Response is null");
                     }
                 } catch (Exception e) {
