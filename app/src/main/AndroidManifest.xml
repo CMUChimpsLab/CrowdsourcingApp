@@ -8,7 +8,7 @@
     <!-- [END gcm_permission] -->
     <!-- [START location_permission] -->
     <uses-permission android:name="android.permission.ACCESS_FINE_LOCATION" />
-    <uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />
+    <!--<uses-permission android:name="android.permission.ACCESS_COARSE_LOCATION" />-->
     <!-- [END location_permission] -->
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -16,6 +16,9 @@
     <uses-permission android:name="android.permission.GET_ACCOUNTS" />
     <uses-permission android:name="android.permission.READ_PROFILE" />
     <uses-permission android:name="android.permission.READ_CONTACTS" />
+
+    <!--API 23 and above-->
+    <!--<uses-permission-sdk-23 android:name="android.permission.ACCESS_FINE_LOCATION" />-->
 
     <application
         android:allowBackup="true"
@@ -52,6 +55,14 @@
         </activity>
         <activity android:name=".activities.TaskCreateActivity"
             android:label="@string/title_activity_task_create"
+            android:parentActivityName=".activities.MainActivity"
+            android:theme="@style/AppTheme.NoActionBar">
+            <meta-data
+                android:name="android.support.PARENT_ACTIVITY"
+                android:value=".activities.MainActivity" />
+        </activity>
+        <activity android:name=".activities.TaskInfoActivity"
+            android:label="@string/title_activity_task_info"
             android:parentActivityName=".activities.MainActivity"
             android:theme="@style/AppTheme.NoActionBar">
             <meta-data

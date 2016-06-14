@@ -8,6 +8,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.Button;
@@ -136,7 +137,7 @@ public class TaskCreateActivity extends AppCompatActivity {
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
                         mExpirationHour = hourOfDay;
                         mExpirationMinute = minute;
-                        mTimeText.setText(mExpirationHour + ":" + mExpirationMinute);
+                        mTimeText.setText(mExpirationHour + ":" + (mExpirationMinute < 10 ? "0" + mExpirationMinute : mExpirationMinute + ""));    // add padding
                     }
                 }, currentHour, currentMinute, false);
                 timePickerDialog.show();
@@ -275,5 +276,17 @@ public class TaskCreateActivity extends AppCompatActivity {
         }
 
         return userEntries;
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(MenuItem item) {
+        switch (item.getItemId()) {
+            case android.R.id.home:
+                // TODO: maybe setResult()?
+                onBackPressed();
+                return true;
+        }
+
+        return super.onOptionsItemSelected(item);
     }
 }
