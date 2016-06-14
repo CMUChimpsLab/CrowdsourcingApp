@@ -287,12 +287,14 @@ public class TaskManager {
                     }
 
                     // no need to deal with tasks that were deleted after being created
+                    List<String> deletedIds = new ArrayList<>();        // to avoid ConcurrentModificationException
                     for (String id : tasksDeleted) {
                         if (tasksCreated.contains(id)) {
                             tasksCreated.remove(id);
-                            tasksDeleted.remove(id);
+                            deletedIds.add(id);
                         }
                     }
+                    tasksDeleted.removeAll(deletedIds);
 
                     // remove deleted tasks
                     removeTasks(context, googleApiClient, tasksDeleted);
