@@ -89,10 +89,9 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
 
                 // pass clicked task to info screen
                 Task clickedTask = (Task) mListCreatedTasks.getAdapter().getItem(position);
-                String taskJson = new Gson().toJson(clickedTask);
 
                 Intent intent = new Intent(getActivity(), TaskInfoActivity.class);
-                intent.putExtra("task", taskJson);
+                intent.putExtra("taskId", ((Task) mListCreatedTasks.getAdapter().getItem(position)).getId());
                 startActivity(intent);
             }
         });

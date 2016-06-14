@@ -72,10 +72,10 @@ public class TaskManager {
     public static List<Task> getAllUnownedIncompleteTasks(Context context) {
         String userId = UserManager.getUserId(context);
         if (userId.isEmpty()) {
-            return new ArrayList<Task>();
+            return new ArrayList<>();
         }
 
-        List<Task> tasks = new ArrayList<Task>();
+        List<Task> tasks = new ArrayList<>();
         for (String id : getSavedTaskIdsSet(context)) {
             Task t = getTaskById(context, id);
             if (!t.getOwner().equals(userId)) {
@@ -267,7 +267,7 @@ public class TaskManager {
                 Log.d(TAG, "changes: " + changes.toString());
 
                 // fetch changes
-                if (appLastUpdatedTime < serverLastUpdatedTime) {
+                if (appLastUpdatedTime < serverLastUpdatedTime) {   // updated earlier than latest server update
                     Log.d(TAG, "start fetching changes");
 
                     // update appLastUpdatedTime to serverLastUpdatedTime

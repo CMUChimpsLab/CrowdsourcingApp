@@ -102,7 +102,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Store values at the time of the login attempt.
         final String email = mEmailView.getText().toString();
-
+        
         boolean cancel = false;
         View focusView = null;
 

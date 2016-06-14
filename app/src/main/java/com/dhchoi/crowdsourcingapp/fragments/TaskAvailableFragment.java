@@ -13,7 +13,7 @@ public class TaskAvailableFragment extends Fragment {
 
     public static final String NAME = "NEARBY";
 
-    private boolean isMapShown = false;
+    public boolean isMapShown = false;
     private TaskAvailableMapFragment mTaskAvailableMapFragment = new TaskAvailableMapFragment();
     private TaskAvailableListFragment mTaskAvailableListFragment = new TaskAvailableListFragment();
 
@@ -42,7 +42,7 @@ public class TaskAvailableFragment extends Fragment {
         return mRootView;
     }
 
-    private void swapFragments() {
+    public void swapFragments() {
         getChildFragmentManager().beginTransaction()
                 // .setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
                 .replace(R.id.task_view_container, !isMapShown ? mTaskAvailableMapFragment : mTaskAvailableListFragment)

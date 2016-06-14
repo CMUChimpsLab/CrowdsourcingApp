@@ -35,6 +35,8 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
     private TextView mActiveTasksNotice;
     private TextView mInactiveTasksNotice;
 
+    private static final String TAG = "TaskAvailableList";
+
     // task related
     private List<Task> mActiveTasks = new ArrayList<Task>();
     private List<Task> mInactiveTasks = new ArrayList<Task>();

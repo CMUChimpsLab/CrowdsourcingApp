@@ -156,6 +156,21 @@ public class MainActivity extends BaseGoogleApiActivity {
     }
 
     @Override
+    public void onBackPressed() {
+        if (mViewPager.getCurrentItem() > 0) {      // back to first page
+            mViewPager.setCurrentItem(0, true);
+            return;
+        }
+
+        if (mTaskAvailableFragment.isMapShown) {
+            mTaskAvailableFragment.swapFragments();
+            return;
+        }
+
+        super.onBackPressed();
+    }
+
+    @Override
     public void onConnected(Bundle bundle) {
         super.onConnected(bundle);
 
@@ -178,8 +193,8 @@ public class MainActivity extends BaseGoogleApiActivity {
 
                     // broadcast tasks to listeners
                     List<Task> allIncompleteTasks = TaskManager.getAllUnownedIncompleteTasks(MainActivity.this);
-                    mActiveTasks = new ArrayList<Task>();
-                    mInactiveTasks = new ArrayList<Task>();
+                    mActiveTasks = new ArrayList<>();
+                    mInactiveTasks = new ArrayList<>();
                     for (Task t : allIncompleteTasks) {
                         if (t.isActivated()) {
                             mActiveTasks.add(t);

@@ -16,6 +16,7 @@ import com.dhchoi.crowdsourcingapp.HttpClientAsyncTask;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.task.Task;
+import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.google.gson.Gson;
 
 import java.util.HashMap;
@@ -42,7 +43,8 @@ public class TaskInfoActivity extends AppCompatActivity {
         mManageTask = (Button) findViewById(R.id.btn_manage_task);
         mDeleteTask = (Button) findViewById(R.id.btn_delete_task);
 
-        Task currentTask = new Gson().fromJson(getIntent().getExtras().getString("task"), Task.class);
+//        Task currentTask = new Gson().fromJson(getIntent().getExtras().getString("task"), Task.class);
+        Task currentTask = TaskManager.getTaskById(this, getIntent().getStringExtra("taskId"));
         taskId = currentTask.getId();
         Log.i("TaskInfoActivity", "Task ID: " + taskId);
         Log.i("TaskInfoActivity", "Task Name: " + currentTask.getName());
