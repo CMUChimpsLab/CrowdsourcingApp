@@ -169,11 +169,19 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         mCreatedTasks.addAll(TaskManager.getAllOwnedTasks(getActivity()));
         mCreatedTaskListAdapter.notifyDataSetChanged();
         mNumCreatedTasks.setText(String.valueOf(mCreatedTasks.size()));
+        if (mCreatedTaskListAdapter.getCount() > 0)
+            mCreatedTasksNotice.setVisibility(View.GONE);
+        else
+            mCreatedTasksNotice.setVisibility(View.VISIBLE);
 
         mCompletedTasks.clear();
         mCompletedTasks.addAll(TaskManager.getAllUnownedCompletedTasks(getActivity()));
         mCompletedTaskListAdapter.notifyDataSetChanged();
         mNumCompletedTasks.setText(String.valueOf(mCompletedTasks.size()));
+        if (mCompletedTaskListAdapter.getCount() > 0)
+            mCompletedTasksNotice.setVisibility(View.GONE);
+        else
+            mCompletedTasksNotice.setVisibility(View.VISIBLE);
 
         if (mSwipeRefresh.isRefreshing())
             mSwipeRefresh.setRefreshing(false);

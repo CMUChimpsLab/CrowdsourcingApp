@@ -288,9 +288,9 @@ public class TaskCreateActivity extends AppCompatActivity {
         userEntries.put("expiresAt", "Tomorrow");
         userEntries.put("refreshRate", "60");
         userEntries.put("locationName", "Carnegie Mellon University");
-        userEntries.put("lat", "40");
-        userEntries.put("lng", "-80");
-        userEntries.put("radius", "5");
+        userEntries.put("lat", "40.4430");
+        userEntries.put("lng", "-79.9455");
+        userEntries.put("radius", "1000");
 
         int tagId = 0;
         String descriptionKey = "taskActions[" + tagId + "][description]";

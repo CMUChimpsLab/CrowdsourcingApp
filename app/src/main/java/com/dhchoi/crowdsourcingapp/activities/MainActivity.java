@@ -50,8 +50,8 @@ public class MainActivity extends BaseGoogleApiActivity {
 
     // task related
     private List<OnTasksUpdatedListener> onTasksUpdatedListeners = new ArrayList<OnTasksUpdatedListener>();
-    private List<Task> mActiveTasks = new ArrayList<Task>();
-    private List<Task> mInactiveTasks = new ArrayList<Task>();
+    private List<Task> mActiveTasks = new ArrayList<>();
+    private List<Task> mInactiveTasks = new ArrayList<>();
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
@@ -108,15 +108,21 @@ public class MainActivity extends BaseGoogleApiActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager = (ViewPager) findViewById(R.id.main_activity_container);
+        if (mViewPager == null)
+            Log.e(Constants.TAG, "ViewPager is null");
+        else
+            mViewPager.setAdapter(mSectionsPagerAdapter);
 
         // ProgressBar to show sync status
         mSyncProgressBar = (ProgressBar) findViewById(R.id.sync_progress_bar);
 
         // Set up the Tab Layout
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+        if (tabLayout == null)
+            Log.e(Constants.TAG, "TabLayout is null");
+        else
+            tabLayout.setupWithViewPager(mViewPager);
 
         // Register to receive messages.
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceTransitionsIntentService.GEOFENCE_TRANSITION_BROADCAST));
