@@ -170,8 +170,8 @@ public class TaskManager {
             // create list of tasks from json string
             List<Task> allTasks = new Gson().fromJson(jsonArray, new TypeToken<ArrayList<Task>>() {
             }.getType());
-            List<Task> addedTasks = new ArrayList<Task>();
-            List<Task> ownedTasks = new ArrayList<Task>();
+            List<Task> addedTasks = new ArrayList<>();
+            List<Task> ownedTasks = new ArrayList<>();
 
             for (Task t : allTasks) {
                 // save task id

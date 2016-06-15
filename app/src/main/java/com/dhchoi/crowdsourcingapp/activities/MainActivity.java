@@ -57,6 +57,8 @@ public class MainActivity extends BaseGoogleApiActivity {
         public void onReceive(Context context, Intent intent) {
             // TODO: what if geofence trigger activated first before syncing for first time
 
+            Log.d(Constants.TAG, "Broadcast Received");
+
             String[] activatedTaskIds = intent.getStringArrayExtra(GeofenceTransitionsIntentService.ACTIVATED_TASK_ID_KEY);
             Log.d(Constants.TAG, "activatedTaskIds: " + Arrays.toString(activatedTaskIds));
             for (String activatedTaskId : intent.getStringArrayExtra(GeofenceTransitionsIntentService.ACTIVATED_TASK_ID_KEY)) {

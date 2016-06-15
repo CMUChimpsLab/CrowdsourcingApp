@@ -287,7 +287,7 @@ public class TaskCreateActivity extends AppCompatActivity {
         userEntries.put("cost", "1");
         userEntries.put("expiresAt", "Tomorrow");
         userEntries.put("refreshRate", "60");
-        userEntries.put("locationName", "Carnegie Mellon University");
+        userEntries.put("locationName", "CMU");
         userEntries.put("lat", "40.4430");
         userEntries.put("lng", "-79.9455");
         userEntries.put("radius", "1000");

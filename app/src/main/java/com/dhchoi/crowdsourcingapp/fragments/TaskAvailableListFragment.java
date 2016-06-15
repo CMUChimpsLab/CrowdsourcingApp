@@ -88,7 +88,7 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
             updateNoticeTextViews();
         }
         else {
-            Log.d(Constants.TAG, "onTasksActivationUpdated was called before view was initialized");
+            Log.d(TAG, "onTasksActivationUpdated was called before view was initialized");
         }
     }
 
