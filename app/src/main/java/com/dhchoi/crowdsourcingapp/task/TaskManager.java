@@ -2,13 +2,17 @@ package com.dhchoi.crowdsourcingapp.task;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.support.annotation.NonNull;
 import android.util.Log;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
 import com.dhchoi.crowdsourcingapp.SimpleGeofence;
+import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.common.api.Status;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -43,10 +47,11 @@ public class TaskManager {
     private static final String JSON_FIELD_STATUS = "status";
     private static final String JSON_FIELD_STATUS_CREATED = "created";
     private static final String JSON_FIELD_STATUS_DELETED = "deleted";
-    // TODO: add UPDATE status to task changeLog
+    // TODO: add UPDATE status in web code
+    private static final String JSON_FIELD_STATUS_UPDATED = "updated";
     private static final String JSON_FIELD_TASK_ID = "taskId";
 
-    private static List<OnTasksUpdatedListener> mOnTasksUpdatedListeners = new ArrayList<OnTasksUpdatedListener>();
+    private static List<OnTasksUpdatedListener> mOnTasksUpdatedListeners = new ArrayList<>();
 
     private TaskManager() {
     }
@@ -71,10 +76,10 @@ public class TaskManager {
     public static List<Task> getAllUnownedIncompleteTasks(Context context) {
         String userId = UserManager.getUserId(context);
         if (userId.isEmpty()) {
-            return new ArrayList<Task>();
+            return new ArrayList<>();
         }
 
-        List<Task> tasks = new ArrayList<Task>();
+        List<Task> tasks = new ArrayList<>();
         for (String id : getSavedTaskIdsSet(context)) {
             Task t = getTaskById(context, id);
             if (!t.getOwner().equals(userId)) {
@@ -150,6 +155,8 @@ public class TaskManager {
      */
     public static void updateTask(Context context, Task task) {
         getSharedPreferences(context).edit().putString(getTaskKeyById(task.getId()), new Gson().toJson(task)).apply();
+        for (OnTasksUpdatedListener listener : mOnTasksUpdatedListeners)
+            listener.onTasksUpdated(task.getId());
     }
 
     /**
@@ -169,8 +176,8 @@ public class TaskManager {
             // create list of tasks from json string
             List<Task> allTasks = new Gson().fromJson(jsonArray, new TypeToken<ArrayList<Task>>() {
             }.getType());
-            List<Task> addedTasks = new ArrayList<Task>();
-            List<Task> ownedTasks = new ArrayList<Task>();
+            List<Task> addedTasks = new ArrayList<>();
+            List<Task> ownedTasks = new ArrayList<>();
 
             for (Task t : allTasks) {
                 // save task id
@@ -184,7 +191,12 @@ public class TaskManager {
                     LocationServices.GeofencingApi.addGeofences(
                             googleApiClient,
                             SimpleGeofence.getGeofencingRequest(t.getLocation().toGeofence()),
-                            SimpleGeofence.getGeofenceTransitionPendingIntent(context));
+                            SimpleGeofence.getGeofenceTransitionPendingIntent(context)).setResultCallback(new ResultCallback<Status>() {
+                        @Override
+                        public void onResult(@NonNull Status status) {
+                            Log.d(TAG, "Geofence Result Callback" + status.getStatusMessage());
+                        }
+                    });
                     addedTasks.add(t);
                 } else {
                     ownedTasks.add(t);
@@ -231,10 +243,6 @@ public class TaskManager {
         }
 
         prefsEditor.putStringSet(TASK_KEY_ID_SET, savedTaskIdsSet).apply();
-
-        for (OnTasksUpdatedListener listener : mOnTasksUpdatedListeners) {
-            listener.onTasksDeleted(taskIds);
-        }
     }
 
     /**
@@ -266,7 +274,7 @@ public class TaskManager {
                 Log.d(TAG, "changes: " + changes.toString());
 
                 // fetch changes
-                if (appLastUpdatedTime < serverLastUpdatedTime) {
+                if (appLastUpdatedTime < serverLastUpdatedTime) {   // updated earlier than latest server update
                     Log.d(TAG, "start fetching changes");
 
                     // update appLastUpdatedTime to serverLastUpdatedTime
@@ -286,12 +294,14 @@ public class TaskManager {
                     }
 
                     // no need to deal with tasks that were deleted after being created
+                    List<String> deletedIds = new ArrayList<>();        // to avoid ConcurrentModificationException
                     for (String id : tasksDeleted) {
                         if (tasksCreated.contains(id)) {
                             tasksCreated.remove(id);
-                            tasksDeleted.remove(id);
+                            deletedIds.add(id);
                         }
                     }
+                    tasksDeleted.removeAll(deletedIds);
 
                     // remove deleted tasks
                     removeTasks(context, googleApiClient, tasksDeleted);
@@ -384,9 +394,16 @@ public class TaskManager {
         /**
          * Callback when receiving info about deleted tasks.
          *
-         * @param deletedTaskIds deleted task ids
+         * @param deletedTaskIds updated task ids
          */
         void onTasksDeleted(List<String> deletedTaskIds);
+
+        /**
+         * Callback when updating info about tasks
+         *
+         * @param taskId updated task id
+         */
+        void onTasksUpdated(String taskId);
     }
 
     public static void addOnTaskUpdatedListener(OnTasksUpdatedListener listener) {

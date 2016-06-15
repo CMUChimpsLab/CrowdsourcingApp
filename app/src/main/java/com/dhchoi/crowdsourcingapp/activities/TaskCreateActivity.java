@@ -3,6 +3,7 @@ package com.dhchoi.crowdsourcingapp.activities;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
+import android.hardware.input.InputManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -11,6 +12,8 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
+import android.view.WindowManager;
+import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
@@ -169,10 +172,11 @@ public class TaskCreateActivity extends AppCompatActivity {
                 Map<String, String> userEntries = getUserEntries();
                 Log.d(Constants.TAG, "User attempting to submit: " + userEntries.toString());
 
-                if (!hasAllFieldsEntered(userEntries)) {
-                    Toast.makeText(TaskCreateActivity.this, "Please check if all fields have been completed.", Toast.LENGTH_SHORT).show();
-                    return;
-                }
+                // TODO: uncomment
+//                if (!hasAllFieldsEntered(userEntries)) {
+//                    Toast.makeText(TaskCreateActivity.this, "Please check if all fields have been completed.", Toast.LENGTH_SHORT).show();
+//                    return;
+//                }
 
                 mSubmit.setEnabled(false);
                 mSubmitProgressBar.setVisibility(ProgressBar.VISIBLE);
@@ -201,6 +205,8 @@ public class TaskCreateActivity extends AppCompatActivity {
                 }.execute();
             }
         });
+
+        hideSoftKeyboard();
     }
 
     @Override
@@ -249,40 +255,60 @@ public class TaskCreateActivity extends AppCompatActivity {
 
     private Map<String, String> getUserEntries() {
         Map<String, String> userEntries = new HashMap<String, String>();
+//        userEntries.put("userId", userId);
+//        userEntries.put("taskName", mTaskName.getText().toString());
+//        userEntries.put("cost", mTaskCost.getText().toString());
+//        String expiresAt = getExpiresAt();
+//        if (expiresAt != null) {
+//            userEntries.put("expiresAt", expiresAt);
+//        }
+//        userEntries.put("refreshRate", mRefreshRate.getText().toString());
+//        userEntries.put("locationName", mLocationName.getText().toString());
+//        userEntries.put("lat", mLocationLat.getText().toString());
+//        userEntries.put("lng", mLocationLng.getText().toString());
+//        userEntries.put("radius", mLocationRadius.getText().toString());
+
+//        int tagId = 0;
+//        for (ViewGroup taskActionViewGroup : mTaskActionLayouts) {
+//            String descriptionKey = "taskActions[" + tagId + "][description]";
+//            String typeKey = "taskActions[" + tagId + "][type]";
+//            String descriptionValue = ((EditText) taskActionViewGroup.findViewById(R.id.action_description)).getText().toString();
+//            String typeValue = ((Spinner) taskActionViewGroup.findViewById(R.id.action_type)).getSelectedItem().toString();
+//            if (!descriptionValue.isEmpty() && !typeValue.isEmpty()) {
+//                userEntries.put(descriptionKey, descriptionValue);
+//                userEntries.put(typeKey, typeValue);
+//                tagId++;
+//            }
+//        }
+
+        // TODO: remove
         userEntries.put("userId", userId);
-        userEntries.put("taskName", mTaskName.getText().toString());
-        userEntries.put("cost", mTaskCost.getText().toString());
-        String expiresAt = getExpiresAt();
-        if (expiresAt != null) {
-            userEntries.put("expiresAt", expiresAt);
-        }
-        userEntries.put("refreshRate", mRefreshRate.getText().toString());
-        userEntries.put("locationName", mLocationName.getText().toString());
-        userEntries.put("lat", mLocationLat.getText().toString());
-        userEntries.put("lng", mLocationLng.getText().toString());
-        userEntries.put("radius", mLocationRadius.getText().toString());
+        userEntries.put("taskName", "Default task");
+        userEntries.put("cost", "1");
+        userEntries.put("expiresAt", "Tomorrow");
+        userEntries.put("refreshRate", "60");
+        userEntries.put("locationName", "CMU");
+        userEntries.put("lat", "40.4430");
+        userEntries.put("lng", "-79.9455");
+        userEntries.put("radius", "1000");
 
         int tagId = 0;
-        for (ViewGroup taskActionViewGroup : mTaskActionLayouts) {
-            String descriptionKey = "taskActions[" + tagId + "][description]";
-            String typeKey = "taskActions[" + tagId + "][type]";
-            String descriptionValue = ((EditText) taskActionViewGroup.findViewById(R.id.action_description)).getText().toString();
-            String typeValue = ((Spinner) taskActionViewGroup.findViewById(R.id.action_type)).getSelectedItem().toString();
-            if (!descriptionValue.isEmpty() && !typeValue.isEmpty()) {
-                userEntries.put(descriptionKey, descriptionValue);
-                userEntries.put(typeKey, typeValue);
-                tagId++;
-            }
-        }
+        String descriptionKey = "taskActions[" + tagId + "][description]";
+        String typeKey = "taskActions[" + tagId + "][type]";
+        userEntries.put(descriptionKey, "Default description");
+        userEntries.put(typeKey, "text");
 
         return userEntries;
+    }
+
+    private void hideSoftKeyboard() {
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
     }
 
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case android.R.id.home:
-                // TODO: maybe setResult()?
                 onBackPressed();
                 return true;
         }

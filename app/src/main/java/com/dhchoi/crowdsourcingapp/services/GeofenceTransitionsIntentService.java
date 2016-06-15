@@ -19,6 +19,8 @@ import java.util.List;
 
 public class GeofenceTransitionsIntentService extends IntentService {
 
+    private static final String TAG = "GeofenceService";
+
     public static final String GEOFENCE_TRANSITION_BROADCAST = Constants.PACKAGE_NAME + ".GEOFENCE_TRANSITION_BROADCAST";
     public static final String ACTIVATED_TASK_ID_KEY = Constants.PACKAGE_NAME + ".ACTIVATED_TASK_ID_KEY";
     public static final String INACTIVATED_TASK_ID_KEY = Constants.PACKAGE_NAME + ".INACTIVATED_TASK_ID_KEY";
@@ -44,45 +46,57 @@ public class GeofenceTransitionsIntentService extends IntentService {
         GeofencingEvent geoFenceEvent = GeofencingEvent.fromIntent(intent);
 
         if (geoFenceEvent.hasError()) {
-            int errorCode = geoFenceEvent.getErrorCode();
-            Log.e(Constants.TAG, "Location Services error: " + errorCode);
-        } else {
-            List<String> activatedTaskIds = new ArrayList<String>();
-            List<String> inactivatedTaskIds = new ArrayList<String>();
-            int transitionType = geoFenceEvent.getGeofenceTransition();
+            Log.e(Constants.TAG, "Location Services error: " + geoFenceEvent.getErrorCode());
+            return;
+        }
 
-            for (Geofence triggeredGeofence : geoFenceEvent.getTriggeringGeofences()) {
-                // taskId and geofence.requestId are identical
-                Task triggeredTask = TaskManager.getTaskById(this, triggeredGeofence.getRequestId());
-                String taskId = triggeredTask.getId();
-                String taskName = triggeredTask.getName();
-                String taskLocationName = triggeredTask.getLocation().getName();
+        List<String> activatedTaskIds = new ArrayList<>();
+        List<String> inactivatedTaskIds = new ArrayList<>();
+        int transitionType = geoFenceEvent.getGeofenceTransition();
 
-                Log.d(Constants.TAG, "Build notification for task: " + taskName);
-                if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType) {
+        for (Geofence triggeredGeofence : geoFenceEvent.getTriggeringGeofences()) {
+            // taskId and geofence.requestId are identical
+            Task triggeredTask = TaskManager.getTaskById(this, triggeredGeofence.getRequestId());
+            String taskId = triggeredTask.getId();
+            String taskName = triggeredTask.getName();
+            String taskLocationName = triggeredTask.getLocation().getName();
+
+            Log.d(Constants.TAG, "Build notification for task: " + taskName);
+            if (Geofence.GEOFENCE_TRANSITION_ENTER == transitionType) {
+                Log.d(TAG, "Geofence Enter");
+
+                if (!triggeredTask.isActivated()) {
                     NotificationHelper.createNotification("Activated: " + taskName, taskLocationName, taskId, this, MainActivity.class);
                     triggeredTask.setActivated(true);
                     activatedTaskIds.add(taskId);
-                } else if (Geofence.GEOFENCE_TRANSITION_EXIT == transitionType) {
+                    inactivatedTaskIds.remove(taskId);
+                }
+            } else if (Geofence.GEOFENCE_TRANSITION_EXIT == transitionType) {
+                Log.d(TAG, "Geofence Exit");
+
+                if (triggeredTask.isActivated()) {
                     NotificationHelper.createNotification("Inactivated: " + taskName, taskLocationName, taskId, this, MainActivity.class);
                     triggeredTask.setActivated(false);
                     inactivatedTaskIds.add(taskId);
-                } else {
-                    Log.d(Constants.TAG, "Discarding Geofence transition type: " + transitionType);
+                    activatedTaskIds.remove(taskId);
                 }
-
-                TaskManager.updateTask(this, triggeredTask);
+            } else {
+                Log.d(Constants.TAG, "Discarding Geofence transition type: " + transitionType);
             }
 
-            // Notify any listener that geofence transition has occurred
-            String[] activatedTaskIdsToStringArr = activatedTaskIds.toArray(new String[activatedTaskIds.size()]);
-            String[] inactivatedTaskIdsToStringArr = inactivatedTaskIds.toArray(new String[inactivatedTaskIds.size()]);
-            Log.d(Constants.TAG, "Broadcast triggered activatedTaskIds" + Arrays.toString(activatedTaskIdsToStringArr));
-            Log.d(Constants.TAG, "Broadcast triggered inactivatedTaskIds" + Arrays.toString(inactivatedTaskIdsToStringArr));
-            Intent geofenceTransitionIntent = new Intent(GEOFENCE_TRANSITION_BROADCAST);
-            geofenceTransitionIntent.putExtra(ACTIVATED_TASK_ID_KEY, activatedTaskIdsToStringArr);
-            geofenceTransitionIntent.putExtra(INACTIVATED_TASK_ID_KEY, inactivatedTaskIdsToStringArr);
-            LocalBroadcastManager.getInstance(this).sendBroadcast(geofenceTransitionIntent);
+            TaskManager.updateTask(this, triggeredTask);
         }
+
+        // Notify any listener that geofence transition has occurred
+        String[] activatedTaskIdsToStringArr = activatedTaskIds.toArray(new String[activatedTaskIds.size()]);
+        String[] inactivatedTaskIdsToStringArr = inactivatedTaskIds.toArray(new String[inactivatedTaskIds.size()]);
+
+        Log.d(Constants.TAG, "Broadcast triggered activatedTaskIds" + Arrays.toString(activatedTaskIdsToStringArr));
+        Log.d(Constants.TAG, "Broadcast triggered inactivatedTaskIds" + Arrays.toString(inactivatedTaskIdsToStringArr));
+
+        Intent geofenceTransitionIntent = new Intent(GEOFENCE_TRANSITION_BROADCAST);
+        geofenceTransitionIntent.putExtra(ACTIVATED_TASK_ID_KEY, activatedTaskIdsToStringArr);
+        geofenceTransitionIntent.putExtra(INACTIVATED_TASK_ID_KEY, inactivatedTaskIdsToStringArr);
+        LocalBroadcastManager.getInstance(this).sendBroadcast(geofenceTransitionIntent);
     }
 }

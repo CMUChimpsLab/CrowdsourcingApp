@@ -93,6 +93,6 @@ public class UserManager {
      * @return the shared preferences that manages user data
      */
     private static SharedPreferences getSharedPreferences(Context context) {
-        return context.getSharedPreferences(USER_SHARED_PREF, context.MODE_PRIVATE);
+        return context.getSharedPreferences(USER_SHARED_PREF, Context.MODE_PRIVATE);
     }
 }

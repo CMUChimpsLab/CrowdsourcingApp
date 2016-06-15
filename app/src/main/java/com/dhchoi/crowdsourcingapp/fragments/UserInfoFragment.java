@@ -2,9 +2,11 @@ package com.dhchoi.crowdsourcingapp.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -16,6 +18,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dhchoi.crowdsourcingapp.R;
+import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskCreateActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskInfoActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
@@ -26,9 +29,7 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.dhchoi.crowdsourcingapp.activities.TaskInfoActivity.TASK_REMOVED;
-
-public class UserInfoFragment extends Fragment {
+public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUpdatedListener {
 
     public static final String NAME = "MY INFO";
     private final int COLOR_ON = 0xffffffff;
@@ -50,6 +51,7 @@ public class UserInfoFragment extends Fragment {
     private TextView mNumCompletedTasks;
     private LinearLayout mNumCreatedTasksTitle;
     private LinearLayout mNumCompletedTasksTitle;
+    private SwipeRefreshLayout mSwipeRefresh;
 
     private static final int TASK_INFO_REQUEST_CODE = 100;
 
@@ -65,7 +67,7 @@ public class UserInfoFragment extends Fragment {
         // Inflate the layout for this fragment
         View rootView = inflater.inflate(R.layout.fragment_user_info, container, false);
 
-        FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
+        final FloatingActionButton fab = (FloatingActionButton) rootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -87,11 +89,10 @@ public class UserInfoFragment extends Fragment {
 
                 // pass clicked task to info screen
                 Task clickedTask = (Task) mListCreatedTasks.getAdapter().getItem(position);
-                String taskJson = new Gson().toJson(clickedTask);
 
                 Intent intent = new Intent(getActivity(), TaskInfoActivity.class);
-                intent.putExtra("task", taskJson);
-                startActivityForResult(intent, TASK_INFO_REQUEST_CODE);
+                intent.putExtra("taskId", ((Task) mListCreatedTasks.getAdapter().getItem(position)).getId());
+                startActivity(intent);
             }
         });
         mNumCreatedTasksTitle = (LinearLayout) rootView.findViewById(R.id.num_created_tasks_title_layout);
@@ -133,23 +134,24 @@ public class UserInfoFragment extends Fragment {
             }
         });
 
-        // fetch tasks
-        mCreatedTasks.addAll(TaskManager.getAllOwnedTasks(getActivity()));
-        mCreatedTaskListAdapter.notifyDataSetChanged();
-        mCompletedTasks.addAll(TaskManager.getAllUnownedCompletedTasks(getActivity()));
-        mCompletedTaskListAdapter.notifyDataSetChanged();
-
         // update views
         mNumCreatedTasks = (TextView) rootView.findViewById(R.id.num_created_tasks);
-        mNumCreatedTasks.setText(String.valueOf(mCreatedTasks.size()));
         mNumCompletedTasks = (TextView) rootView.findViewById(R.id.num_completed_tasks);
-        mNumCompletedTasks.setText(String.valueOf(mCompletedTasks.size()));
         mCreatedTasksNotice = (TextView) rootView.findViewById(R.id.created_tasks_notice);
         mCompletedTasksNotice = (TextView) rootView.findViewById(R.id.completed_tasks_notice);
 
         String userId = UserManager.getUserId(getActivity());
         mUserId = (TextView) rootView.findViewById(R.id.user_id);
         mUserId.setText(userId);
+
+        // swipe refresh layout
+        mSwipeRefresh = (SwipeRefreshLayout) rootView.findViewById(R.id.layout_swipe_refresh);
+        mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                fetchTasks();
+            }
+        });
 
         updateNoticeTextViews();
 
@@ -161,21 +163,33 @@ public class UserInfoFragment extends Fragment {
         mCompletedTasksNotice.setVisibility(mCompletedTaskListAdapter.getCount() > 0 ? TextView.GONE : TextView.VISIBLE);
     }
 
+    private void fetchTasks() {
+        // fetch tasks
+        mCreatedTasks.clear();
+        mCreatedTasks.addAll(TaskManager.getAllOwnedTasks(getActivity()));
+        mCreatedTaskListAdapter.notifyDataSetChanged();
+        mNumCreatedTasks.setText(String.valueOf(mCreatedTasks.size()));
+        if (mCreatedTaskListAdapter.getCount() > 0)
+            mCreatedTasksNotice.setVisibility(View.GONE);
+        else
+            mCreatedTasksNotice.setVisibility(View.VISIBLE);
+
+        mCompletedTasks.clear();
+        mCompletedTasks.addAll(TaskManager.getAllUnownedCompletedTasks(getActivity()));
+        mCompletedTaskListAdapter.notifyDataSetChanged();
+        mNumCompletedTasks.setText(String.valueOf(mCompletedTasks.size()));
+        if (mCompletedTaskListAdapter.getCount() > 0)
+            mCompletedTasksNotice.setVisibility(View.GONE);
+        else
+            mCompletedTasksNotice.setVisibility(View.VISIBLE);
+
+        if (mSwipeRefresh.isRefreshing())
+            mSwipeRefresh.setRefreshing(false);
+    }
+
     @Override
-    public void onActivityResult(int requestCode, int resultCode, Intent data) {
-        switch (requestCode) {
-            case TASK_INFO_REQUEST_CODE:
-                switch (resultCode) {
-                    case TASK_REMOVED:
-                        
-                        break;
-                    // TODO: deal with other user's action on the task
-
-                }
-                return;
-        }
-
-        super.onActivityResult(requestCode, resultCode, data);
+    public void onTasksActivationUpdated(List<Task> activatedTasks, List<Task> inactivatedTasks) {
+        fetchTasks();
     }
 
     class CreatedTaskListAdapter extends ArrayAdapter<Task> {
@@ -224,5 +238,4 @@ public class UserInfoFragment extends Fragment {
         }
     }
 
-    // TODO: add listener to get user created tasks
 }

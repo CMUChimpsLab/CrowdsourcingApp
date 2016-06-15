@@ -14,6 +14,7 @@ import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.text.TextUtils;
 import android.util.Log;
+import android.util.Patterns;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.AutoCompleteTextView;
@@ -101,7 +102,7 @@ public class LoginActivity extends AppCompatActivity {
 
         // Store values at the time of the login attempt.
         final String email = mEmailView.getText().toString();
-
+        
         boolean cancel = false;
         View focusView = null;
 
@@ -159,9 +160,8 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    //TODO: Replace this with your own logic
     private boolean isEmailValid(String email) {
-        return email.contains("@");
+        return Patterns.EMAIL_ADDRESS.matcher(email).matches();                     // Android's default check
     }
 
     /**

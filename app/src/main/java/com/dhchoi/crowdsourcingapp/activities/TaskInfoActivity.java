@@ -15,8 +15,8 @@ import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientAsyncTask;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
 import com.dhchoi.crowdsourcingapp.R;
-import com.dhchoi.crowdsourcingapp.fragments.UserInfoFragment;
 import com.dhchoi.crowdsourcingapp.task.Task;
+import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.google.gson.Gson;
 
 import java.util.HashMap;
@@ -29,8 +29,6 @@ public class TaskInfoActivity extends AppCompatActivity {
     private TextView mTaskName;
     private Button mManageTask;
     private Button mDeleteTask;
-
-    public static final int TASK_REMOVED = 201;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -45,7 +43,8 @@ public class TaskInfoActivity extends AppCompatActivity {
         mManageTask = (Button) findViewById(R.id.btn_manage_task);
         mDeleteTask = (Button) findViewById(R.id.btn_delete_task);
 
-        Task currentTask = new Gson().fromJson(getIntent().getExtras().getString("task"), Task.class);
+//        Task currentTask = new Gson().fromJson(getIntent().getExtras().getString("task"), Task.class);
+        Task currentTask = TaskManager.getTaskById(this, getIntent().getStringExtra("taskId"));
         taskId = currentTask.getId();
         Log.i("TaskInfoActivity", "Task ID: " + taskId);
         Log.i("TaskInfoActivity", "Task Name: " + currentTask.getName());
@@ -65,8 +64,6 @@ public class TaskInfoActivity extends AppCompatActivity {
             }
         });
 
-
-
     }
 
     private void deleteTask() {
@@ -75,12 +72,12 @@ public class TaskInfoActivity extends AppCompatActivity {
             @Override
             protected void onPostExecute(String response) {
                 // showProgress(false);
-
                 try {
                     if (response != null) {
                         Log.d("TaskInfoActivity", response);
                         onBackPressed();
                     } else {
+                        Toast.makeText(TaskInfoActivity.this, "Failed to delete task", Toast.LENGTH_SHORT).show();
                         Log.d("TaskInfoActivity", "Response is null");
                     }
                 } catch (Exception e) {

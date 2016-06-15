@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -29,12 +30,14 @@ import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
+import com.google.android.gms.common.api.Result;
+import com.google.android.gms.common.api.ResultCallback;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
-public class MainActivity extends BaseGoogleApiActivity {
+public class MainActivity extends BaseGoogleApiActivity implements TaskManager.OnTasksUpdatedListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -50,12 +53,14 @@ public class MainActivity extends BaseGoogleApiActivity {
 
     // task related
     private List<OnTasksUpdatedListener> onTasksUpdatedListeners = new ArrayList<OnTasksUpdatedListener>();
-    private List<Task> mActiveTasks = new ArrayList<Task>();
-    private List<Task> mInactiveTasks = new ArrayList<Task>();
+    private List<Task> mActiveTasks = new ArrayList<>();
+    private List<Task> mInactiveTasks = new ArrayList<>();
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
             // TODO: what if geofence trigger activated first before syncing for first time
+
+            Log.d(Constants.TAG, "Broadcast Received");
 
             String[] activatedTaskIds = intent.getStringArrayExtra(GeofenceTransitionsIntentService.ACTIVATED_TASK_ID_KEY);
             Log.d(Constants.TAG, "activatedTaskIds: " + Arrays.toString(activatedTaskIds));
@@ -92,6 +97,7 @@ public class MainActivity extends BaseGoogleApiActivity {
     {
         onTasksUpdatedListeners.add(mTaskAvailableFragment.getTaskAvailableListFragment());
         onTasksUpdatedListeners.add(mTaskAvailableFragment.getTaskAvailableMapFragment());
+        onTasksUpdatedListeners.add(mUserInfoFragment);
     }
 
     @Override
@@ -107,15 +113,21 @@ public class MainActivity extends BaseGoogleApiActivity {
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
 
         // Set up the ViewPager with the sections adapter.
-        mViewPager = (ViewPager) findViewById(R.id.container);
-        mViewPager.setAdapter(mSectionsPagerAdapter);
+        mViewPager = (ViewPager) findViewById(R.id.main_activity_container);
+        if (mViewPager == null)
+            Log.e(Constants.TAG, "ViewPager is null");
+        else
+            mViewPager.setAdapter(mSectionsPagerAdapter);
 
         // ProgressBar to show sync status
         mSyncProgressBar = (ProgressBar) findViewById(R.id.sync_progress_bar);
 
         // Set up the Tab Layout
         TabLayout tabLayout = (TabLayout) findViewById(R.id.tabs);
-        tabLayout.setupWithViewPager(mViewPager);
+        if (tabLayout == null)
+            Log.e(Constants.TAG, "TabLayout is null");
+        else
+            tabLayout.setupWithViewPager(mViewPager);
 
         // Register to receive messages.
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceTransitionsIntentService.GEOFENCE_TRANSITION_BROADCAST));
@@ -132,8 +144,6 @@ public class MainActivity extends BaseGoogleApiActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         // Handle action bar item clicks here. The action bar will automatically handle clicks on the Home/Up button,
         // so long as you specify a parent activity in AndroidManifest.xml.
-
-        // TODO: might want to overwrite the default Home/Up button to make sure single top navigation
 
         int id = item.getItemId();
 
@@ -154,6 +164,21 @@ public class MainActivity extends BaseGoogleApiActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        if (mViewPager.getCurrentItem() > 0) {      // back to first page
+            mViewPager.setCurrentItem(0, true);
+            return;
+        }
+
+        if (mTaskAvailableFragment.isMapShown) {
+            mTaskAvailableFragment.swapFragments();
+            return;
+        }
+
+        super.onBackPressed();
     }
 
     @Override
@@ -179,8 +204,8 @@ public class MainActivity extends BaseGoogleApiActivity {
 
                     // broadcast tasks to listeners
                     List<Task> allIncompleteTasks = TaskManager.getAllUnownedIncompleteTasks(MainActivity.this);
-                    mActiveTasks = new ArrayList<Task>();
-                    mInactiveTasks = new ArrayList<Task>();
+                    mActiveTasks = new ArrayList<>();
+                    mInactiveTasks = new ArrayList<>();
                     for (Task t : allIncompleteTasks) {
                         if (t.isActivated()) {
                             mActiveTasks.add(t);
@@ -190,7 +215,6 @@ public class MainActivity extends BaseGoogleApiActivity {
                     }
 
                     triggerOnTasksUpdatedEvent();
-
                 } else {
                     Snackbar.make(currentFragmentView, "Failed to sync with server.", Snackbar.LENGTH_LONG).show();
                 }
@@ -205,6 +229,54 @@ public class MainActivity extends BaseGoogleApiActivity {
         // Unregister since the activity is about to be closed.
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         super.onDestroy();
+    }
+
+    @Override
+    public void onTasksCreatedByOthers(List<Task> createdTasksByOthers) {
+
+    }
+
+    @Override
+    public void onTasksCreatedByUser(List<Task> createdTasksByUser) {
+
+    }
+
+    @Override
+    public void onTasksDeleted(List<String> deletedTaskIds) {
+
+    }
+
+    // TODO: temp
+    @Override
+    public void onTasksUpdated(String taskId) {
+        Task task = TaskManager.getTaskById(this, taskId);
+        boolean isActive = task.isActivated();
+
+        for (int i = 0; i < mActiveTasks.size(); i++) {
+            if (mActiveTasks.get(i).getId().equals(taskId)) {
+                mActiveTasks.set(i, TaskManager.getTaskById(this, taskId));
+                if (!isActive) {
+                    mActiveTasks.remove(i);
+                    mInactiveTasks.add(task);
+                }
+                return;
+            }
+        }
+
+        for (int i = 0; i < mInactiveTasks.size(); i++) {
+            if (mInactiveTasks.get(i).getId().equals(taskId)) {
+                mInactiveTasks.set(i, TaskManager.getTaskById(this, taskId));
+                if (isActive) {
+                    mInactiveTasks.remove(i);
+                    mActiveTasks.add(task);
+                }
+            }
+        }
+
+        // update the list and map displays
+        for (OnTasksUpdatedListener listener : onTasksUpdatedListeners) {
+            listener.onTasksActivationUpdated(mActiveTasks, mInactiveTasks);
+        }
     }
 
     /**
