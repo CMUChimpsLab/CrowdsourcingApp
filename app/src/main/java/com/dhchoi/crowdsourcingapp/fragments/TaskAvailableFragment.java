@@ -8,6 +8,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.dhchoi.crowdsourcingapp.R;
+import com.dhchoi.crowdsourcingapp.activities.MainActivity;
+import com.dhchoi.crowdsourcingapp.task.Task;
+import com.dhchoi.crowdsourcingapp.task.TaskManager;
+
+import java.util.List;
 
 public class TaskAvailableFragment extends Fragment {
 
