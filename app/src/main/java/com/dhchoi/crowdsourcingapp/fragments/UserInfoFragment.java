@@ -18,6 +18,7 @@ import android.widget.Toast;
 
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.activities.MainActivity;
+import com.dhchoi.crowdsourcingapp.activities.ResponseInfoActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskCreateActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskInfoActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
@@ -85,9 +86,6 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(getActivity(), "Task Clicked", Toast.LENGTH_SHORT).show();
 
-                // pass clicked task to info screen
-                Task clickedTask = (Task) mListCreatedTasks.getAdapter().getItem(position);
-
                 Intent intent = new Intent(getActivity(), TaskInfoActivity.class);
                 intent.putExtra("taskId", ((Task) mListCreatedTasks.getAdapter().getItem(position)).getId());
                 startActivity(intent);
@@ -114,10 +112,11 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         mListCompletedTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                // TODO: create activity where user can view details of completed task (what he responded, etc.)
+                Toast.makeText(getActivity(), "Task Clicked", Toast.LENGTH_SHORT).show();
 
-
-
+                Intent intent = new Intent(getActivity(), ResponseInfoActivity.class);
+                intent.putExtra("taskId", ((Task)mListCompletedTasks.getAdapter().getItem(position)).getId());
+                startActivity(intent);
             }
         });
         mNumCompletedTasksTitle = (LinearLayout) rootView.findViewById(R.id.num_completed_tasks_title_layout);
