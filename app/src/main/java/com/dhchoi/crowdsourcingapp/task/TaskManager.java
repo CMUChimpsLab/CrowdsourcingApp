@@ -9,6 +9,7 @@ import android.util.Log;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
+import com.dhchoi.crowdsourcingapp.LocationAgent;
 import com.dhchoi.crowdsourcingapp.SimpleGeofence;
 import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
@@ -183,10 +184,8 @@ public class TaskManager {
             // create list of tasks from json string
             List<Task> allTasks = new Gson().fromJson(jsonArray, new TypeToken<ArrayList<Task>>() {
             }.getType());
-            List<Task> addedTasks = new ArrayList<>();
+            List<Task> addedTasks = new ArrayList<>();      // also to be added as geofence
             List<Task> ownedTasks = new ArrayList<>();
-
-//            LocationServices.GeofencingApi.removeGeofences(googleApiClient, getGeofencingPendingIntent(context));
 
             for (Task t : allTasks) {
                 // save task id
@@ -198,17 +197,15 @@ public class TaskManager {
                 if (!userId.equals(t.getOwner())) {
                     // start geofence
 
-                    LocationServices.GeofencingApi.addGeofences(
-                            googleApiClient,
-                            SimpleGeofence.getGeofencingRequest(t.getLocation().toGeofence()),
-                            SimpleGeofence.getGeofenceTransitionPendingIntent(context)).setResultCallback(new ResultCallback<Status>() {
-                        @Override
-                        public void onResult(@NonNull Status status) {
-                            Log.d(TAG, "Geofence Result Callback" + status.getStatusMessage());
-                        }
-                    });
-
-//                    mGeofenceList.add(t.getLocation().toGeofence());
+//                    LocationServices.GeofencingApi.addGeofences(
+//                            googleApiClient,
+//                            SimpleGeofence.getGeofencingRequest(t.getLocation().toGeofence()),
+//                            SimpleGeofence.getGeofenceTransitionPendingIntent(context)).setResultCallback(new ResultCallback<Status>() {
+//                        @Override
+//                        public void onResult(@NonNull Status status) {
+//                            Log.d(TAG, "Geofence Result Callback " + status.getStatusMessage());
+//                        }
+//                    });
 
                     addedTasks.add(t);
                 } else {
@@ -216,15 +213,7 @@ public class TaskManager {
                 }
             }
 
-//            LocationServices.GeofencingApi.addGeofences(
-//                    googleApiClient,
-//                    getGeofencingRequest(),
-//                    getGeofencingPendingIntent(context)).setResultCallback(new ResultCallback<Status>() {
-//                @Override
-//                public void onResult(@NonNull Status status) {
-//                    Log.d(TAG, "Geofence Result Callback" + status.getStatusMessage());
-//                }
-//            });
+//            LocationAgent.addGeofences(addedTasks);
 
             prefsEditor.putStringSet(TASK_KEY_ID_SET, savedTaskIdsSet).apply();
 
@@ -248,9 +237,11 @@ public class TaskManager {
         SharedPreferences sharedPreferences = getSharedPreferences(context);
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Set<String> savedTaskIdsSet = getSavedTaskIdsSet(context);
+        List<Task> removedTasks = new ArrayList<>();
 
         for (String id : taskIds) {
             Task task = getTaskById(context, id);
+
             if (task != null) {
                 // remove task
                 prefsEditor.remove(getTaskKeyById(task.getId()));
@@ -259,12 +250,14 @@ public class TaskManager {
                 savedTaskIdsSet.remove(task.getId());
 
                 // cancel geofence
-                List<String> geofenceId = new ArrayList<String>();
-                geofenceId.add(task.getLocation().getTaskId());
-                LocationServices.GeofencingApi.removeGeofences(googleApiClient, geofenceId);
-                // TODO: check if working, so um... not working actually
+                removedTasks.add(task);
+//                List<String> geofenceId = new ArrayList<String>();
+//                geofenceId.add(task.getLocation().getTaskId());
+//                LocationServices.GeofencingApi.removeGeofences(googleApiClient, geofenceId);
             }
         }
+
+        LocationAgent.removeGeofences(removedTasks);
 
         prefsEditor.putStringSet(TASK_KEY_ID_SET, savedTaskIdsSet).apply();
     }

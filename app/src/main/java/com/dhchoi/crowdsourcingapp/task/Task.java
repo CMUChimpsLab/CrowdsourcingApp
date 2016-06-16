@@ -26,6 +26,8 @@ public class Task implements Serializable {
     private double mExpiresAt;
     @SerializedName("refreshRate")
     private int mRefreshRate;
+    @SerializedName("radius")
+    private int mRadius;
     @SerializedName("location")
     private SimpleGeofence mLocation;
     @SerializedName("taskactions")
@@ -34,9 +36,14 @@ public class Task implements Serializable {
     private long mCompletionTime = 0;
 
     public Task(String id, String name, int cost, SimpleGeofence location) {
+        this(id, name, cost, 1000, location);
+    }
+
+    public Task(String id, String name, int cost, int radius, SimpleGeofence location) {
         mId = id;
         mName = name;
         mCost = cost;
+        mRadius = radius;
         mLocation = location;
     }
 
@@ -62,6 +69,10 @@ public class Task implements Serializable {
 
     public int getRefreshRate() {
         return mRefreshRate;
+    }
+
+    public int getRadius() {
+        return mRadius;
     }
 
     public SimpleGeofence getLocation() {
