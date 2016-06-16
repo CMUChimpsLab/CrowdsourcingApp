@@ -24,9 +24,12 @@ import java.util.Map;
 
 public class TaskInfoActivity extends AppCompatActivity {
 
+    private static final String TAG = "TaskInfoActivity";
+
     private String taskId;
 
     private TextView mTaskName;
+    private TextView mSubmittedResp;
     private Button mManageTask;
     private Button mDeleteTask;
 
@@ -40,15 +43,16 @@ public class TaskInfoActivity extends AppCompatActivity {
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
         mTaskName = (TextView) findViewById(R.id.info_task_name);
+        mSubmittedResp = (TextView) findViewById(R.id.submitted_resp);
         mManageTask = (Button) findViewById(R.id.btn_manage_task);
         mDeleteTask = (Button) findViewById(R.id.btn_delete_task);
 
 //        Task currentTask = new Gson().fromJson(getIntent().getExtras().getString("task"), Task.class);
         Task currentTask = TaskManager.getTaskById(this, getIntent().getStringExtra("taskId"));
         taskId = currentTask.getId();
-        Log.i("TaskInfoActivity", "Task ID: " + taskId);
-        Log.i("TaskInfoActivity", "Task Name: " + currentTask.getName());
-        Log.i("TaskInfoActivity", "Task Cost: " + currentTask.getCost());
+        Log.i(TAG, "Task ID: " + taskId);
+        Log.i(TAG, "Task Name: " + currentTask.getName());
+        Log.i(TAG, "Task Cost: " + currentTask.getCost());
 
         mTaskName.setText(currentTask.getName());
         mManageTask.setOnClickListener(new View.OnClickListener() {

@@ -24,7 +24,6 @@ import com.dhchoi.crowdsourcingapp.task.Task;
 
 import java.util.ArrayList;
 import java.util.Calendar;
-import java.util.Date;
 import java.util.List;
 import java.util.Random;
 
@@ -114,7 +113,7 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
             }
 
             // set texts
-            ((TextView) convertView.findViewById(R.id.task_name)).setText(task.getName());
+            ((TextView) convertView.findViewById(R.id.submitted_resp)).setText(task.getName());
             ((TextView) convertView.findViewById(R.id.task_location)).setText(task.getLocation().getName());
             ((TextView) convertView.findViewById(R.id.task_cost)).setText("$" + task.getCost());
             // set remaining time

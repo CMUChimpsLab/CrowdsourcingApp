@@ -2,7 +2,6 @@ package com.dhchoi.crowdsourcingapp.fragments;
 
 import android.content.Context;
 import android.content.Intent;
-import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -24,7 +23,6 @@ import com.dhchoi.crowdsourcingapp.activities.TaskInfoActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
-import com.google.gson.Gson;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -117,6 +115,9 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 // TODO: create activity where user can view details of completed task (what he responded, etc.)
+
+
+
             }
         });
         mNumCompletedTasksTitle = (LinearLayout) rootView.findViewById(R.id.num_completed_tasks_title_layout);
@@ -149,7 +150,8 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                fetchTasks();
+                TaskManager.syncTasks(getActivity(), ((MainActivity)getActivity()).getGoogleApiClient());
+                mSwipeRefresh.setRefreshing(false);
             }
         });
 
@@ -207,7 +209,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.listitem_task_created, parent, false);
             }
 
-            ((TextView) convertView.findViewById(R.id.task_name)).setText(task.getName());
+            ((TextView) convertView.findViewById(R.id.submitted_resp)).setText(task.getName());
             //((TextView) convertView.findViewById(R.id.last_answer_time)).setText();
             //((TextView) convertView.findViewById(R.id.num_answers)).setText();
 
@@ -230,7 +232,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.listitem_task_completed, parent, false);
             }
 
-            ((TextView) convertView.findViewById(R.id.task_name)).setText(task.getName());
+            ((TextView) convertView.findViewById(R.id.submitted_resp)).setText(task.getName());
             ((TextView) convertView.findViewById(R.id.task_location)).setText(task.getLocation().getName());
             ((TextView) convertView.findViewById(R.id.task_cost)).setText("$" + task.getCost());
 

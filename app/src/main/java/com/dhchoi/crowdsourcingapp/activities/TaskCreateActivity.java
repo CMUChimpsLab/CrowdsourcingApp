@@ -3,7 +3,6 @@ package com.dhchoi.crowdsourcingapp.activities;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.hardware.input.InputManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,12 +12,10 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -80,7 +77,6 @@ public class TaskCreateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_create);
 
-        // TODO: check why back arrow has different behavior as back button
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -88,7 +84,7 @@ public class TaskCreateActivity extends AppCompatActivity {
         userId = UserManager.getUserId(this);
 
         // views
-        mTaskName = (EditText) findViewById(R.id.task_name);
+        mTaskName = (EditText) findViewById(R.id.submitted_resp);
         mTaskCost = (EditText) findViewById(R.id.task_cost);
         mLocationName = (EditText) findViewById(R.id.location_name);
         mLocationLat = (EditText) findViewById(R.id.location_lat);

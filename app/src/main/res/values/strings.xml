@@ -4,6 +4,7 @@
     <string name="title_activity_task_create">Create Task</string>
     <string name="title_activity_task_complete">Complete Task</string>
     <string name="title_activity_task_info">Task Information</string>
+    <string name="title_activity_resp_info">Response Information</string>
     <string name="title_activity_current_location">Current Location</string>
     <string name="action_settings">Settings</string>
 

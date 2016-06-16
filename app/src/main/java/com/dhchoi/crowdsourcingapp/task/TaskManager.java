@@ -1,6 +1,8 @@
 package com.dhchoi.crowdsourcingapp.task;
 
+import android.app.PendingIntent;
 import android.content.Context;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.support.annotation.NonNull;
 import android.util.Log;
@@ -8,11 +10,13 @@ import android.util.Log;
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
 import com.dhchoi.crowdsourcingapp.SimpleGeofence;
-import com.dhchoi.crowdsourcingapp.activities.MainActivity;
+import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.common.api.ResultCallback;
 import com.google.android.gms.common.api.Status;
+import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofencingRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
@@ -52,6 +56,9 @@ public class TaskManager {
     private static final String JSON_FIELD_TASK_ID = "taskId";
 
     private static List<OnTasksUpdatedListener> mOnTasksUpdatedListeners = new ArrayList<>();
+
+    private static List<Geofence> mGeofenceList;
+    private static PendingIntent mGeofencePendingIntent;
 
     private TaskManager() {
     }
@@ -179,6 +186,8 @@ public class TaskManager {
             List<Task> addedTasks = new ArrayList<>();
             List<Task> ownedTasks = new ArrayList<>();
 
+//            LocationServices.GeofencingApi.removeGeofences(googleApiClient, getGeofencingPendingIntent(context));
+
             for (Task t : allTasks) {
                 // save task id
                 prefsEditor.putString(getTaskKeyById(t.getId()), new Gson().toJson(t));
@@ -188,6 +197,7 @@ public class TaskManager {
 
                 if (!userId.equals(t.getOwner())) {
                     // start geofence
+
                     LocationServices.GeofencingApi.addGeofences(
                             googleApiClient,
                             SimpleGeofence.getGeofencingRequest(t.getLocation().toGeofence()),
@@ -197,11 +207,24 @@ public class TaskManager {
                             Log.d(TAG, "Geofence Result Callback" + status.getStatusMessage());
                         }
                     });
+
+//                    mGeofenceList.add(t.getLocation().toGeofence());
+
                     addedTasks.add(t);
                 } else {
                     ownedTasks.add(t);
                 }
             }
+
+//            LocationServices.GeofencingApi.addGeofences(
+//                    googleApiClient,
+//                    getGeofencingRequest(),
+//                    getGeofencingPendingIntent(context)).setResultCallback(new ResultCallback<Status>() {
+//                @Override
+//                public void onResult(@NonNull Status status) {
+//                    Log.d(TAG, "Geofence Result Callback" + status.getStatusMessage());
+//                }
+//            });
 
             prefsEditor.putStringSet(TASK_KEY_ID_SET, savedTaskIdsSet).apply();
 
@@ -238,7 +261,8 @@ public class TaskManager {
                 // cancel geofence
                 List<String> geofenceId = new ArrayList<String>();
                 geofenceId.add(task.getLocation().getTaskId());
-                LocationServices.GeofencingApi.removeGeofences(googleApiClient, geofenceId); // TODO: check if working
+                LocationServices.GeofencingApi.removeGeofences(googleApiClient, geofenceId);
+                // TODO: check if working, so um... not working actually
             }
         }
 
@@ -322,6 +346,22 @@ public class TaskManager {
         }
 
         return false;
+    }
+
+    private static PendingIntent getGeofencingPendingIntent(Context context) {
+        if (mGeofencePendingIntent != null)
+            return mGeofencePendingIntent;
+
+        Intent intent = new Intent(context, GeofenceTransitionsIntentService.class);
+        mGeofencePendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        return mGeofencePendingIntent;
+    }
+
+    private static GeofencingRequest getGeofencingRequest() {
+        return new GeofencingRequest.Builder()
+                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+                .addGeofences(mGeofenceList)
+                .build();
     }
 
     /**

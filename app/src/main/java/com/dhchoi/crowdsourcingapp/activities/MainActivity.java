@@ -32,6 +32,7 @@ import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
 import com.google.android.gms.common.api.Result;
 import com.google.android.gms.common.api.ResultCallback;
+import com.google.android.gms.location.LocationServices;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -323,18 +324,25 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
      *
      */
     private void triggerOnTasksUpdatedEvent() {
-        // TODO: remove geofence tracking if task is completed
+        // remove geofence location tracking
+        List<String> completedTaskIds = new ArrayList<>();
+
         // ignore completed tasks
         for (Task t : mActiveTasks) {
             if (t.isCompleted()) {
                 mActiveTasks.remove(t);
+                completedTaskIds.add(t.getId());
             }
         }
         for (Task t : mInactiveTasks) {
             if (t.isCompleted()) {
                 mInactiveTasks.remove(t);
+                completedTaskIds.add(t.getId());
             }
         }
+
+        if (completedTaskIds.size() > 0)
+            LocationServices.GeofencingApi.removeGeofences(getGoogleApiClient(), completedTaskIds);
 
         for (OnTasksUpdatedListener onTasksUpdatedListener : onTasksUpdatedListeners) {
             onTasksUpdatedListener.onTasksActivationUpdated(mActiveTasks, mInactiveTasks);

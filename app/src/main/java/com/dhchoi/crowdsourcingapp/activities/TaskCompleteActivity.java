@@ -75,7 +75,7 @@ public class TaskCompleteActivity extends AppCompatActivity {
         final ProgressBar submitResponseProgressBar = (ProgressBar) findViewById(R.id.submitResponseProgressBar);
         mSubmitResponseButton = (Button) findViewById(R.id.submit_button);
         mSubmissionNotice = (TextView) findViewById(R.id.submission_notice);
-        ((TextView) findViewById(R.id.task_name)).setText(mTask.getName());
+        ((TextView) findViewById(R.id.submitted_resp)).setText(mTask.getName());
         ((TextView) findViewById(R.id.task_location)).setText(mTask.getLocation().getName());
 
         final ViewGroup taskActionsLayout = (ViewGroup) findViewById(R.id.task_actions);
@@ -108,7 +108,8 @@ public class TaskCompleteActivity extends AppCompatActivity {
                             if (responseObj.getBoolean("result")) {
                                 Toast.makeText(TaskCompleteActivity.this, "Response submitted!", Toast.LENGTH_SHORT).show();
                                 // update the time when the task was completed
-                                mTask.setCompletionTime(new Date().getTime()); // TODO: use same value from server
+                                // TODO: use same value from server, not quite getting what this is saying
+                                mTask.setCompletionTime(new Date().getTime());
                                 TaskManager.updateTask(TaskCompleteActivity.this, mTask);
                                 // exit activity
                                 TaskCompleteActivity.this.finish();
