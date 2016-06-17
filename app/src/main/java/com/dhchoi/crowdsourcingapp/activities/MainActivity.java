@@ -23,7 +23,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.dhchoi.crowdsourcingapp.Constants;
-import com.dhchoi.crowdsourcingapp.LocationAgent;
+import com.dhchoi.crowdsourcingapp.services.LocationAgent;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.fragments.CrowdActivityFragment;
 import com.dhchoi.crowdsourcingapp.fragments.TaskAvailableFragment;

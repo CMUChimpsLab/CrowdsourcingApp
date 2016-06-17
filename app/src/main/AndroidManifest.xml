@@ -110,7 +110,7 @@
         <service
             android:name=".services.GcmRegistrationIntentService"
             android:exported="false" />
-        <service android:name=".LocationAgent"
+        <service android:name=".services.LocationAgent"
             android:exported="false" />
 
         <!-- [START gcm_listener] -->
