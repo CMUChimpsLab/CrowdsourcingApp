@@ -5,6 +5,8 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
@@ -23,12 +25,17 @@ import android.widget.Toast;
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientAsyncTask;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
+import com.dhchoi.crowdsourcingapp.LocationAgent;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskAction;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
+import com.google.android.gms.location.LocationRequest;
+import com.google.android.gms.location.LocationServices;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
@@ -39,9 +46,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class TaskCompleteActivity extends AppCompatActivity {
+public class TaskCompleteActivity extends BaseGoogleApiActivity {
 
-    private List<ViewGroup> mTaskActionLayouts = new ArrayList<ViewGroup>();
+    private static final String TAG = "TaskComplete";
+
+    private List<ViewGroup> mTaskActionLayouts = new ArrayList<>();
     private SharedPreferences mSharedPreferences;
     private Button mSubmitResponseButton;
     private TextView mSubmissionNotice;
@@ -49,13 +58,27 @@ public class TaskCompleteActivity extends AppCompatActivity {
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            List<String> inactivatedTaskIds = Arrays.asList(intent.getStringArrayExtra(GeofenceTransitionsIntentService.INACTIVATED_TASK_ID_KEY));
-            List<String> activatedTaskIds = Arrays.asList(intent.getStringArrayExtra(GeofenceTransitionsIntentService.ACTIVATED_TASK_ID_KEY));
-            if (inactivatedTaskIds.contains(mTask.getId()) || activatedTaskIds.contains(mTask.getId())) {
-                updateSubmitResponseButtonStatus();
-            }
+            Log.d(TAG, "Broadcast Received");
+
+            ArrayList<String> activatedTaskIds = intent.getStringArrayListExtra(LocationAgent.ACTIVATED_TASK_ID_KEY);
+            ArrayList<String> inactivatedTaskIds = intent.getStringArrayListExtra(LocationAgent.INACTIVATED_TASK_ID_KEY);
+
+            Log.d(TAG, "Activated: " + activatedTaskIds.toString());
+            Log.d(TAG, "Inactivated: " + inactivatedTaskIds.toString());
+
+            mTask = TaskManager.getTaskById(TaskCompleteActivity.this, mTask.getId());
+
+            updateSubmitResponseButtonStatus();
+
+//            List<String> inactivatedTaskIds = Arrays.asList(intent.getStringArrayExtra(GeofenceTransitionsIntentService.INACTIVATED_TASK_ID_KEY));
+//            List<String> activatedTaskIds = Arrays.asList(intent.getStringArrayExtra(GeofenceTransitionsIntentService.ACTIVATED_TASK_ID_KEY));
+//            if (inactivatedTaskIds.contains(mTask.getId()) || activatedTaskIds.contains(mTask.getId())) {
+//                updateSubmitResponseButtonStatus();
+//            }
         }
     };
+
+    private LocationAgent.LocationChangeListener locationListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -127,7 +150,21 @@ public class TaskCompleteActivity extends AppCompatActivity {
         });
 
         // Register to receive messages.
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceTransitionsIntentService.GEOFENCE_TRANSITION_BROADCAST));
+//        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceTransitionsIntentService.GEOFENCE_TRANSITION_BROADCAST));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(LocationAgent.LOCATION_AGENT_BROADCAST));
+
+        locationListener = new LocationAgent.LocationChangeListener() {
+            @Override
+            public void onLocationChanged(Location location) {
+                super.onLocationChanged(location);      // print log
+
+                Intent intent = new Intent(TaskCompleteActivity.this, LocationAgent.class);
+                String latLngStr = new Gson().toJson(new LatLng(location.getLatitude(), location.getLongitude()));
+                intent.setData(Uri.parse(latLngStr));
+                startService(intent);
+                Log.d(TAG, "Intent Sent from " + TAG);
+            }
+        };
     }
 
     @Override
@@ -138,7 +175,6 @@ public class TaskCompleteActivity extends AppCompatActivity {
     }
 
     private void updateSubmitResponseButtonStatus() {
-        // TODO: think about what to do if user leaves region on this screen
 
         if (!mTask.isActivated()) {
             mSubmitResponseButton.setEnabled(false);
@@ -193,5 +229,20 @@ public class TaskCompleteActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @SuppressWarnings("All")
+    @Override
+    public void onConnected(Bundle bundle) {
+        super.onConnected(bundle);
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                getGoogleApiClient(),
+                LocationRequest.create()
+                        .setInterval(5000)
+                        .setFastestInterval(1000)
+                        .setSmallestDisplacement(0.0001f)
+                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY),
+                locationListener);
     }
 }

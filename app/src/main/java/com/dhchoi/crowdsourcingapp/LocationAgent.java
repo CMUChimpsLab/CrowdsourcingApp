@@ -138,4 +138,13 @@ public class LocationAgent extends IntentService {
 
     }
 
+    /***
+     * handles
+     */
+    public interface MoveListener {
+
+        void onMove();
+
+    }
+
 }

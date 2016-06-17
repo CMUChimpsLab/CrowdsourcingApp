@@ -60,8 +60,6 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // TODO: what if geofence trigger activated first before syncing for first time
-
             Log.d(Constants.TAG, "Broadcast Received");
 
             ArrayList<String> activatedTaskIds = intent.getStringArrayListExtra(LocationAgent.ACTIVATED_TASK_ID_KEY);
@@ -110,7 +108,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         }
     };
 
-    private LocationAgent.LocationChangeListener locationLister;
+    private LocationAgent.LocationChangeListener LocationListener;
 
     private TaskAvailableFragment mTaskAvailableFragment = TaskAvailableFragment.newInstance();
     private CrowdActivityFragment mCrowdActivityFragment = CrowdActivityFragment.newInstance();
@@ -155,7 +153,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
 //        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceTransitionsIntentService.GEOFENCE_TRANSITION_BROADCAST));
         LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(LocationAgent.LOCATION_AGENT_BROADCAST));
 
-        locationLister = new LocationAgent.LocationChangeListener() {
+        LocationListener = new LocationAgent.LocationChangeListener() {
             @Override
             public void onLocationChanged(Location location) {
                 super.onLocationChanged(location);  // print log
@@ -164,7 +162,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
                 String latLngStr = new Gson().toJson(new LatLng(location.getLatitude(), location.getLongitude()));
                 intent.setData(Uri.parse(latLngStr));
                 startService(intent);
-                Log.d(Constants.TAG, "Intent Sent");
+                Log.d(Constants.TAG, "Intent Sent from MainActivity");
             }
         };
     }
@@ -197,7 +195,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
             startActivity(new Intent(this, CheckLoginActivity.class));
 
             // unregister location listener
-            LocationServices.FusedLocationApi.removeLocationUpdates(getGoogleApiClient(), locationLister);
+            LocationServices.FusedLocationApi.removeLocationUpdates(getGoogleApiClient(), LocationListener);
 
             finish();
             return true;
@@ -275,7 +273,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
                         .setFastestInterval(1000)
                         .setSmallestDisplacement(0.0001f)
                         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY),
-                locationLister);
+                LocationListener);
     }
 
     @Override
