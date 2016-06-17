@@ -252,7 +252,7 @@
                 android:id="@+id/location_radius"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="location_radius"
+                android:text="1000"
                 android:visibility="gone" />
 
             <LinearLayout

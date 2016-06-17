@@ -46,7 +46,7 @@ public class TaskCreateActivity extends AppCompatActivity {
 
     private final int PLACE_PICKER_REQUEST = 1;
     private final PlacePicker.IntentBuilder mPlacePickerIntentBuilder = new PlacePicker.IntentBuilder();
-    private List<ViewGroup> mTaskActionLayouts = new ArrayList<ViewGroup>();
+    private List<ViewGroup> mTaskActionLayouts = new ArrayList<>();
     private String userId;
 
     private EditText mTaskName;
@@ -147,9 +147,7 @@ public class TaskCreateActivity extends AppCompatActivity {
             public void onClick(View v) {
                 try {
                     startActivityForResult(mPlacePickerIntentBuilder.build(TaskCreateActivity.this), PLACE_PICKER_REQUEST);
-                } catch (GooglePlayServicesRepairableException e) {
-                    e.printStackTrace();
-                } catch (GooglePlayServicesNotAvailableException e) {
+                } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
                     e.printStackTrace();
                 }
             }

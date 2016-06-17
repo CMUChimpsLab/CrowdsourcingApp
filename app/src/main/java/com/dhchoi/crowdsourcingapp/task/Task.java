@@ -72,7 +72,9 @@ public class Task implements Serializable {
     }
 
     public int getRadius() {
-        return mRadius;
+        // TODO: remove when fixed the server radius code
+        return 1000;
+//        return mRadius;
     }
 
     public SimpleGeofence getLocation() {
