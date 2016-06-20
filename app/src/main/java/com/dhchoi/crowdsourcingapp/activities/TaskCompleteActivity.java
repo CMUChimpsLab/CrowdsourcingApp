@@ -198,13 +198,13 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
                     String taskActionId = (String) childView.getTag();
                     String taskActionResponse = ((EditText) childView).getText().toString();
 
-                    taskActionIds += taskActionId + ",";
+                    taskActionIds += "\"" + taskActionId + "\",";
                     taskActionResponses += "\"" + taskActionId + "\": \"" + taskActionResponse + "\",";
                 }
             }
         }
 
-        taskActionIds = taskActionIds.substring(0, taskActionIds.length() - 1);
+        taskActionIds = taskActionIds.substring(0, taskActionIds.length() - 1); // remove that last ','
         taskActionIds += "]";
         userResponses.put("taskActionIds", taskActionIds);
 

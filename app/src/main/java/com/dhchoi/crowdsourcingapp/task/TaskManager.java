@@ -105,7 +105,7 @@ public class TaskManager {
             return new ArrayList<Task>();
         }
 
-        List<Task> tasks = new ArrayList<Task>();
+        List<Task> tasks = new ArrayList<>();
         for (String id : getSavedTaskIdsSet(context)) {
             Task t = getTaskById(context, id);
             if (!t.getOwner().equals(userId) && t.isCompleted()) {
@@ -319,7 +319,7 @@ public class TaskManager {
                     removeTasks(context, googleApiClient, tasksDeleted);
 
                     // fetch and set new tasks
-                    Map<String, String> fetchParams = new HashMap<String, String>();
+                    Map<String, String> fetchParams = new HashMap<>();
                     fetchParams.put(JSON_FIELD_TASK_ID, tasksCreated.toString());
                     String fetchResponse = HttpClientCallable.Executor.execute(new HttpClientCallable(Constants.APP_SERVER_TASK_FETCH_URL, HttpClientCallable.GET, fetchParams));
                     if (fetchResponse != null) {

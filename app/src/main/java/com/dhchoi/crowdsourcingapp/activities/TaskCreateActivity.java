@@ -286,9 +286,13 @@ public class TaskCreateActivity extends AppCompatActivity {
         userEntries.put("lng", "-79.9455");
         userEntries.put("radius", "1000");
 
-        int tagId = 0;
-        String descriptionKey = "taskActions[" + tagId + "][description]";
-        String typeKey = "taskActions[" + tagId + "][type]";
+        String descriptionKey = "taskActions[" + 0 + "][description]";
+        String typeKey = "taskActions[" + 0 + "][type]";
+        userEntries.put(descriptionKey, "Default description");
+        userEntries.put(typeKey, "text");
+
+        descriptionKey = "taskActions[" + 1 + "][description]";
+        typeKey = "taskActions[" + 1 + "][type]";
         userEntries.put(descriptionKey, "Default description");
         userEntries.put(typeKey, "text");
 
