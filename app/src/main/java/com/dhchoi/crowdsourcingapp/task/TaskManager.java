@@ -28,6 +28,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import static com.dhchoi.crowdsourcingapp.Constants.APP_SERVER_RESPONSE_FETCH_URL;
 import static com.dhchoi.crowdsourcingapp.Constants.PACKAGE_NAME;
 
 /**
@@ -47,7 +48,7 @@ public class TaskManager {
     private static final String JSON_FIELD_STATUS = "status";
     private static final String JSON_FIELD_STATUS_CREATED = "created";
     private static final String JSON_FIELD_STATUS_DELETED = "deleted";
-    // TODO: add UPDATE status in web code
+    // TODO: add UPDATE, RESPONSE_RETCH status in web code
     private static final String JSON_FIELD_STATUS_UPDATED = "updated";
     private static final String JSON_FIELD_TASK_ID = "taskId";
 
@@ -208,8 +209,6 @@ public class TaskManager {
                 }
             }
 
-//            LocationAgent.addGeofences(addedTasks);
-
             prefsEditor.putStringSet(TASK_KEY_ID_SET, savedTaskIdsSet).apply();
 
             for (OnTasksUpdatedListener listener : mOnTasksUpdatedListeners) {
@@ -334,6 +333,32 @@ public class TaskManager {
         }
 
         return false;
+    }
+
+    public static Map<String, String> getTaskResponses(String taskId) {
+        try {
+            Map<String, String> respParams = new HashMap<>();
+            respParams.put("taskId", taskId);
+            String fetchedResponse = HttpClientCallable.Executor.execute(new HttpClientCallable(Constants.APP_SERVER_RESPONSE_FETCH_URL, HttpClientCallable.GET, respParams));
+            if (fetchedResponse != null) {
+                JSONObject fetchResponseObj = new JSONObject(fetchedResponse);
+
+                if (fetchResponseObj.get("error") != null)
+                    Log.d(TAG, "Fetched task responses success " + fetchedResponse);
+                else
+                    Log.d(TAG, "Fetch responses failed: " + fetchResponseObj.get("error"));
+
+                if (fetchResponseObj.getJSONArray("responses") != null) {
+                    Log.d(TAG, "Responses: " + fetchResponseObj.getJSONArray("responses")); // array of JSON objects
+                }
+            } else {
+                Log.d(TAG, "Task has no responses");
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return null;
     }
 
     private static PendingIntent getGeofencingPendingIntent(Context context) {

@@ -47,12 +47,15 @@ public class TaskInfoActivity extends AppCompatActivity {
         mManageTask = (Button) findViewById(R.id.btn_manage_task);
         mDeleteTask = (Button) findViewById(R.id.btn_delete_task);
 
-//        Task currentTask = new Gson().fromJson(getIntent().getExtras().getString("task"), Task.class);
         Task currentTask = TaskManager.getTaskById(this, getIntent().getStringExtra("taskId"));
         taskId = currentTask.getId();
         Log.i(TAG, "Task ID: " + taskId);
         Log.i(TAG, "Task Name: " + currentTask.getName());
         Log.i(TAG, "Task Cost: " + currentTask.getCost());
+
+        // TODO:
+        Log.d(TAG, "Getting responses");
+        TaskManager.getTaskResponses(taskId);
 
         mTaskName.setText(currentTask.getName());
         mManageTask.setOnClickListener(new View.OnClickListener() {
@@ -67,7 +70,6 @@ public class TaskInfoActivity extends AppCompatActivity {
                 deleteTask();
             }
         });
-
     }
 
     private void deleteTask() {
