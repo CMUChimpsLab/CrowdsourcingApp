@@ -7,6 +7,7 @@ import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -26,7 +27,15 @@ import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
 
+import org.json.JSONArray;
+import org.json.JSONException;
+
+import java.text.DateFormat;
+import java.text.NumberFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUpdatedListener {
@@ -230,8 +239,36 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
             }
 
             ((TextView) convertView.findViewById(R.id.num_submitted_response)).setText(task.getName());
-            //((TextView) convertView.findViewById(R.id.last_answer_time)).setText();
-            //((TextView) convertView.findViewById(R.id.num_answers)).setText();
+            final View finalConvertView = convertView;
+            new AsyncTask<String, Void, JSONArray>() {
+                @Override
+                protected JSONArray doInBackground(String... params) {
+                    return TaskManager.getTaskResponses(params[0]);
+                }
+
+                @Override
+                protected void onPostExecute(JSONArray jsonArray) {
+                    ((TextView)finalConvertView.findViewById(R.id.num_answers)).setText(
+                            String.valueOf(jsonArray.length()));
+                    try {
+                        if (jsonArray.length() > 0) {
+                            // "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+                            String dateString = jsonArray.getJSONObject(jsonArray.length() - 1)
+                                    .get("createdAt").toString();
+                            dateString = dateString.substring(0, dateString.length() - 1).replace('T', ' ');
+                            long last = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(dateString).getTime()
+                                    - 1000 * 3600 * 4;
+                            // TODO: figure out why this weird time difference is happening
+                            long now = new Date().getTime();
+
+                            ((TextView)finalConvertView.findViewById(R.id.last_answer_time)).setText(
+                                    String.valueOf((now - last) / (1000 * 60)) + " minutes ago");
+                        }
+                    } catch (JSONException | ParseException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }.execute(task.getId());
 
             return convertView;
         }

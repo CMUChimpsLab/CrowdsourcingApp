@@ -279,7 +279,7 @@ public class TaskCreateActivity extends AppCompatActivity {
         userEntries.put("userId", userId);
         userEntries.put("taskName", "Default task");
         userEntries.put("cost", "1");
-        userEntries.put("expiresAt", "Tomorrow");
+        userEntries.put("expiresAt", String.valueOf(new Date().getTime() + 1000 * 60 * 60 * 24));
         userEntries.put("refreshRate", "60");
         userEntries.put("locationName", "CMU");
         userEntries.put("lat", "40.4430");
