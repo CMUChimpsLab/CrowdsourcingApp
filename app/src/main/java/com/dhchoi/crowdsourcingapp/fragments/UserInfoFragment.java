@@ -229,7 +229,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.listitem_task_created, parent, false);
             }
 
-            ((TextView) convertView.findViewById(R.id.submitted_resp)).setText(task.getName());
+            ((TextView) convertView.findViewById(R.id.num_submitted_response)).setText(task.getName());
             //((TextView) convertView.findViewById(R.id.last_answer_time)).setText();
             //((TextView) convertView.findViewById(R.id.num_answers)).setText();
 
@@ -252,7 +252,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.listitem_task_completed, parent, false);
             }
 
-            ((TextView) convertView.findViewById(R.id.submitted_resp)).setText(task.getName());
+            ((TextView) convertView.findViewById(R.id.num_submitted_response)).setText(task.getName());
             ((TextView) convertView.findViewById(R.id.task_location)).setText(task.getLocation().getName());
             ((TextView) convertView.findViewById(R.id.task_cost)).setText("$" + task.getCost());
 

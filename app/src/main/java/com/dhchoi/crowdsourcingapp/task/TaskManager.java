@@ -335,7 +335,7 @@ public class TaskManager {
         return false;
     }
 
-    public static Map<String, String> getTaskResponses(String taskId) {
+    public static JSONArray getTaskResponses(String taskId) {
         try {
             Map<String, String> respParams = new HashMap<>();
             respParams.put("taskId", taskId);
@@ -344,12 +344,14 @@ public class TaskManager {
                 JSONObject fetchResponseObj = new JSONObject(fetchedResponse);
 
                 if (fetchResponseObj.get("error") != null)
-                    Log.d(TAG, "Fetched task responses success " + fetchedResponse);
+                    Log.d(TAG, "Fetched task responses success");
                 else
                     Log.d(TAG, "Fetch responses failed: " + fetchResponseObj.get("error"));
 
-                if (fetchResponseObj.getJSONArray("responses") != null) {
-                    Log.d(TAG, "Responses: " + fetchResponseObj.getJSONArray("responses")); // array of JSON objects
+                JSONArray responsesList;
+                if ((responsesList = fetchResponseObj.getJSONArray("responses")) != null) {
+                    Log.d(TAG, "Responses: " + responsesList); // array of JSON objects
+                    return responsesList;
                 }
             } else {
                 Log.d(TAG, "Task has no responses");

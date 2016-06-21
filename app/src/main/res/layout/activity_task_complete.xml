@@ -33,7 +33,7 @@
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
         <TextView
-            android:id="@+id/submitted_resp"
+            android:id="@+id/num_submitted_response"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentEnd="true"
@@ -48,7 +48,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_alignParentStart="true"
-            android:layout_below="@id/submitted_resp"
+            android:layout_below="@id/num_submitted_response"
             android:layout_marginBottom="32dp"
             android:text="Task Location"
             android:textAppearance="?android:attr/textAppearanceSmall"

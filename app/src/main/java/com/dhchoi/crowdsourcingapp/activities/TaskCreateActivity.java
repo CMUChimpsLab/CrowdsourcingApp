@@ -84,7 +84,7 @@ public class TaskCreateActivity extends AppCompatActivity {
         userId = UserManager.getUserId(this);
 
         // views
-        mTaskName = (EditText) findViewById(R.id.submitted_resp);
+        mTaskName = (EditText) findViewById(R.id.num_submitted_response);
         mTaskCost = (EditText) findViewById(R.id.task_cost);
         mLocationName = (EditText) findViewById(R.id.location_name);
         mLocationLat = (EditText) findViewById(R.id.location_lat);

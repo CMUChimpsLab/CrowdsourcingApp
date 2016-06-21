@@ -95,7 +95,7 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
         final ProgressBar submitResponseProgressBar = (ProgressBar) findViewById(R.id.submitResponseProgressBar);
         mSubmitResponseButton = (Button) findViewById(R.id.submit_button);
         mSubmissionNotice = (TextView) findViewById(R.id.submission_notice);
-        ((TextView) findViewById(R.id.submitted_resp)).setText(mTask.getName());
+        ((TextView) findViewById(R.id.num_submitted_response)).setText(mTask.getName());
         ((TextView) findViewById(R.id.task_location)).setText(mTask.getLocation().getName());
 
         final ViewGroup taskActionsLayout = (ViewGroup) findViewById(R.id.task_actions);

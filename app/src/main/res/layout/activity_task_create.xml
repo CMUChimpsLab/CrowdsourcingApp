@@ -55,7 +55,7 @@
                         android:textAppearance="?android:attr/textAppearanceLarge" />
 
                     <EditText
-                        android:id="@+id/submitted_resp"
+                        android:id="@+id/num_submitted_response"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
@@ -282,9 +282,7 @@
                 android:id="@+id/task_actions_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-            </LinearLayout>
+                android:orientation="vertical" />
 
             <Button
                 android:id="@+id/submit_btn"
