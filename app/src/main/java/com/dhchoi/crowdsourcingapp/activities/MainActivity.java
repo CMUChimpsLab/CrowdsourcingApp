@@ -21,6 +21,7 @@ import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.widget.ProgressBar;
+import android.widget.TextView;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.services.LocationAgent;
@@ -234,7 +235,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
 
             @Override
             protected void onPostExecute(Boolean syncSuccess) {
-                mSyncProgressBar.setVisibility(ProgressBar.GONE);
+//                mSyncProgressBar.setVisibility(ProgressBar.GONE);
                 Fragment currentFragment = mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
                 View currentFragmentView = currentFragment.getView().findViewById(R.id.fragment_content);
 
@@ -244,7 +245,6 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
                     // broadcast tasks to listeners
                     List<Task> allIncompleteTasks = TaskManager.getAllUnownedIncompleteTasks(MainActivity.this);
 
-                    // TODO: add to geo fences
                     LocationAgent.addGeofences(allIncompleteTasks);
 
                     mActiveTasks = new ArrayList<>();
@@ -259,8 +259,31 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
 
                     triggerOnTasksUpdatedEvent();
                 } else {
-                    Snackbar.make(currentFragmentView, "Failed to sync with server.", Snackbar.LENGTH_LONG).show();
+                    Snackbar.make(currentFragmentView, "Failed to sync with server", Snackbar.LENGTH_LONG).show();
                 }
+
+                // after syncing tasks, sync the user
+                new AsyncTask<Void, Void, Boolean>() {
+                    @Override
+                    protected Boolean doInBackground(Void... params) {
+                        return UserManager.syncUser(MainActivity.this);
+                    }
+
+                    @Override
+                    protected void onPostExecute(Boolean syncSuccess) {
+                        mSyncProgressBar.setVisibility(View.GONE);
+                        Fragment currentFragment = mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
+                        View currentFragmentView = currentFragment.getView().findViewById(R.id.fragment_content);
+
+                        if (syncSuccess) {
+                            Snackbar.make(currentFragmentView, "Sync success!", Snackbar.LENGTH_LONG).show();
+                            
+                            triggerOnUserUpdatedEvent();
+                        } else {
+                            Snackbar.make(currentFragmentView, "Failed to sync with server", Snackbar.LENGTH_LONG).show();
+                        }
+                    }
+                }.execute();
             }
         }.execute();
 
@@ -298,7 +321,6 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
 
     }
 
-    // TODO: temp
     @Override
     public void onTasksUpdated(String taskId) {
         Task task = TaskManager.getTaskById(this, taskId);
@@ -336,7 +358,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
      */
     public class SectionsPagerAdapter extends FragmentPagerAdapter {
 
-        List<FragmentWrapper> fragmentWrappers = new ArrayList<FragmentWrapper>();
+        List<FragmentWrapper> fragmentWrappers = new ArrayList<>();
 
         public SectionsPagerAdapter(FragmentManager fm) {
             super(fm);
@@ -372,7 +394,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
     }
 
     /**
-     *
+     * Add and remove the tasks in display
      */
     private void triggerOnTasksUpdatedEvent() {
         // remove geofence location tracking
@@ -398,6 +420,12 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         for (OnTasksUpdatedListener onTasksUpdatedListener : onTasksUpdatedListeners) {
             onTasksUpdatedListener.onTasksActivationUpdated(mActiveTasks, mInactiveTasks);
         }
+    }
+
+    // update the display of user information
+    private void triggerOnUserUpdatedEvent() {
+        // change display of available balance
+        mUserInfoFragment.updateUserTextViews();
     }
 
     /**

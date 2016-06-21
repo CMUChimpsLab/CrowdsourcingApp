@@ -2,15 +2,29 @@ package com.dhchoi.crowdsourcingapp.user;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+import android.util.Log;
+
+import com.dhchoi.crowdsourcingapp.Constants;
+import com.dhchoi.crowdsourcingapp.HttpClientCallable;
+import com.google.android.gms.common.api.GoogleApiClient;
+
+import org.json.JSONException;
+import org.json.JSONObject;
+
+import java.util.HashMap;
+import java.util.Map;
 
 import static com.dhchoi.crowdsourcingapp.Constants.PACKAGE_NAME;
 
 public class UserManager {
 
+    private static final String TAG = "UserManager";
+
     private static final String USER_SHARED_PREF = PACKAGE_NAME + ".USER_SHARED_PREF";
     private static final String USER_LOGGED_IN = PACKAGE_NAME + ".USER_LOGGED_IN";
     private static final String USER_ID_KEY = PACKAGE_NAME + ".USER_ID_KEY";
     private static final String USER_GCM_TOKEN_KEY = PACKAGE_NAME + ".USER_GCM_TOKEN_KEY";
+    private static final String USER_BALANCE = PACKAGE_NAME  + ".USER_BALANCE";
 
     private UserManager() {
     }
@@ -46,6 +60,16 @@ public class UserManager {
     }
 
     /**
+     * Sets the balance of the user
+     *
+     * @param context   of the app
+     * @param balance   current balance of the user
+     */
+    public static void setUserBalance(Context context, float balance) {
+        getSharedPreferences(context).edit().putFloat(USER_BALANCE, balance).apply();
+    }
+
+    /**
      * Returns the user's id.
      *
      * @param context of the app
@@ -73,6 +97,41 @@ public class UserManager {
      */
     public static boolean isUserLoggedIn(Context context) {
         return getSharedPreferences(context).getBoolean(USER_LOGGED_IN, false);
+    }
+
+    /**
+     * Returns the current balance of the user (default 20)
+     * @param context of the app
+     * @return current balance of the user
+     */
+    public static float getUserBalance(Context context) {
+        return getSharedPreferences(context).getFloat(USER_BALANCE, 20);
+    }
+
+    public static boolean syncUser(Context context) {
+        try {
+            Map<String, String> userParams = new HashMap<>();
+            userParams.put("userId", UserManager.getUserId(context));
+            String syncResponse = HttpClientCallable.Executor.execute(new HttpClientCallable(Constants.APP_SERVER_USER_FETCH_URL, HttpClientCallable.GET, userParams));
+            if (syncResponse != null) {
+                JSONObject syncResponseObj = new JSONObject(syncResponse);
+
+                double userBalance = (float) syncResponseObj.getDouble("balance");
+                String userId = syncResponseObj.getString("id");
+
+                setUserBalance(context, (float) userBalance);
+
+                Log.d(TAG, "User Sync Success");
+                Log.d(TAG, "User ID: " + userId);
+                Log.d(TAG, "Current Balance: " + userBalance);
+
+                return true;
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return false;
     }
 
     /**

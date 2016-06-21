@@ -2,6 +2,7 @@ package com.dhchoi.crowdsourcingapp.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.Fragment;
@@ -42,6 +43,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
     private ArrayAdapter<Task> mCompletedTaskListAdapter;
 
     private TextView mUserId;
+    private TextView mUserBalance;
     private TextView mCreatedTasksNotice;
     private TextView mCompletedTasksNotice;
     private ListView mListCreatedTasks;
@@ -144,13 +146,27 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         mUserId = (TextView) rootView.findViewById(R.id.user_id);
         mUserId.setText(userId);
 
+        mUserBalance = (TextView) rootView.findViewById(R.id.available_balance);
+
         // swipe refresh layout
         mSwipeRefresh = (SwipeRefreshLayout) rootView.findViewById(R.id.layout_swipe_refresh);
         mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
-                TaskManager.syncTasks(getActivity(), ((MainActivity)getActivity()).getGoogleApiClient());
-                mSwipeRefresh.setRefreshing(false);
+                new AsyncTask<Void, Void, Void>() {
+                    @Override
+                    protected Void doInBackground(Void... params) {
+                        // update the two layouts
+                        TaskManager.syncTasks(getActivity(), ((MainActivity)getActivity()).getGoogleApiClient());
+                        UserManager.syncUser(getActivity());
+                        return null;
+                    }
+
+                    @Override
+                    protected void onPostExecute(Void aVoid) {
+                        mSwipeRefresh.setRefreshing(false);
+                    }
+                }.execute();
             }
         });
 
@@ -162,6 +178,11 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
     private void updateNoticeTextViews() {
         mCreatedTasksNotice.setVisibility(mCreatedTaskListAdapter.getCount() > 0 ? TextView.GONE : TextView.VISIBLE);
         mCompletedTasksNotice.setVisibility(mCompletedTaskListAdapter.getCount() > 0 ? TextView.GONE : TextView.VISIBLE);
+    }
+
+    @SuppressWarnings("All")
+    public void updateUserTextViews() {
+        mUserBalance.setText(String.format("%.1f", UserManager.getUserBalance(getActivity())));
     }
 
     private void fetchTasks() {

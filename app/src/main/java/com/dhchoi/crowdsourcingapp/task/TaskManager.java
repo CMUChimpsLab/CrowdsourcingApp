@@ -274,7 +274,7 @@ public class TaskManager {
             Log.d(TAG, "check sync availability with server. appLastUpdatedTime: " + appLastUpdatedTime);
 
             // check sync availability
-            Map<String, String> syncParams = new HashMap<String, String>();
+            Map<String, String> syncParams = new HashMap<>();
             syncParams.put(JSON_FIELD_LAST_UPDATED, String.valueOf(appLastUpdatedTime));
             String syncResponse = HttpClientCallable.Executor.execute(new HttpClientCallable(Constants.APP_SERVER_TASK_SYNC_URL, HttpClientCallable.GET, syncParams));
             if (syncResponse != null) {
@@ -292,35 +292,35 @@ public class TaskManager {
                     // update appLastUpdatedTime to serverLastUpdatedTime
                     saveLastUpdatedTime(context, serverLastUpdatedTime);
 
-                    List<String> tasksCreated = new ArrayList<String>();
-                    List<String> tasksDeleted = new ArrayList<String>();
+                    List<String> tasksCreatedIds = new ArrayList<>();
+                    List<String> tasksDeletedIds = new ArrayList<>();
                     for (int i = 0; i < changes.length(); i++) {
                         String taskId = changes.getJSONObject(i).getString(JSON_FIELD_TASK_ID);
                         String taskStatus = changes.getJSONObject(i).getString(JSON_FIELD_STATUS);
                         if (taskStatus.equals(JSON_FIELD_STATUS_CREATED)) {
-                            tasksCreated.add(taskId);
+                            tasksCreatedIds.add(taskId);
                         }
                         if (taskStatus.equals(JSON_FIELD_STATUS_DELETED)) {
-                            tasksDeleted.add(taskId);
+                            tasksDeletedIds.add(taskId);
                         }
                     }
 
                     // no need to deal with tasks that were deleted after being created
                     List<String> deletedIds = new ArrayList<>();        // to avoid ConcurrentModificationException
-                    for (String id : tasksDeleted) {
-                        if (tasksCreated.contains(id)) {
-                            tasksCreated.remove(id);
+                    for (String id : tasksDeletedIds) {
+                        if (tasksCreatedIds.contains(id)) {
+                            tasksCreatedIds.remove(id);
                             deletedIds.add(id);
                         }
                     }
-                    tasksDeleted.removeAll(deletedIds);
+                    tasksDeletedIds.removeAll(deletedIds);
 
                     // remove deleted tasks
-                    removeTasks(context, googleApiClient, tasksDeleted);
+                    removeTasks(context, googleApiClient, tasksDeletedIds);
 
                     // fetch and set new tasks
                     Map<String, String> fetchParams = new HashMap<>();
-                    fetchParams.put(JSON_FIELD_TASK_ID, tasksCreated.toString());
+                    fetchParams.put(JSON_FIELD_TASK_ID, tasksCreatedIds.toString());
                     String fetchResponse = HttpClientCallable.Executor.execute(new HttpClientCallable(Constants.APP_SERVER_TASK_FETCH_URL, HttpClientCallable.GET, fetchParams));
                     if (fetchResponse != null) {
                         setTasks(context, googleApiClient, fetchResponse);
