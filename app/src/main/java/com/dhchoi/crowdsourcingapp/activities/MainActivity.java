@@ -256,6 +256,8 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
                         }
                     }
 
+                    // TODO: update locally the tasks
+
                     triggerOnTasksUpdatedEvent();
                 } else {
                     Snackbar.make(currentFragmentView, "Failed to sync with server", Snackbar.LENGTH_LONG).show();

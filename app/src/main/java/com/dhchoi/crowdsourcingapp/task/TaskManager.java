@@ -160,6 +160,16 @@ public class TaskManager {
     }
 
     /**
+     * Updates a list of {@link Task}s by rewriting them with the new data
+     * @param context of the app
+     * @param tasks   to be updated
+     */
+    public static void updateTasks(Context context, List<Task> tasks) {
+        for (Task task : tasks)
+            updateTask(context, task);
+    }
+
+    /**
      * Creates a list of {@link Task}s from its string representation and
      *
      * @param context         of the app

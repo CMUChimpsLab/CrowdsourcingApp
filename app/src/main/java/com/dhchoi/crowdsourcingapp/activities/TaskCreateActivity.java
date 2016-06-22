@@ -189,16 +189,12 @@ public class TaskCreateActivity extends AppCompatActivity {
 
                         try {
                             JSONObject responseObj = new JSONObject(response);
-                            if (responseObj.getString("error").length() >= 0) {
-                                Toast.makeText(TaskCreateActivity.this, responseObj.getString("error"), Toast.LENGTH_SHORT).show();
+                            Log.d(Constants.TAG, "Server response: " + responseObj);
+                            if (!responseObj.getString("createdTaskId").isEmpty()) {
+                                Toast.makeText(TaskCreateActivity.this, "Task created!", Toast.LENGTH_SHORT).show();
+                                TaskCreateActivity.this.finish();
                             } else {
-                                Log.d(Constants.TAG, "Server response: " + responseObj);
-                                if (!responseObj.getString("createdTaskId").isEmpty()) {
-                                    Toast.makeText(TaskCreateActivity.this, "Task created!", Toast.LENGTH_SHORT).show();
-                                    TaskCreateActivity.this.finish();
-                                } else {
-                                    Toast.makeText(TaskCreateActivity.this, "Your request was ill-formatted. Please check inputs again.", Toast.LENGTH_SHORT).show();
-                                }
+                                Toast.makeText(TaskCreateActivity.this, "Your request was ill-formatted. Please check inputs again.", Toast.LENGTH_SHORT).show();
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
