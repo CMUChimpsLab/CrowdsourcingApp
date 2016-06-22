@@ -39,7 +39,7 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseGoogleApiActivity implements TaskManager.OnTasksSyncListener {
+public class MainActivity extends BaseGoogleApiActivity implements TaskManager.OnSyncCompleteListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
@@ -256,8 +256,6 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
                         }
                     }
 
-                    // TODO: update locally the tasks
-
                     triggerOnTasksUpdatedEvent();
                 } else {
                     Snackbar.make(currentFragmentView, "Failed to sync with server", Snackbar.LENGTH_LONG).show();
@@ -308,50 +306,8 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
     }
 
     @Override
-    public void onTasksCreatedByOthers(List<Task> createdTasksByOthers) {
-
-    }
-
-    @Override
-    public void onTasksCreatedByUser(List<Task> createdTasksByUser) {
-
-    }
-
-    @Override
-    public void onTasksDeleted(List<String> deletedTaskIds) {
-
-    }
-
-    @Override
-    public void onTasksUpdated(String taskId) {
-        Task task = TaskManager.getTaskById(this, taskId);
-        boolean isActive = task.isActivated();
-
-        for (int i = 0; i < mActiveTasks.size(); i++) {
-            if (mActiveTasks.get(i).getId().equals(taskId)) {
-                mActiveTasks.set(i, TaskManager.getTaskById(this, taskId));
-                if (!isActive) {
-                    mActiveTasks.remove(i);
-                    mInactiveTasks.add(task);
-                }
-                return;
-            }
-        }
-
-        for (int i = 0; i < mInactiveTasks.size(); i++) {
-            if (mInactiveTasks.get(i).getId().equals(taskId)) {
-                mInactiveTasks.set(i, TaskManager.getTaskById(this, taskId));
-                if (isActive) {
-                    mInactiveTasks.remove(i);
-                    mActiveTasks.add(task);
-                }
-            }
-        }
-
-        // update the list and map displays
-        for (OnTasksUpdatedListener listener : onTasksUpdatedListeners) {
-            listener.onTasksActivationUpdated(mActiveTasks, mInactiveTasks);
-        }
+    public void onSyncComplete() {
+        triggerOnTasksUpdatedEvent();
     }
 
     /**

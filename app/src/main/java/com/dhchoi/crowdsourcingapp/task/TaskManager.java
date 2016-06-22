@@ -48,7 +48,7 @@ public class TaskManager {
     private static final String JSON_FIELD_STATUS_UPDATED = "updated";
     private static final String JSON_FIELD_TASK_ID = "taskId";
 
-    private static List<OnTasksSyncListener> mOnTasksUpdatedListeners = new ArrayList<>();
+    private static List<OnSyncCompleteListener> mOnSyncCompleteListeners = new ArrayList<>();
 
     private static List<Geofence> mGeofenceList;
     private static PendingIntent mGeofencePendingIntent;
@@ -155,8 +155,8 @@ public class TaskManager {
      */
     public static void updateTask(Context context, Task task) {
         getSharedPreferences(context).edit().putString(getTaskKeyById(task.getId()), new Gson().toJson(task)).apply();
-        for (OnTasksSyncListener listener : mOnTasksUpdatedListeners)
-            listener.onTasksUpdated(task.getId());
+        for (OnSyncCompleteListener listener : mOnSyncCompleteListeners)
+            listener.onSyncComplete();
     }
 
     /**
@@ -180,12 +180,11 @@ public class TaskManager {
     private static void setTasks(Context context, GoogleApiClient googleApiClient, String jsonArray) throws SecurityException {
         try {
             SharedPreferences.Editor prefsEditor = getSharedPreferences(context).edit();
-            Set<String> savedTaskIdsSet = getSavedTaskIdsSet(context);
+            Set<String> savedTaskIdsSet = getSavedTaskIdsSet(context);  // all tasks save locally
             String userId = UserManager.getUserId(context);
 
             // create list of tasks from json string
-            List<Task> allTasks = new Gson().fromJson(jsonArray, new TypeToken<ArrayList<Task>>() {
-            }.getType());
+            List<Task> allTasks = new Gson().fromJson(jsonArray, new TypeToken<ArrayList<Task>>() {}.getType());
             List<Task> addedTasks = new ArrayList<>();      // also to be added as geofence
             List<Task> ownedTasks = new ArrayList<>();
 
@@ -196,7 +195,7 @@ public class TaskManager {
                 // save task id to saved tasks id set
                 savedTaskIdsSet.add(t.getId());
 
-                if (!userId.equals(t.getOwner())) {
+                if (!userId.equals(t.getOwner())) {     // not my task
                     // start geofence
 
 //                    LocationServices.GeofencingApi.addGeofences(
@@ -217,10 +216,9 @@ public class TaskManager {
 
             prefsEditor.putStringSet(TASK_KEY_ID_SET, savedTaskIdsSet).apply();
 
-            for (OnTasksSyncListener listener : mOnTasksUpdatedListeners) {
-                listener.onTasksCreatedByOthers(addedTasks);
-                listener.onTasksCreatedByUser(ownedTasks);
-            }
+//            for (OnSyncCompleteListener listener : mOnSyncCompleteListeners) {
+//               // update UI
+//            }
         } catch (Exception e) {
             Log.e(TAG, e.getMessage());
         }
@@ -338,6 +336,9 @@ public class TaskManager {
             Log.e(TAG, e.getMessage());
         }
 
+        for (OnSyncCompleteListener listener : mOnSyncCompleteListeners)
+            listener.onSyncComplete();
+
         return false;
     }
 
@@ -436,42 +437,19 @@ public class TaskManager {
         prefsEditor.putLong(TASKS_LAST_UPDATED, time).apply();
     }
 
-    public interface OnTasksSyncListener {
-
-        /**
-         * Callback when receiving info about tasks created by other users.
-         *
-         * @param createdTasksByOthers tasks created by other users
-         */
-        void onTasksCreatedByOthers(List<Task> createdTasksByOthers);
-
-        /**
-         * Callback when receiving info about tasks created by current user.
-         *
-         * @param createdTasksByUser tasks created by current user
-         */
-        void onTasksCreatedByUser(List<Task> createdTasksByUser);
-
-        /**
-         * Callback when receiving info about deleted tasks.
-         *
-         * @param deletedTaskIds updated task ids
-         */
-        void onTasksDeleted(List<String> deletedTaskIds);
+    public interface OnSyncCompleteListener {
 
         /**
          * Callback when updating info about tasks
-         *
-         * @param taskId updated task id
          */
-        void onTasksUpdated(String taskId);
+        void onSyncComplete();
     }
 
-    public static void addOnTaskUpdatedListener(OnTasksSyncListener listener) {
-        mOnTasksUpdatedListeners.add(listener);
+    public static void addOnSyncCompleteListener(OnSyncCompleteListener listener) {
+        mOnSyncCompleteListeners.add(listener);
     }
 
-    public static void removeOnTaskUpdatedListener(OnTasksSyncListener listener) {
-        mOnTasksUpdatedListeners.remove(listener);
+    public static void removeOnSyncCompleteListener(OnSyncCompleteListener listener) {
+        mOnSyncCompleteListeners.remove(listener);
     }
 }
