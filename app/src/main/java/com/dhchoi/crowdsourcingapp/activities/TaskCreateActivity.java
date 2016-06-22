@@ -13,6 +13,8 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
@@ -60,6 +62,8 @@ public class TaskCreateActivity extends AppCompatActivity {
     private Button mTimeAdd;
     private EditText mTimeText;
     private EditText mRefreshRate;
+    private EditText mAnswersLeft;
+    private CheckBox mEndlessAnswers;
     private Button mLocationAdd;
     private ViewGroup mTaskActionsContainer;
     private Button mTaskActionAdd;
@@ -100,6 +104,8 @@ public class TaskCreateActivity extends AppCompatActivity {
         mTimeAdd = (Button) findViewById(R.id.time_add_btn);
         mTimeText = (EditText) findViewById(R.id.time_add_text);
         mRefreshRate = (EditText) findViewById(R.id.refresh_rate);
+        mAnswersLeft = (EditText) findViewById(R.id.answers_left);
+        mEndlessAnswers = (CheckBox) findViewById(R.id.endless_answers_check);
 
         // set OnClickListeners on buttons
         mDateAdd.setOnClickListener(new View.OnClickListener() {
@@ -183,12 +189,16 @@ public class TaskCreateActivity extends AppCompatActivity {
 
                         try {
                             JSONObject responseObj = new JSONObject(response);
-                            Log.d(Constants.TAG, "Server response: " + responseObj);
-                            if (!responseObj.getString("createdTaskId").isEmpty()) {
-                                Toast.makeText(TaskCreateActivity.this, "Task created!", Toast.LENGTH_SHORT).show();
-                                TaskCreateActivity.this.finish();
+                            if (responseObj.getString("error").length() >= 0) {
+                                Toast.makeText(TaskCreateActivity.this, responseObj.getString("error"), Toast.LENGTH_SHORT).show();
                             } else {
-                                Toast.makeText(TaskCreateActivity.this, "Your request was ill-formatted. Please check inputs again.", Toast.LENGTH_SHORT).show();
+                                Log.d(Constants.TAG, "Server response: " + responseObj);
+                                if (!responseObj.getString("createdTaskId").isEmpty()) {
+                                    Toast.makeText(TaskCreateActivity.this, "Task created!", Toast.LENGTH_SHORT).show();
+                                    TaskCreateActivity.this.finish();
+                                } else {
+                                    Toast.makeText(TaskCreateActivity.this, "Your request was ill-formatted. Please check inputs again.", Toast.LENGTH_SHORT).show();
+                                }
                             }
                         } catch (Exception e) {
                             e.printStackTrace();
@@ -197,6 +207,15 @@ public class TaskCreateActivity extends AppCompatActivity {
                         }
                     }
                 }.execute();
+            }
+        });
+        mEndlessAnswers.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                    mAnswersLeft.setEnabled(false);
+                else
+                    mAnswersLeft.setEnabled(true);
             }
         });
 
@@ -261,6 +280,7 @@ public class TaskCreateActivity extends AppCompatActivity {
 //        userEntries.put("lat", mLocationLat.getText().toString());
 //        userEntries.put("lng", mLocationLng.getText().toString());
 //        userEntries.put("radius", mLocationRadius.getText().toString());
+//        userEntries.put("answersLeft", mEndlessAnswers.isChecked() ? "-1" : mAnswersLeft.getText().toString());
 
 //        int tagId = 0;
 //        for (ViewGroup taskActionViewGroup : mTaskActionLayouts) {
@@ -281,6 +301,7 @@ public class TaskCreateActivity extends AppCompatActivity {
         userEntries.put("cost", "1");
         userEntries.put("expiresAt", String.valueOf(new Date().getTime() + 1000 * 60 * 60 * 24));
         userEntries.put("refreshRate", "60");
+        userEntries.put("answersLeft", "-1");
         userEntries.put("locationName", "CMU");
         userEntries.put("lat", "40.4430");
         userEntries.put("lng", "-79.9455");

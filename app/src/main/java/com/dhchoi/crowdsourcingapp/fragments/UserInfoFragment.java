@@ -5,9 +5,9 @@ import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.FloatingActionButton;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
-import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -20,7 +20,6 @@ import android.widget.Toast;
 
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.activities.MainActivity;
-import com.dhchoi.crowdsourcingapp.activities.ResponseInfoActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskCreateActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskInfoActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
@@ -37,6 +36,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Locale;
 
 public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUpdatedListener {
 
@@ -64,6 +64,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
     private SwipeRefreshLayout mSwipeRefresh;
 
     private static final int TASK_INFO_REQUEST_CODE = 100;
+    private static final int TIME_OFFSET = 1000 * 3600 * 4;
 
     public UserInfoFragment() {
     }
@@ -125,7 +126,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(getActivity(), "Task Clicked", Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(getActivity(), ResponseInfoActivity.class);
+                Intent intent = new Intent(getActivity(), TaskInfoActivity.class);
                 intent.putExtra("taskId", ((Task)mListCompletedTasks.getAdapter().getItem(position)).getId());
                 startActivity(intent);
             }
@@ -174,6 +175,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
                     @Override
                     protected void onPostExecute(Void aVoid) {
                         mSwipeRefresh.setRefreshing(false);
+                        Snackbar.make(getView(), "Sync success!", Snackbar.LENGTH_LONG).show();
                     }
                 }.execute();
             }
@@ -248,22 +250,24 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
 
                 @Override
                 protected void onPostExecute(JSONArray jsonArray) {
-                    ((TextView)finalConvertView.findViewById(R.id.num_answers)).setText(
-                            String.valueOf(jsonArray.length()));
                     try {
                         if (jsonArray.length() > 0) {
+                            ((TextView)finalConvertView.findViewById(R.id.num_answers)).setText(
+                                    String.valueOf(jsonArray.length()));
+
                             // "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
                             String dateString = jsonArray.getJSONObject(jsonArray.length() - 1)
                                     .get("createdAt").toString();
                             dateString = dateString.substring(0, dateString.length() - 1).replace('T', ' ');
-                            long last = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS").parse(dateString).getTime()
-                                    - 1000 * 3600 * 4;
+                            long last = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US)
+                                    .parse(dateString).getTime() - TIME_OFFSET;
                             // TODO: figure out why this weird time difference is happening
                             long now = new Date().getTime();
 
                             ((TextView)finalConvertView.findViewById(R.id.last_answer_time)).setText(
                                     String.valueOf((now - last) / (1000 * 60)) + " minutes ago");
-                        }
+                        } else
+                            ((TextView)finalConvertView.findViewById(R.id.last_answer_time)).setText("N/A");
                     } catch (JSONException | ParseException e) {
                         e.printStackTrace();
                     }

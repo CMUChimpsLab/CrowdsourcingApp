@@ -181,6 +181,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:inputType="numberDecimal"
+                    android:textAlignment="center"
                     android:text="60" />
 
                 <TextView
@@ -189,6 +190,44 @@
                     android:text=" minutes"
                     android:layout_weight="1"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/answers_left_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total Answers: "
+                    android:layout_weight="1"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <EditText
+                    android:id="@+id/answers_left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:inputType="number"
+                    android:textAlignment="center"
+                    android:text="1" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_weight=".3"
+                    android:text="Endless"/>
+
+                <CheckBox
+                    android:id="@+id/endless_answers_check"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:checked="false"/>
 
             </LinearLayout>
 

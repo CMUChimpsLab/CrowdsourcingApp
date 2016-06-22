@@ -125,11 +125,14 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
 
                         try {
                             JSONObject responseObj = new JSONObject(response);
-                            if (responseObj.getBoolean("result")) {
+                            if (responseObj.getString("error").length() > 0) {
+                                Toast.makeText(TaskCompleteActivity.this, responseObj.getString("error"), Toast.LENGTH_SHORT).show();
+                            } else if (responseObj.getBoolean("result")) {
                                 Toast.makeText(TaskCompleteActivity.this, "Response submitted!", Toast.LENGTH_SHORT).show();
                                 // update the time when the task was completed
-                                // TODO: use same value from server, not quite getting what this is saying
-                                mTask.setCompletionTime(new Date().getTime());
+                                // TODO: use same value from server
+                                // TODO: update the task from server, mainly for answersLeft field
+//                                mTask.setCompletionTime(new Date().getTime());
                                 TaskManager.updateTask(TaskCompleteActivity.this, mTask);
                                 // exit activity
                                 TaskCompleteActivity.this.finish();
