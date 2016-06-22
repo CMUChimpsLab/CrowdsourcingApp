@@ -61,7 +61,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
     private LinearLayout mNumCompletedTasksTitle;
     private SwipeRefreshLayout mSwipeRefresh;
 
-    private static final int TIME_OFFSET = 1000 * 3600 * 4;
+    private static final int TIME_OFFSET = -1000 * 3600 * 4;
 
     public UserInfoFragment() {
     }
@@ -169,6 +169,9 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
 
                     @Override
                     protected void onPostExecute(Void aVoid) {
+                        mCreatedTaskListAdapter.notifyDataSetChanged();
+                        updateUserTextViews();
+
                         mSwipeRefresh.setRefreshing(false);
                         Snackbar.make(getView(), "Sync success!", Snackbar.LENGTH_LONG).show();
                     }
@@ -222,12 +225,15 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
 
     class CreatedTaskListAdapter extends ArrayAdapter<Task> {
 
+        private View mConvertView;
+
         public CreatedTaskListAdapter(Context context, List<Task> tasks) {
             super(context, android.R.layout.simple_list_item_1, tasks);
         }
 
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
+            mConvertView = convertView;
             Task task = getItem(position);
 
             // Check if an existing view is being reused, otherwise inflate the view
@@ -235,8 +241,13 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
                 convertView = LayoutInflater.from(getContext()).inflate(R.layout.listitem_task_created, parent, false);
             }
 
+            updateTaskInfoDisplay(task, convertView);
+
+            return convertView;
+        }
+
+        public void updateTaskInfoDisplay(Task task, final View convertView) {
             ((TextView) convertView.findViewById(R.id.num_submitted_response)).setText(task.getName());
-            final View finalConvertView = convertView;
             new AsyncTask<String, Void, JSONArray>() {
                 @Override
                 protected JSONArray doInBackground(String... params) {
@@ -247,7 +258,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
                 protected void onPostExecute(JSONArray jsonArray) {
                     try {
                         if (jsonArray.length() > 0) {
-                            ((TextView)finalConvertView.findViewById(R.id.num_answers)).setText(
+                            ((TextView)convertView.findViewById(R.id.num_answers)).setText(
                                     String.valueOf(jsonArray.length()));
 
                             // "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
@@ -255,22 +266,20 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
                                     .get("createdAt").toString();
                             dateString = dateString.substring(0, dateString.length() - 1).replace('T', ' ');
                             long last = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss.SSS", Locale.US)
-                                    .parse(dateString).getTime() - TIME_OFFSET;
-                            // TODO: figure out why this weird time difference is happening
+                                    .parse(dateString).getTime() + TIME_OFFSET;
                             long now = new Date().getTime();
 
-                            ((TextView)finalConvertView.findViewById(R.id.last_answer_time)).setText(
+                            ((TextView)convertView.findViewById(R.id.last_answer_time)).setText(
                                     String.valueOf((now - last) / (1000 * 60)) + " minutes ago");
                         } else
-                            ((TextView)finalConvertView.findViewById(R.id.last_answer_time)).setText("N/A");
+                            ((TextView)convertView.findViewById(R.id.last_answer_time)).setText("N/A");
                     } catch (JSONException | ParseException e) {
                         e.printStackTrace();
                     }
                 }
             }.execute(task.getId());
-
-            return convertView;
         }
+
     }
 
     class CompletedTaskListAdapter extends ArrayAdapter<Task> {
