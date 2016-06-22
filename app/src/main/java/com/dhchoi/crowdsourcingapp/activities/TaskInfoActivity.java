@@ -22,8 +22,11 @@ import com.dhchoi.crowdsourcingapp.task.TaskManager;
 
 import org.json.JSONArray;
 import org.json.JSONException;
+import org.json.JSONObject;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class TaskInfoActivity extends AppCompatActivity {
@@ -91,19 +94,30 @@ public class TaskInfoActivity extends AppCompatActivity {
             mNumSubmittedResp.setText(String.valueOf("0"));
         } else {
             mNoResponseNotice.setVisibility(View.GONE);
-            for (int i = 0; i < responseList.length(); i++) {
-                View taskResponseLayout = LayoutInflater.from(this).inflate(R.layout.task_response_text, null);
-                try {
-                    ((TextView)taskResponseLayout.findViewById(R.id.response_description)).setText(
-                            responseList.getJSONObject(i).getString("response"));
-                    ((TextView)taskResponseLayout.findViewById(R.id.response_user)).setText(
-                            responseList.getJSONObject(i).getString("userId"));
-                } catch (JSONException e) {
-                    e.printStackTrace();
+            List<JSONObject> allResponsesList = new ArrayList<>();
+
+            try {
+                // extract action responses
+                for (int i = 0; i < responseList.length(); i++) {
+                    JSONArray actionResponseList = ((JSONObject)responseList.get(i)).getJSONArray("taskactionresponses");
+                    for (int j = 0; j < actionResponseList.length(); j++) {
+                        JSONObject actionResponse = actionResponseList.getJSONObject(j);
+                        allResponsesList.add(actionResponse);
+                    }
                 }
 
-                mTaskResponseContainer.addView(taskResponseLayout);
+                for (JSONObject jsonObj : allResponsesList) {
+                    View taskResponseLayout = LayoutInflater.from(this).inflate(R.layout.task_response_text, null);
+                    ((TextView)taskResponseLayout.findViewById(R.id.response_description)).setText(
+                            jsonObj.getString("response"));
+                    ((TextView)taskResponseLayout.findViewById(R.id.response_user)).setText(
+                            jsonObj.getString("userId"));
+                    mTaskResponseContainer.addView(taskResponseLayout);
+                }
+            } catch (JSONException e) {
+                e.printStackTrace();
             }
+
             // number of responses
             mNumSubmittedResp.setText(String.valueOf(responseList.length()));
         }

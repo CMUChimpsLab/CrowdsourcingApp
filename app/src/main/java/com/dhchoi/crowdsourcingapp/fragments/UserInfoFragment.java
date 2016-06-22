@@ -29,8 +29,6 @@ import com.dhchoi.crowdsourcingapp.user.UserManager;
 import org.json.JSONArray;
 import org.json.JSONException;
 
-import java.text.DateFormat;
-import java.text.NumberFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -45,8 +43,8 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
     private final int COLOR_OFF = 0x22000000;
 
     // task related
-    private List<Task> mCreatedTasks = new ArrayList<Task>();
-    private List<Task> mCompletedTasks = new ArrayList<Task>();
+    private List<Task> mCreatedTasks = new ArrayList<>();
+    private List<Task> mCompletedTasks = new ArrayList<>();
 
     private ArrayAdapter<Task> mCreatedTaskListAdapter;
     private ArrayAdapter<Task> mCompletedTaskListAdapter;
@@ -63,7 +61,6 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
     private LinearLayout mNumCompletedTasksTitle;
     private SwipeRefreshLayout mSwipeRefresh;
 
-    private static final int TASK_INFO_REQUEST_CODE = 100;
     private static final int TIME_OFFSET = 1000 * 3600 * 4;
 
     public UserInfoFragment() {
@@ -96,8 +93,6 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         mListCreatedTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getActivity(), "Task Clicked", Toast.LENGTH_SHORT).show();
-
                 Intent intent = new Intent(getActivity(), TaskInfoActivity.class);
                 intent.putExtra("taskId", ((Task) mListCreatedTasks.getAdapter().getItem(position)).getId());
                 startActivity(intent);

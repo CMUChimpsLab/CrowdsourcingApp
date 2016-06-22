@@ -2,18 +2,15 @@ package com.dhchoi.crowdsourcingapp.task;
 
 import android.app.PendingIntent;
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.util.Log;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
 import com.dhchoi.crowdsourcingapp.services.LocationAgent;
-import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.Geofence;
-import com.google.android.gms.location.GeofencingRequest;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -28,7 +25,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
-import static com.dhchoi.crowdsourcingapp.Constants.APP_SERVER_RESPONSE_FETCH_URL;
 import static com.dhchoi.crowdsourcingapp.Constants.PACKAGE_NAME;
 
 /**
@@ -52,7 +48,7 @@ public class TaskManager {
     private static final String JSON_FIELD_STATUS_UPDATED = "updated";
     private static final String JSON_FIELD_TASK_ID = "taskId";
 
-    private static List<OnTasksUpdatedListener> mOnTasksUpdatedListeners = new ArrayList<>();
+    private static List<OnTasksSyncListener> mOnTasksUpdatedListeners = new ArrayList<>();
 
     private static List<Geofence> mGeofenceList;
     private static PendingIntent mGeofencePendingIntent;
@@ -159,7 +155,7 @@ public class TaskManager {
      */
     public static void updateTask(Context context, Task task) {
         getSharedPreferences(context).edit().putString(getTaskKeyById(task.getId()), new Gson().toJson(task)).apply();
-        for (OnTasksUpdatedListener listener : mOnTasksUpdatedListeners)
+        for (OnTasksSyncListener listener : mOnTasksUpdatedListeners)
             listener.onTasksUpdated(task.getId());
     }
 
@@ -211,7 +207,7 @@ public class TaskManager {
 
             prefsEditor.putStringSet(TASK_KEY_ID_SET, savedTaskIdsSet).apply();
 
-            for (OnTasksUpdatedListener listener : mOnTasksUpdatedListeners) {
+            for (OnTasksSyncListener listener : mOnTasksUpdatedListeners) {
                 listener.onTasksCreatedByOthers(addedTasks);
                 listener.onTasksCreatedByUser(ownedTasks);
             }
@@ -342,11 +338,11 @@ public class TaskManager {
             String fetchedResponse = HttpClientCallable.Executor.execute(new HttpClientCallable(Constants.APP_SERVER_RESPONSE_FETCH_URL, HttpClientCallable.GET, respParams));
             if (fetchedResponse != null) {
                 JSONObject fetchResponseObj = new JSONObject(fetchedResponse);
-
-                if (fetchResponseObj.get("error") != null)
+                if (fetchResponseObj.getString("error").length() > 0) {
+                    Log.d(TAG, "Fetch responses failed: " + fetchResponseObj.getString("error"));
+                    return null;
+                } else
                     Log.d(TAG, "Fetched task responses success");
-                else
-                    Log.d(TAG, "Fetch responses failed: " + fetchResponseObj.get("error"));
 
                 JSONArray responsesList;
                 if ((responsesList = fetchResponseObj.getJSONArray("responses")) != null) {
@@ -363,21 +359,21 @@ public class TaskManager {
         return null;
     }
 
-    private static PendingIntent getGeofencingPendingIntent(Context context) {
-        if (mGeofencePendingIntent != null)
-            return mGeofencePendingIntent;
-
-        Intent intent = new Intent(context, GeofenceTransitionsIntentService.class);
-        mGeofencePendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
-        return mGeofencePendingIntent;
-    }
-
-    private static GeofencingRequest getGeofencingRequest() {
-        return new GeofencingRequest.Builder()
-                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
-                .addGeofences(mGeofenceList)
-                .build();
-    }
+//    private static PendingIntent getGeofencingPendingIntent(Context context) {
+//        if (mGeofencePendingIntent != null)
+//            return mGeofencePendingIntent;
+//
+//        Intent intent = new Intent(context, GeofenceTransitionsIntentService.class);
+//        mGeofencePendingIntent = PendingIntent.getService(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+//        return mGeofencePendingIntent;
+//    }
+//
+//    private static GeofencingRequest getGeofencingRequest() {
+//        return new GeofencingRequest.Builder()
+//                .setInitialTrigger(GeofencingRequest.INITIAL_TRIGGER_ENTER)
+//                .addGeofences(mGeofenceList)
+//                .build();
+//    }
 
     /**
      * Returns the shared preferences that manages all {@link Task}s.
@@ -430,7 +426,7 @@ public class TaskManager {
         prefsEditor.putLong(TASKS_LAST_UPDATED, time).apply();
     }
 
-    public interface OnTasksUpdatedListener {
+    public interface OnTasksSyncListener {
 
         /**
          * Callback when receiving info about tasks created by other users.
@@ -461,11 +457,11 @@ public class TaskManager {
         void onTasksUpdated(String taskId);
     }
 
-    public static void addOnTaskUpdatedListener(OnTasksUpdatedListener listener) {
+    public static void addOnTaskUpdatedListener(OnTasksSyncListener listener) {
         mOnTasksUpdatedListeners.add(listener);
     }
 
-    public static void removeOnTaskUpdatedListener(OnTasksUpdatedListener listener) {
+    public static void removeOnTaskUpdatedListener(OnTasksSyncListener listener) {
         mOnTasksUpdatedListeners.remove(listener);
     }
 }

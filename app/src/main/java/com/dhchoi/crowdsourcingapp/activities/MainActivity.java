@@ -39,7 +39,7 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 import java.util.List;
 
-public class MainActivity extends BaseGoogleApiActivity implements TaskManager.OnTasksUpdatedListener {
+public class MainActivity extends BaseGoogleApiActivity implements TaskManager.OnTasksSyncListener {
 
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
