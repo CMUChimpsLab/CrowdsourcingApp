@@ -125,7 +125,7 @@ public class TaskInfoActivity extends AppCompatActivity {
 
     private void deleteTask() {
         Map<String, String> params = new HashMap<>();
-        new HttpClientAsyncTask(Constants.APP_SERVER_USER_DELETE_URL + "/" + taskId, HttpClientCallable.GET, params) {
+        new HttpClientAsyncTask(Constants.APP_SERVER_TASK_DELETE_URL + "/" + taskId, HttpClientCallable.GET, params) {
             @Override
             protected void onPostExecute(String response) {
                 try {
