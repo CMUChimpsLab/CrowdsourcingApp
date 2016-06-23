@@ -61,4 +61,5 @@ public class TaskAvailableFragment extends Fragment {
     public TaskAvailableListFragment getTaskAvailableListFragment() {
         return mTaskAvailableListFragment;
     }
+
 }

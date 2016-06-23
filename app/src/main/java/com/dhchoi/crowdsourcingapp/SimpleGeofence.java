@@ -7,6 +7,7 @@ import android.content.Intent;
 import com.dhchoi.crowdsourcingapp.services.GeofenceTransitionsIntentService;
 import com.google.android.gms.location.Geofence;
 import com.google.android.gms.location.GeofencingRequest;
+import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
@@ -53,6 +54,10 @@ public class SimpleGeofence implements Serializable {
 
     public double getLongitude() {
         return mLongitude;
+    }
+
+    public LatLng getLatLng() {
+        return new LatLng(getLatitude(), getLongitude());
     }
 
     public float getRadius() {

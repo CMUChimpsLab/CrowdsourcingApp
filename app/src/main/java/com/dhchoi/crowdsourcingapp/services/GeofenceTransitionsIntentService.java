@@ -11,6 +11,7 @@ import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.google.android.gms.location.Geofence;
+import com.google.android.gms.location.GeofenceStatusCodes;
 import com.google.android.gms.location.GeofencingEvent;
 
 import java.util.ArrayList;
@@ -46,7 +47,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
         GeofencingEvent geoFenceEvent = GeofencingEvent.fromIntent(intent);
 
         if (geoFenceEvent.hasError()) {
-            Log.e(Constants.TAG, "Location Services error: " + geoFenceEvent.getErrorCode());
+            Log.e(Constants.TAG, "Location Services error: " + GeofenceStatusCodes.getStatusCodeString(geoFenceEvent.getErrorCode()));
             return;
         }
 

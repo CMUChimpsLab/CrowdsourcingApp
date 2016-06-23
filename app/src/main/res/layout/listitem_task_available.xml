@@ -25,7 +25,7 @@
                 android:background="#ddd" />
 
             <TextView
-                android:id="@+id/task_name"
+                android:id="@+id/num_submitted_response"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_alignParentStart="true"
@@ -43,7 +43,7 @@
                 android:id="@+id/task_location"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_below="@id/task_name"
+                android:layout_below="@id/num_submitted_response"
                 android:paddingLeft="10dp"
                 android:paddingRight="10dp"
                 android:text="Task Location"
@@ -64,7 +64,7 @@
                 android:id="@+id/task_cost"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_above="@id/task_name"
+                android:layout_above="@id/num_submitted_response"
                 android:layout_alignParentEnd="true"
                 android:background="#33000000"
                 android:paddingBottom="10dp"

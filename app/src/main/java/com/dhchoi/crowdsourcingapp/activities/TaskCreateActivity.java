@@ -3,7 +3,6 @@ package com.dhchoi.crowdsourcingapp.activities;
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
 import android.content.Intent;
-import android.hardware.input.InputManager;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
@@ -13,12 +12,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.WindowManager;
-import android.view.inputmethod.InputMethodManager;
 import android.widget.Button;
+import android.widget.CheckBox;
+import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -49,7 +48,7 @@ public class TaskCreateActivity extends AppCompatActivity {
 
     private final int PLACE_PICKER_REQUEST = 1;
     private final PlacePicker.IntentBuilder mPlacePickerIntentBuilder = new PlacePicker.IntentBuilder();
-    private List<ViewGroup> mTaskActionLayouts = new ArrayList<ViewGroup>();
+    private List<ViewGroup> mTaskActionLayouts = new ArrayList<>();
     private String userId;
 
     private EditText mTaskName;
@@ -63,6 +62,8 @@ public class TaskCreateActivity extends AppCompatActivity {
     private Button mTimeAdd;
     private EditText mTimeText;
     private EditText mRefreshRate;
+    private EditText mAnswersLeft;
+    private CheckBox mEndlessAnswers;
     private Button mLocationAdd;
     private ViewGroup mTaskActionsContainer;
     private Button mTaskActionAdd;
@@ -80,7 +81,6 @@ public class TaskCreateActivity extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_task_create);
 
-        // TODO: check why back arrow has different behavior as back button
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
@@ -88,7 +88,7 @@ public class TaskCreateActivity extends AppCompatActivity {
         userId = UserManager.getUserId(this);
 
         // views
-        mTaskName = (EditText) findViewById(R.id.task_name);
+        mTaskName = (EditText) findViewById(R.id.num_submitted_response);
         mTaskCost = (EditText) findViewById(R.id.task_cost);
         mLocationName = (EditText) findViewById(R.id.location_name);
         mLocationLat = (EditText) findViewById(R.id.location_lat);
@@ -104,6 +104,8 @@ public class TaskCreateActivity extends AppCompatActivity {
         mTimeAdd = (Button) findViewById(R.id.time_add_btn);
         mTimeText = (EditText) findViewById(R.id.time_add_text);
         mRefreshRate = (EditText) findViewById(R.id.refresh_rate);
+        mAnswersLeft = (EditText) findViewById(R.id.answers_left);
+        mEndlessAnswers = (CheckBox) findViewById(R.id.endless_answers_check);
 
         // set OnClickListeners on buttons
         mDateAdd.setOnClickListener(new View.OnClickListener() {
@@ -151,9 +153,7 @@ public class TaskCreateActivity extends AppCompatActivity {
             public void onClick(View v) {
                 try {
                     startActivityForResult(mPlacePickerIntentBuilder.build(TaskCreateActivity.this), PLACE_PICKER_REQUEST);
-                } catch (GooglePlayServicesRepairableException e) {
-                    e.printStackTrace();
-                } catch (GooglePlayServicesNotAvailableException e) {
+                } catch (GooglePlayServicesRepairableException | GooglePlayServicesNotAvailableException e) {
                     e.printStackTrace();
                 }
             }
@@ -203,6 +203,15 @@ public class TaskCreateActivity extends AppCompatActivity {
                         }
                     }
                 }.execute();
+            }
+        });
+        mEndlessAnswers.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
+            @Override
+            public void onCheckedChanged(CompoundButton buttonView, boolean isChecked) {
+                if (isChecked)
+                    mAnswersLeft.setEnabled(false);
+                else
+                    mAnswersLeft.setEnabled(true);
             }
         });
 
@@ -267,6 +276,7 @@ public class TaskCreateActivity extends AppCompatActivity {
 //        userEntries.put("lat", mLocationLat.getText().toString());
 //        userEntries.put("lng", mLocationLng.getText().toString());
 //        userEntries.put("radius", mLocationRadius.getText().toString());
+//        userEntries.put("answersLeft", mEndlessAnswers.isChecked() ? "-1" : mAnswersLeft.getText().toString());
 
 //        int tagId = 0;
 //        for (ViewGroup taskActionViewGroup : mTaskActionLayouts) {
@@ -285,16 +295,21 @@ public class TaskCreateActivity extends AppCompatActivity {
         userEntries.put("userId", userId);
         userEntries.put("taskName", "Default task");
         userEntries.put("cost", "1");
-        userEntries.put("expiresAt", "Tomorrow");
+        userEntries.put("expiresAt", String.valueOf(new Date().getTime() + 1000 * 60 * 60 * 24));
         userEntries.put("refreshRate", "60");
+        userEntries.put("answersLeft", "-1");
         userEntries.put("locationName", "CMU");
         userEntries.put("lat", "40.4430");
         userEntries.put("lng", "-79.9455");
         userEntries.put("radius", "1000");
 
-        int tagId = 0;
-        String descriptionKey = "taskActions[" + tagId + "][description]";
-        String typeKey = "taskActions[" + tagId + "][type]";
+        String descriptionKey = "taskActions[" + 0 + "][description]";
+        String typeKey = "taskActions[" + 0 + "][type]";
+        userEntries.put(descriptionKey, "Default description");
+        userEntries.put(typeKey, "text");
+
+        descriptionKey = "taskActions[" + 1 + "][description]";
+        typeKey = "taskActions[" + 1 + "][type]";
         userEntries.put(descriptionKey, "Default description");
         userEntries.put(typeKey, "text");
 

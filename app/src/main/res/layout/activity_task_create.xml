@@ -48,14 +48,14 @@
                     android:orientation="vertical">
 
                     <TextView
-                        android:id="@+id/task_name_title"
+                        android:id="@+id/submitted_resp_title"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
                         android:text="Task Name"
                         android:textAppearance="?android:attr/textAppearanceLarge" />
 
                     <EditText
-                        android:id="@+id/task_name"
+                        android:id="@+id/num_submitted_response"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content" />
 
@@ -181,6 +181,7 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:inputType="numberDecimal"
+                    android:textAlignment="center"
                     android:text="60" />
 
                 <TextView
@@ -189,6 +190,44 @@
                     android:text=" minutes"
                     android:layout_weight="1"
                     android:textAppearance="?android:attr/textAppearanceMedium" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:orientation="horizontal">
+
+                <TextView
+                    android:id="@+id/answers_left_title"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="Total Answers: "
+                    android:layout_weight="1"
+                    android:textAppearance="?android:attr/textAppearanceMedium" />
+
+                <EditText
+                    android:id="@+id/answers_left"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_weight="1"
+                    android:inputType="number"
+                    android:textAlignment="center"
+                    android:text="1" />
+
+                <TextView
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="30dp"
+                    android:layout_weight=".3"
+                    android:text="Endless"/>
+
+                <CheckBox
+                    android:id="@+id/endless_answers_check"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="10dp"
+                    android:checked="false"/>
 
             </LinearLayout>
 
@@ -252,7 +291,7 @@
                 android:id="@+id/location_radius"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="location_radius"
+                android:text="1000"
                 android:visibility="gone" />
 
             <LinearLayout
@@ -282,9 +321,7 @@
                 android:id="@+id/task_actions_container"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:orientation="vertical">
-
-            </LinearLayout>
+                android:orientation="vertical" />
 
             <Button
                 android:id="@+id/submit_btn"
