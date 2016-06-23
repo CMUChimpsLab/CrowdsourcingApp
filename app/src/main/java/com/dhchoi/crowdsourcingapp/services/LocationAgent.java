@@ -88,10 +88,15 @@ public class LocationAgent extends IntentService {
     }
 
     public static void removeGeofence(Task task) {
-        if (task != null && !mGeofenceList.contains(task)) {
-            Log.d(TAG, "Removing Geofence " + task.getId() + "...");
-            // TODO: this remove doesn't work
-            mGeofenceList.remove(task);
+        if (task != null) {
+            String removeId = task.getId();
+            Log.d(TAG, "Removing Geofence " + removeId + "...");
+
+            for (int i = 0; i < mGeofenceList.size(); i++) {
+                if (mGeofenceList.get(i).getId().equals(removeId))
+                    mGeofenceList.remove(i);
+            }
+
             Log.d(TAG, "Geofences: " + mGeofenceList);
         }
     }

@@ -121,9 +121,9 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Toast.makeText(getActivity(), "Task Clicked", Toast.LENGTH_SHORT).show();
 
-                Intent intent = new Intent(getActivity(), TaskInfoActivity.class);
-                intent.putExtra("taskId", ((Task)mListCompletedTasks.getAdapter().getItem(position)).getId());
-                startActivity(intent);
+//                Intent intent = new Intent(getActivity(), TaskInfoActivity.class);
+//                intent.putExtra("taskId", ((Task)mListCompletedTasks.getAdapter().getItem(position)).getId());
+//                startActivity(intent);
             }
         });
         mNumCompletedTasksTitle = (LinearLayout) rootView.findViewById(R.id.num_completed_tasks_title_layout);
