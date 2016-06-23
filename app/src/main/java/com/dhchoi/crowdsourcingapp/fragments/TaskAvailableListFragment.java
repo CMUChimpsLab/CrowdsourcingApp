@@ -35,9 +35,11 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
     private TextView mActiveTasksNotice;
     private TextView mInactiveTasksNotice;
 
+    private static final String TAG = "TaskAvailableList";
+
     // task related
-    private List<Task> mActiveTasks = new ArrayList<Task>();
-    private List<Task> mInactiveTasks = new ArrayList<Task>();
+    private List<Task> mActiveTasks = new ArrayList<>();
+    private List<Task> mInactiveTasks = new ArrayList<>();
 
     public TaskAvailableListFragment() {
         // Required empty public constructor
@@ -86,7 +88,7 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
             updateNoticeTextViews();
         }
         else {
-            Log.d(Constants.TAG, "onTasksActivationUpdated was called before view was initialized");
+            Log.d(TAG, "onTasksActivationUpdated was called before view was initialized");
         }
     }
 

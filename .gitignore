@@ -1,3 +1,6 @@
+# Keys and secrets
+app/src/main/java/com/dhchoi/crowdsourcingapp/Constants.java
+
 ### Android template
 # Built application files
 *.apk
