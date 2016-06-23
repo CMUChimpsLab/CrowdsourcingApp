@@ -14,6 +14,7 @@ import android.widget.ArrayAdapter;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
+import android.widget.Toast;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.views.CustomListView;
@@ -167,6 +168,11 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
         public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
             Task task = (Task) parent.getItemAtPosition(position);
             Log.d(Constants.TAG, "clicked task: " + task);
+
+            if (task.isCompleted()) {
+                Toast.makeText(getActivity(), "You have answered this question", Toast.LENGTH_SHORT).show();
+                return;
+            }
 
             Intent intent = new Intent(getActivity(), TaskCompleteActivity.class);
             intent.putExtra(Task.TASK_KEY_SERIALIZABLE, task.getId());

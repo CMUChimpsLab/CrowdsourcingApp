@@ -51,7 +51,7 @@ public class LocationAgent extends IntentService {
         for (Task task : mGeofenceList) {
             LatLng existingLocation = task.getLocation().getLatLng();
 
-            Log.d(TAG, "Distance: " + getDistanceFromLatLng(newLocation, existingLocation) + " Radius: " + task.getRadius());
+            Log.d(TAG, "Task ID: " + task.getId() + " Distance: " + getDistanceFromLatLng(newLocation, existingLocation) + " Radius: " + task.getRadius());
 
             if ((int)getDistanceFromLatLng(newLocation, existingLocation) <= task.getRadius()) {
                 activatedTaskIds.add(task.getId());
@@ -88,8 +88,12 @@ public class LocationAgent extends IntentService {
     }
 
     public static void removeGeofence(Task task) {
-        if (task != null)
+        if (task != null && !mGeofenceList.contains(task)) {
+            Log.d(TAG, "Removing Geofence " + task.getId() + "...");
+            // TODO: this remove doesn't work
             mGeofenceList.remove(task);
+            Log.d(TAG, "Geofences: " + mGeofenceList);
+        }
     }
 
     public static void removeGeofences(Collection<Task> tasks) {

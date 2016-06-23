@@ -131,11 +131,14 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
                                 Toast.makeText(TaskCompleteActivity.this, "Response submitted!", Toast.LENGTH_SHORT).show();
                                 // update the time when the task was completed
                                 // TODO: use same value from server
-                                // TODO: update the task from server, mainly for answersLeft field
-//                                mTask.setCompletionTime(new Date().getTime());
+                                // update the task from server
+                                // mainly for answersLeft field, and answerers
+
+                                mTask.setCompleted(true);
                                 TaskManager.updateTask(TaskCompleteActivity.this, mTask);
                                 // exit activity
-                                TaskCompleteActivity.this.finish();
+                                setResult(MainActivity.RESPOND_SUCCESS);
+                                finish();
                             } else {
                                 Toast.makeText(TaskCompleteActivity.this, "Your request was ill-formatted. Please check inputs again.", Toast.LENGTH_SHORT).show();
                             }

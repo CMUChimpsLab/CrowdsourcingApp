@@ -41,6 +41,8 @@ import java.util.List;
 
 public class MainActivity extends BaseGoogleApiActivity implements TaskManager.OnSyncCompleteListener {
 
+    public static final int RESPOND_SUCCESS = 0x5221;
+
     /**
      * The {@link android.support.v4.view.PagerAdapter} that will provide
      * fragments for each of the sections. We use a
@@ -165,6 +167,8 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
                 Log.d(Constants.TAG, "Intent Sent from MainActivity");
             }
         };
+
+        TaskManager.addOnSyncCompleteListener(this);
     }
 
     @Override
@@ -256,6 +260,9 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
                         }
                     }
 
+                    Log.i(Constants.TAG, "Activated: " + mActiveTasks);
+                    Log.i(Constants.TAG, "Inactivated: " + mInactiveTasks);
+
                     triggerOnTasksUpdatedEvent();
                 } else {
                     Snackbar.make(currentFragmentView, "Failed to sync with server", Snackbar.LENGTH_LONG).show();
@@ -307,6 +314,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
 
     @Override
     public void onSyncComplete() {
+        Log.d("MainActivity", "Sync Complete");
         triggerOnTasksUpdatedEvent();
     }
 
@@ -354,25 +362,35 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
      * Add and remove the tasks in display
      */
     private void triggerOnTasksUpdatedEvent() {
+        Log.d(Constants.TAG, "Tasks updated event triggered");
+
         // remove geofence location tracking
         List<String> completedTaskIds = new ArrayList<>();
 
         // ignore completed tasks
+        List<Task> removeTasksList = new ArrayList<>();
         for (Task t : mActiveTasks) {
             if (t.isCompleted()) {
-                mActiveTasks.remove(t);
+                removeTasksList.add(t);
                 completedTaskIds.add(t.getId());
             }
         }
+        mActiveTasks.removeAll(removeTasksList);
+
+        removeTasksList.clear();
         for (Task t : mInactiveTasks) {
             if (t.isCompleted()) {
-                mInactiveTasks.remove(t);
+                removeTasksList.add(t);
                 completedTaskIds.add(t.getId());
             }
         }
+        mInactiveTasks.removeAll(removeTasksList);
 
-        if (completedTaskIds.size() > 0)
-            LocationServices.GeofencingApi.removeGeofences(getGoogleApiClient(), completedTaskIds);
+        if (completedTaskIds.size() > 0) {
+//            LocationServices.GeofencingApi.removeGeofences(getGoogleApiClient(), completedTaskIds);
+            for (String id : completedTaskIds)
+                LocationAgent.removeGeofence(TaskManager.getTaskById(this, id));
+        }
 
         for (OnTasksUpdatedListener onTasksUpdatedListener : onTasksUpdatedListeners) {
             onTasksUpdatedListener.onTasksActivationUpdated(mActiveTasks, mInactiveTasks);

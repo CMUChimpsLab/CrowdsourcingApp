@@ -7,6 +7,7 @@ import android.util.Log;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
+import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.dhchoi.crowdsourcingapp.services.LocationAgent;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
 import com.google.android.gms.common.api.GoogleApiClient;
@@ -44,7 +45,7 @@ public class TaskManager {
     private static final String JSON_FIELD_STATUS = "status";
     private static final String JSON_FIELD_STATUS_CREATED = "created";
     private static final String JSON_FIELD_STATUS_DELETED = "deleted";
-    // TODO: add UPDATE, RESPONSE_RETCH status in web code
+    // TODO: add UPDATE status in web code
     private static final String JSON_FIELD_STATUS_UPDATED = "updated";
     private static final String JSON_FIELD_TASK_ID = "taskId";
 
@@ -99,7 +100,7 @@ public class TaskManager {
     public static List<Task> getAllUnownedCompletedTasks(Context context) {
         String userId = UserManager.getUserId(context);
         if (userId.isEmpty()) {
-            return new ArrayList<Task>();
+            return new ArrayList<>();
         }
 
         List<Task> tasks = new ArrayList<>();
@@ -122,10 +123,10 @@ public class TaskManager {
     public static List<Task> getAllOwnedTasks(Context context) {
         String userId = UserManager.getUserId(context);
         if (userId.isEmpty()) {
-            return new ArrayList<Task>();
+            return new ArrayList<>();
         }
 
-        List<Task> tasks = new ArrayList<Task>();
+        List<Task> tasks = new ArrayList<>();
         for (String id : getSavedTaskIdsSet(context)) {
             Task t = getTaskById(context, id);
             if (t.getOwner().equals(userId)) {
@@ -144,7 +145,7 @@ public class TaskManager {
      */
     public static void reset(Context context, GoogleApiClient googleApiClient) {
         saveLastUpdatedTime(context, 0);
-        removeTasks(context, googleApiClient, new ArrayList<String>(getSavedTaskIdsSet(context)));
+        removeTasks(context, googleApiClient, new ArrayList<>(getSavedTaskIdsSet(context)));
     }
 
     /**
@@ -154,9 +155,8 @@ public class TaskManager {
      * @param task    to be updated
      */
     public static void updateTask(Context context, Task task) {
+        Log.d(TAG, "Updating task " + task.getId() + "...");
         getSharedPreferences(context).edit().putString(getTaskKeyById(task.getId()), new Gson().toJson(task)).apply();
-        for (OnSyncCompleteListener listener : mOnSyncCompleteListeners)
-            listener.onSyncComplete();
     }
 
     /**
@@ -174,19 +174,34 @@ public class TaskManager {
      *
      * @param context         of the app
      * @param googleApiClient to be used for Google services
-     * @param jsonArray       JSON array of {@link Task}s by its string representation
+     * @param fetchResponse       JSON array of {@link Task}s by its string representation
      * @throws SecurityException
      */
-    private static void setTasks(Context context, GoogleApiClient googleApiClient, String jsonArray) throws SecurityException {
+    private static void setTasks(Context context, GoogleApiClient googleApiClient, String fetchResponse) throws SecurityException {
+        Log.i(TAG, "Setting Tasks...");
         try {
             SharedPreferences.Editor prefsEditor = getSharedPreferences(context).edit();
             Set<String> savedTaskIdsSet = getSavedTaskIdsSet(context);  // all tasks save locally
             String userId = UserManager.getUserId(context);
 
             // create list of tasks from json string
-            List<Task> allTasks = new Gson().fromJson(jsonArray, new TypeToken<ArrayList<Task>>() {}.getType());
+            List<Task> allTasks = new Gson().fromJson(fetchResponse, new TypeToken<ArrayList<Task>>() {}.getType());
             List<Task> addedTasks = new ArrayList<>();      // also to be added as geofence
             List<Task> ownedTasks = new ArrayList<>();
+
+            for (Task t : allTasks) {
+                Log.d("Scanning Tasks", "Task ID: " + t.getId() + " #Responses: " + t.getTaskResponses().size());
+
+                for (TaskResponse taskResponse : t.getTaskResponses()) {
+                    String answererId = taskResponse.getUserId();
+                    Log.d("Scanning Responses",  "      User ID: " + answererId);
+
+                    if (answererId.equals(userId)) {        // I have answered it
+                        t.setCompleted(true);
+                        break;
+                    }
+                }
+            }
 
             for (Task t : allTasks) {
                 // save task id
@@ -207,7 +222,6 @@ public class TaskManager {
 //                            Log.d(TAG, "Geofence Result Callback " + status.getStatusMessage());
 //                        }
 //                    });
-
                     addedTasks.add(t);
                 } else {
                     ownedTasks.add(t);
@@ -215,12 +229,11 @@ public class TaskManager {
             }
 
             prefsEditor.putStringSet(TASK_KEY_ID_SET, savedTaskIdsSet).apply();
-
 //            for (OnSyncCompleteListener listener : mOnSyncCompleteListeners) {
 //               // update UI
 //            }
         } catch (Exception e) {
-            Log.e(TAG, e.getMessage());
+            e.printStackTrace();
         }
     }
 
@@ -290,12 +303,13 @@ public class TaskManager {
 
                 // fetch changes
                 if (appLastUpdatedTime < serverLastUpdatedTime) {   // updated earlier than latest server update
-                    Log.d(TAG, "start fetching changes");
+                    Log.d(TAG, "Start fetching changes");
 
                     // update appLastUpdatedTime to serverLastUpdatedTime
                     saveLastUpdatedTime(context, serverLastUpdatedTime);
 
                     List<String> tasksCreatedIds = new ArrayList<>();
+//                    List<String> tasksUpdatedIds = new ArrayList<>();
                     List<String> tasksDeletedIds = new ArrayList<>();
                     for (int i = 0; i < changes.length(); i++) {
                         String taskId = changes.getJSONObject(i).getString(JSON_FIELD_TASK_ID);
@@ -303,6 +317,10 @@ public class TaskManager {
                         if (taskStatus.equals(JSON_FIELD_STATUS_CREATED)) {
                             tasksCreatedIds.add(taskId);
                         }
+//                        if (taskStatus.equals(JSON_FIELD_STATUS_UPDATED)) {
+//                            tasksUpdatedIds.add(taskId);
+//                            // TODO:
+//                        }
                         if (taskStatus.equals(JSON_FIELD_STATUS_DELETED)) {
                             tasksDeletedIds.add(taskId);
                         }
@@ -316,28 +334,35 @@ public class TaskManager {
                             deletedIds.add(id);
                         }
                     }
+                    for (String id : deletedIds) {
+                        LocationAgent.removeGeofence(TaskManager.getTaskById(context, id));
+                    }
                     tasksDeletedIds.removeAll(deletedIds);
 
                     // remove deleted tasks
                     removeTasks(context, googleApiClient, tasksDeletedIds);
 
-                    // fetch and set new tasks
-                    Map<String, String> fetchParams = new HashMap<>();
-                    fetchParams.put(JSON_FIELD_TASK_ID, tasksCreatedIds.toString());
-                    String fetchResponse = HttpClientCallable.Executor.execute(new HttpClientCallable(Constants.APP_SERVER_TASK_FETCH_URL, HttpClientCallable.GET, fetchParams));
-                    if (fetchResponse != null) {
-                        setTasks(context, googleApiClient, fetchResponse);
-                        return true;
+                    // fetch and set new tasks (only when there are new tasks)
+                    if (tasksCreatedIds.size() > 0) {
+                        Map<String, String> fetchParams = new HashMap<>();
+                        fetchParams.put(JSON_FIELD_TASK_ID, tasksCreatedIds.toString());
+                        String fetchResponse = HttpClientCallable.Executor.execute(new HttpClientCallable(Constants.APP_SERVER_TASK_FETCH_URL, HttpClientCallable.GET, fetchParams));
+                        if (fetchResponse != null) {
+                            setTasks(context, googleApiClient, fetchResponse);
+                            return true;
+                        }
                     }
                 }
+
+//                for (OnSyncCompleteListener listener : mOnSyncCompleteListeners)
+//                    listener.onSyncComplete();
+
                 return true;
             }
+
         } catch (JSONException e) {
             Log.e(TAG, e.getMessage());
         }
-
-        for (OnSyncCompleteListener listener : mOnSyncCompleteListeners)
-            listener.onSyncComplete();
 
         return false;
     }

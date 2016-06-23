@@ -21,6 +21,12 @@ public class TaskAction implements Serializable {
     private String mDescription;
     @SerializedName("type")
     private TaskActionType mTaskActionType;
+    @SerializedName("createdAt")
+    private String mCreatedAt;
+    @SerializedName("updatedAt")
+    private String mUpdatedAt;
+    @SerializedName("taskId")
+    private String mTaskId;
 
     public TaskAction(String id, String description, TaskActionType taskActionType) {
         mId = id;
