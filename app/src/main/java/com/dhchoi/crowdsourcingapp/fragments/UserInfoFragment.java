@@ -66,7 +66,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
     private LinearLayout mNumCompletedTasksTitle;
     private SwipeRefreshLayout mSwipeRefresh;
 
-    private static final int TIME_OFFSET = (int) (-1000 * 3600 * 4.5);
+    private static final int TIME_OFFSET = -1000 * 3600 * 4;        // UTC to EST
 
     public UserInfoFragment() {
     }
@@ -124,12 +124,16 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         mListCompletedTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                String taskId = mCompletedTaskListAdapter.getItem(position).getId();
-                Bundle args = new Bundle();
-                args.putString("taskId", taskId);
+                try {
+                    String taskId = mCompletedTaskListAdapter.getItem(position).getId();
+                    Bundle args = new Bundle();
+                    args.putString("taskId", taskId);
 
-                DialogFragment fragment = ResponseInfoDialogFragment.newInstance(args);
-                fragment.show(getFragmentManager(), taskId);
+                    DialogFragment fragment = ResponseInfoDialogFragment.newInstance(args);
+                    fragment.show(getFragmentManager(), taskId);
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
             }
         });
         mNumCompletedTasksTitle = (LinearLayout) rootView.findViewById(R.id.num_completed_tasks_title_layout);
@@ -311,6 +315,9 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         }
     }
 
+    /***
+     * to display user's own response to a task
+     */
     private static class ResponseInfoDialogFragment extends DialogFragment {
 
         public static ResponseInfoDialogFragment newInstance(Bundle args) {
@@ -330,6 +337,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
             ((TextView)dialogView.findViewById(R.id.dialog_task_name)).setText(task.getName());
             ((TextView)dialogView.findViewById(R.id.dialog_task_cost)).setText(String.valueOf(task.getCost()));
 
+            // query for all owned answers and display
             ViewGroup taskResponseContainer = (ViewGroup) dialogView.findViewById(R.id.dialog_task_response_container);
             ArrayList<String> taskResponses = (ArrayList<String>) task.getMyResponses(UserManager.getUserId(getActivity()));
             for (String resp : taskResponses) {
