@@ -1,6 +1,7 @@
 package com.dhchoi.crowdsourcingapp.task;
 
 import com.dhchoi.crowdsourcingapp.SimpleGeofence;
+import com.dhchoi.crowdsourcingapp.user.UserManager;
 import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONArray;
@@ -108,6 +109,27 @@ public class Task implements Serializable {
     public Task setCompleted(boolean completed) {
         mIsComplete = completed;
         return this;
+    }
+
+    public List<String> getMyResponses(String answererId) {
+        ArrayList<String> myResponseStrings = new ArrayList<>();
+
+        JSONArray jsonArray = TaskManager.getTaskResponses(mId);
+        try {
+            for (int i = 0; i < jsonArray.length(); i++) {
+                if (jsonArray.getJSONObject(i).getString("userId").equals(answererId)) {
+                    // get all of my responses
+                    JSONArray myResponseList = jsonArray.getJSONObject(i).getJSONArray("taskactionresponses");
+                    for (int j = 0; j < myResponseList.length(); j++)
+                        myResponseStrings.add(myResponseList.getJSONObject(j).getString("response"));
+                    break;
+                }
+            }
+        } catch (JSONException e) {
+            e.printStackTrace();
+        }
+
+        return myResponseStrings;
     }
 
     @Override

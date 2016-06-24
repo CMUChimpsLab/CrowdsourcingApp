@@ -1,11 +1,15 @@
 package com.dhchoi.crowdsourcingapp.fragments;
 
+import android.app.AlertDialog;
+import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
@@ -24,6 +28,7 @@ import com.dhchoi.crowdsourcingapp.activities.TaskCreateActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskInfoActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
+import com.dhchoi.crowdsourcingapp.task.TaskResponse;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
 
 import org.json.JSONArray;
@@ -61,7 +66,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
     private LinearLayout mNumCompletedTasksTitle;
     private SwipeRefreshLayout mSwipeRefresh;
 
-    private static final int TIME_OFFSET = -1000 * 3600 * 4;
+    private static final int TIME_OFFSET = (int) (-1000 * 3600 * 4.5);
 
     public UserInfoFragment() {
     }
@@ -94,7 +99,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
                 Intent intent = new Intent(getActivity(), TaskInfoActivity.class);
-                intent.putExtra("taskId", ((Task) mListCreatedTasks.getAdapter().getItem(position)).getId());
+                intent.putExtra("taskId", mCreatedTaskListAdapter.getItem(position).getId());
                 startActivity(intent);
             }
         });
@@ -119,11 +124,12 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         mListCompletedTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                Toast.makeText(getActivity(), "Task Clicked", Toast.LENGTH_SHORT).show();
+                String taskId = mCompletedTaskListAdapter.getItem(position).getId();
+                Bundle args = new Bundle();
+                args.putString("taskId", taskId);
 
-//                Intent intent = new Intent(getActivity(), TaskInfoActivity.class);
-//                intent.putExtra("taskId", ((Task)mListCompletedTasks.getAdapter().getItem(position)).getId());
-//                startActivity(intent);
+                DialogFragment fragment = ResponseInfoDialogFragment.newInstance(args);
+                fragment.show(getFragmentManager(), taskId);
             }
         });
         mNumCompletedTasksTitle = (LinearLayout) rootView.findViewById(R.id.num_completed_tasks_title_layout);
@@ -305,4 +311,38 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         }
     }
 
+    private static class ResponseInfoDialogFragment extends DialogFragment {
+
+        public static ResponseInfoDialogFragment newInstance(Bundle args) {
+            ResponseInfoDialogFragment fragment = new ResponseInfoDialogFragment();
+            fragment.setArguments(args);
+
+            return fragment;
+        }
+
+        @NonNull
+        @Override
+        public Dialog onCreateDialog(Bundle savedInstanceState) {
+            Bundle args = getArguments();
+            Task task = TaskManager.getTaskById(getActivity(), args.getString("taskId"));
+
+            View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_task_info, null);
+            ((TextView)dialogView.findViewById(R.id.dialog_task_name)).setText(task.getName());
+            ((TextView)dialogView.findViewById(R.id.dialog_task_cost)).setText(String.valueOf(task.getCost()));
+
+            ViewGroup taskResponseContainer = (ViewGroup) dialogView.findViewById(R.id.dialog_task_response_container);
+            ArrayList<String> taskResponses = (ArrayList<String>) task.getMyResponses(UserManager.getUserId(getActivity()));
+            for (String resp : taskResponses) {
+                TextView responseTextView = new TextView(getActivity());
+                responseTextView.setTextSize(16);
+                responseTextView.setText(resp);
+                taskResponseContainer.addView(responseTextView);
+            }
+
+            return new AlertDialog.Builder(getActivity())
+                    .setView(dialogView)
+                    .setPositiveButton("Dismiss", null)
+                    .create();
+        }
+    }
 }
