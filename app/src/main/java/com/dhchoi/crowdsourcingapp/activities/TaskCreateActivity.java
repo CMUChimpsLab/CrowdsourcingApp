@@ -31,6 +31,7 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.json.JSONObject;
 
@@ -54,18 +55,18 @@ public class TaskCreateActivity extends AppCompatActivity {
     private List<ViewGroup> mTaskActionLayouts = new ArrayList<>();
     private String userId;
 
-    private EditText mTaskName;
-    private EditText mTaskCost;
+    private MaterialEditText mTaskName;
+    private MaterialEditText mTaskCost;
     private EditText mLocationName;
     private EditText mLocationLat;
     private EditText mLocationLng;
     private EditText mLocationRadius;
     private Button mDateAdd;
-    private EditText mDateText;
+    private MaterialEditText mDateText;
     private Button mTimeAdd;
-    private EditText mTimeText;
-    private EditText mRefreshRate;
-    private EditText mAnswersLeft;
+    private MaterialEditText mTimeText;
+    private MaterialEditText mRefreshRate;
+    private MaterialEditText mAnswersLeft;
     private CheckBox mEndlessAnswers;
     private Button mLocationAdd;
     private ViewGroup mTaskActionsContainer;
@@ -91,8 +92,8 @@ public class TaskCreateActivity extends AppCompatActivity {
         userId = UserManager.getUserId(this);
 
         // views
-        mTaskName = (EditText) findViewById(R.id.num_submitted_response);
-        mTaskCost = (EditText) findViewById(R.id.task_cost);
+        mTaskName = (MaterialEditText) findViewById(R.id.task_name);
+        mTaskCost = (MaterialEditText) findViewById(R.id.task_cost);
         mLocationName = (EditText) findViewById(R.id.location_name);
         mLocationLat = (EditText) findViewById(R.id.location_lat);
         mLocationLng = (EditText) findViewById(R.id.location_lng);
@@ -103,11 +104,11 @@ public class TaskCreateActivity extends AppCompatActivity {
         mSubmit = (Button) findViewById(R.id.submit_btn);
         mSubmitProgressBar = (ProgressBar) findViewById(R.id.submit_progress_bar);
         mDateAdd = (Button) findViewById(R.id.date_add_btn);
-        mDateText = (EditText) findViewById(R.id.date_add_text);
+        mDateText = (MaterialEditText) findViewById(R.id.date_add_text);
         mTimeAdd = (Button) findViewById(R.id.time_add_btn);
-        mTimeText = (EditText) findViewById(R.id.time_add_text);
-        mRefreshRate = (EditText) findViewById(R.id.refresh_rate);
-        mAnswersLeft = (EditText) findViewById(R.id.answers_left);
+        mTimeText = (MaterialEditText) findViewById(R.id.time_add_text);
+        mRefreshRate = (MaterialEditText) findViewById(R.id.refresh_rate);
+        mAnswersLeft = (MaterialEditText) findViewById(R.id.answers_left);
         mEndlessAnswers = (CheckBox) findViewById(R.id.endless_answers_check);
 
         // set OnClickListeners on buttons
@@ -285,7 +286,7 @@ public class TaskCreateActivity extends AppCompatActivity {
         for (ViewGroup taskActionViewGroup : mTaskActionLayouts) {
             String descriptionKey = "taskActions[" + tagId + "][description]";
             String typeKey = "taskActions[" + tagId + "][type]";
-            String descriptionValue = ((EditText) taskActionViewGroup.findViewById(R.id.action_description)).getText().toString();
+            String descriptionValue = ((MaterialEditText) taskActionViewGroup.findViewById(R.id.action_description)).getText().toString();
             String typeValue = ((Spinner) taskActionViewGroup.findViewById(R.id.action_type)).getSelectedItem().toString();
             if (!descriptionValue.isEmpty() && !typeValue.isEmpty()) {
                 userEntries.put(descriptionKey, descriptionValue);

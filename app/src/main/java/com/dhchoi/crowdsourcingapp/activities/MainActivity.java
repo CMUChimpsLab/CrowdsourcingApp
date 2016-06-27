@@ -242,6 +242,8 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
                 Fragment currentFragment = mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
                 View currentFragmentView = currentFragment.getView().findViewById(R.id.fragment_content);
 
+                final boolean[] success = {true};
+
                 if (syncSuccess) {
                     Snackbar.make(currentFragmentView, "Sync success!", Snackbar.LENGTH_LONG).show();
 
@@ -265,7 +267,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
 
                     triggerOnTasksUpdatedEvent();
                 } else {
-                    Snackbar.make(currentFragmentView, "Failed to sync with server", Snackbar.LENGTH_LONG).show();
+                    success[0] = false;
                 }
 
                 // after syncing tasks, sync the user
@@ -281,15 +283,18 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
                         Fragment currentFragment = mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
                         View currentFragmentView = currentFragment.getView().findViewById(R.id.fragment_content);
 
-                        if (syncSuccess) {
-                            Snackbar.make(currentFragmentView, "Sync success!", Snackbar.LENGTH_LONG).show();
-                            
+                        if (syncSuccess)
                             triggerOnUserUpdatedEvent();
-                        } else {
-                            Snackbar.make(currentFragmentView, "Failed to sync with server", Snackbar.LENGTH_LONG).show();
-                        }
+                        else
+                            success[0] = false;
                     }
                 }.execute();
+
+                if (success[0])
+                    Snackbar.make(currentFragmentView, "Sync success!", Snackbar.LENGTH_LONG).show();
+                else
+                    Snackbar.make(currentFragmentView, "Failed to sync with server", Snackbar.LENGTH_LONG).show();
+
             }
         }.execute();
 

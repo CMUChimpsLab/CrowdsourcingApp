@@ -131,6 +131,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
 
                     DialogFragment fragment = ResponseInfoDialogFragment.newInstance(args);
                     fragment.show(getFragmentManager(), taskId);
+
                 } catch (Exception e) {
                     e.printStackTrace();
                 }
