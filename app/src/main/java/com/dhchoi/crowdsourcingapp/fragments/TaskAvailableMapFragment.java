@@ -171,7 +171,7 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
         // remove previous markers
         mGoogleMap.clear();
 
-        List<Task> allTasks = new ArrayList<Task>();
+        List<Task> allTasks = new ArrayList<>();
         allTasks.addAll(mActiveTasks);
         allTasks.addAll(mInactiveTasks);
 
