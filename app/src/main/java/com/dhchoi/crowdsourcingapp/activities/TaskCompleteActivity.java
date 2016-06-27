@@ -129,7 +129,7 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
                             } else if (responseObj.getBoolean("result")) {
                                 Toast.makeText(TaskCompleteActivity.this, "Response submitted!", Toast.LENGTH_SHORT).show();
                                 // update the time when the task was completed
-                                // TODO: use same value from server
+                                // use same value from server ???
                                 // update the task from server
                                 // mainly for answersLeft field, and answerers
 
