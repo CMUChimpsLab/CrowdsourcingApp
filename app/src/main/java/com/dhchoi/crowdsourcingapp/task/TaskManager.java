@@ -7,8 +7,7 @@ import android.util.Log;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
-import com.dhchoi.crowdsourcingapp.activities.MainActivity;
-import com.dhchoi.crowdsourcingapp.services.LocationAgent;
+import com.dhchoi.crowdsourcingapp.services.GeofenceService;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
 import com.google.android.gms.common.api.GoogleApiClient;
 import com.google.android.gms.location.Geofence;
@@ -268,7 +267,7 @@ public class TaskManager {
             }
         }
 
-        LocationAgent.removeGeofences(removedTasks);
+        GeofenceService.removeGeofences(removedTasks);
 
         prefsEditor.putStringSet(TASK_KEY_ID_SET, savedTaskIdsSet).apply();
     }
@@ -335,7 +334,7 @@ public class TaskManager {
                         }
                     }
                     for (String id : deletedIds) {
-                        LocationAgent.removeGeofence(TaskManager.getTaskById(context, id));
+                        GeofenceService.removeGeofence(TaskManager.getTaskById(context, id));
                     }
                     tasksDeletedIds.removeAll(deletedIds);
 
