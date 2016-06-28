@@ -223,20 +223,35 @@
                     android:id="@+id/refresh_rate"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_weight="5"
+                    android:layout_weight="1"
                     android:inputType="numberDecimal"
                     android:textAlignment="center"
+                    android:paddingRight="10dp"
                     app:met_floatingLabel="highlight"
-                    app:met_floatingLabelText="Refresh Rate"
+                    app:met_floatingLabelText="Refresh Rate (min)"
                     app:met_floatingLabelAlwaysShown="true"
                     android:text="60" />
 
-                <TextView
+                <!--<TextView-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text=" minutes"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/location_radius"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:text=" minutes"
                     android:layout_weight="1"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:inputType="numberDecimal"
+                    android:textAlignment="center"
+                    android:paddingLeft="10dp"
+                    app:met_floatingLabel="highlight"
+                    app:met_floatingLabelText="Radius (m)"
+                    app:met_floatingLabelAlwaysShown="true"
+                    android:text="1000" />
+
 
             </LinearLayout>
 
@@ -341,12 +356,12 @@
                 android:text="location_lng"
                 android:visibility="gone" />
 
-            <EditText
-                android:id="@+id/location_radius"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1000"
-                android:visibility="gone" />
+            <!--<EditText-->
+                <!--android:id="@+id/location_radius"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="1000"-->
+                <!--android:visibility="gone" />-->
 
             <LinearLayout
                 android:layout_width="match_parent"

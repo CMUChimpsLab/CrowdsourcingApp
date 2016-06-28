@@ -60,7 +60,7 @@ public class TaskCreateActivity extends AppCompatActivity {
     private EditText mLocationName;
     private EditText mLocationLat;
     private EditText mLocationLng;
-    private EditText mLocationRadius;
+    private MaterialEditText mLocationRadius;
     private Button mDateAdd;
     private MaterialEditText mDateText;
     private Button mTimeAdd;
@@ -97,7 +97,7 @@ public class TaskCreateActivity extends AppCompatActivity {
         mLocationName = (EditText) findViewById(R.id.location_name);
         mLocationLat = (EditText) findViewById(R.id.location_lat);
         mLocationLng = (EditText) findViewById(R.id.location_lng);
-        mLocationRadius = (EditText) findViewById(R.id.location_radius);
+        mLocationRadius = (MaterialEditText) findViewById(R.id.location_radius);
         mLocationAdd = (Button) findViewById(R.id.location_add_btn);
         mTaskActionsContainer = (ViewGroup) findViewById(R.id.task_actions_container);
         mTaskActionAdd = (Button) findViewById(R.id.task_action_add_btn);
