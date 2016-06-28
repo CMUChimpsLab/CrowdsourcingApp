@@ -4,8 +4,8 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:paddingLeft="16dp"
-    android:paddingRight="16dp">
+    android:paddingLeft="32dp"
+    android:paddingRight="32dp">
 
     <TextView
         android:id="@+id/dialog_task_name"
@@ -40,6 +40,7 @@
         android:textAlignment="center"
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:layout_below="@+id/dialog_task_cost"
+        android:layout_marginTop="10dp"
         android:text="My Responses" />
 
     <LinearLayout
