@@ -34,6 +34,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.json.JSONObject;
 
@@ -101,8 +102,13 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
         for (TaskAction taskAction : mTask.getTaskActions()) {
             if (taskAction.getType() == TaskAction.TaskActionType.TEXT) {
                 View taskActionLayout = LayoutInflater.from(this).inflate(R.layout.task_action_text_complete, null);
-                ((TextView) taskActionLayout.findViewById(R.id.task_action_description)).setText(taskAction.getDescription());
-                taskActionLayout.findViewById(R.id.task_action_response).setTag(taskAction.getId());
+
+//                ((TextView) taskActionLayout.findViewById(R.id.task_action_description)).setText(taskAction.getDescription());
+
+                MaterialEditText materialEditText = (MaterialEditText) taskActionLayout.findViewById(R.id.task_action_response);
+                materialEditText.setFloatingLabelText(taskAction.getDescription());
+                materialEditText.setTag(taskAction.getId());
+
                 mTaskActionLayouts.add((ViewGroup) taskActionLayout);
                 taskActionsLayout.addView(taskActionLayout);
             }

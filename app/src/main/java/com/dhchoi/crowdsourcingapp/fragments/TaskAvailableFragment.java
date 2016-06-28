@@ -22,6 +22,8 @@ public class TaskAvailableFragment extends Fragment {
     private TaskAvailableMapFragment mTaskAvailableMapFragment = new TaskAvailableMapFragment();
     private TaskAvailableListFragment mTaskAvailableListFragment = new TaskAvailableListFragment();
 
+    private FloatingActionButton fab;
+
     public TaskAvailableFragment() {
         // Required empty public constructor
     }
@@ -35,12 +37,11 @@ public class TaskAvailableFragment extends Fragment {
         View mRootView = inflater.inflate(R.layout.fragment_task_available, container, false);
         getChildFragmentManager().beginTransaction().replace(R.id.task_view_container, isMapShown ? mTaskAvailableMapFragment : mTaskAvailableListFragment).commit();
 
-        FloatingActionButton fab = (FloatingActionButton) mRootView.findViewById(R.id.fab);
+        fab = (FloatingActionButton) mRootView.findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 swapFragments();
-                isMapShown = !isMapShown;
             }
         });
 
@@ -52,6 +53,11 @@ public class TaskAvailableFragment extends Fragment {
                 // .setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
                 .replace(R.id.task_view_container, !isMapShown ? mTaskAvailableMapFragment : mTaskAvailableListFragment)
                 .commit();
+        isMapShown = !isMapShown;
+        if (fab.isShown())
+            fab.hide();
+        else
+            fab.show();
     }
 
     public TaskAvailableMapFragment getTaskAvailableMapFragment() {

@@ -2,19 +2,24 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:paddingTop="10dp"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
     android:orientation="vertical">
 
-    <TextView
-        android:id="@+id/task_action_description"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Task Action Description"
-        android:textAppearance="?android:attr/textAppearanceMedium" />
+    <!--<TextView-->
+        <!--android:id="@+id/task_action_description"-->
+        <!--android:layout_width="wrap_content"-->
+        <!--android:layout_height="wrap_content"-->
+        <!--android:text="Task Action Description"-->
+        <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
 
-    <EditText
+    <com.rengwuxian.materialedittext.MaterialEditText
         android:id="@+id/task_action_response"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        app:met_floatingLabel="highlight"
+        app:met_floatingLabelText="Action Response"
+        app:met_floatingLabelAlwaysShown="true"
         android:hint="Task Action Response" />
 
 </LinearLayout>
