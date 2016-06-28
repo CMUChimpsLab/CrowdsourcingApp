@@ -117,6 +117,7 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
             ((TextView) convertView.findViewById(R.id.num_submitted_response)).setText(task.getName());
             ((TextView) convertView.findViewById(R.id.task_location)).setText(task.getLocation().getName());
             ((TextView) convertView.findViewById(R.id.task_cost)).setText("$" + task.getCost());
+
             // set remaining time
             String expiresAtText = "";
             Calendar currentTime = Calendar.getInstance();
