@@ -150,7 +150,7 @@
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/date_add_text"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
                     app:met_floatingLabel="highlight"
@@ -162,11 +162,11 @@
                 <Button
                     android:id="@+id/date_add_btn"
                     style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:textColor="@color/colorAccent"
+                    android:textColor="@color/colorPrimary"
                     android:text="Select" />
 
             </LinearLayout>
@@ -186,7 +186,7 @@
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/time_add_text"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="3"
                     app:met_floatingLabel="highlight"
@@ -198,10 +198,10 @@
                     android:id="@+id/time_add_btn"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_weight="1"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:textColor="@color/colorAccent"
+                    android:textColor="@color/colorPrimary"
                     android:text="Select" />
 
             </LinearLayout>
@@ -221,7 +221,7 @@
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/refresh_rate"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:inputType="numberDecimal"
@@ -241,7 +241,7 @@
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/location_radius"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:inputType="numberDecimal"
@@ -270,7 +270,7 @@
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/answers_left"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="5"
                     android:inputType="number"
@@ -281,10 +281,10 @@
                     android:text="1" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="30dp"
-                    android:layout_weight=".3"
+                    android:layout_weight="1.5"
                     android:text="Endless"/>
 
                 <CheckBox
@@ -292,6 +292,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
+                    android:imeActionLabel="Endless"
                     android:checked="false"/>
 
             </LinearLayout>
@@ -316,7 +317,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:textColor="@color/colorAccent"
+                    android:textColor="@color/colorPrimary"
                     android:text="Pick" />
 
             </LinearLayout>
@@ -383,7 +384,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:background="?android:attr/selectableItemBackgroundBorderless"
-                    android:textColor="@color/colorAccent"
+                    android:textColor="@color/colorPrimary"
                     android:text="Add" />
 
             </LinearLayout>
