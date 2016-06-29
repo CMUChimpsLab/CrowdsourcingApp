@@ -17,9 +17,9 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
-public class LocationAgent extends IntentService {
+public class GeofenceService extends IntentService {
 
-    private static final String TAG = "LocationAgent";
+    private static final String TAG = "GeofenceService";
 
     public static final String LOCATION_AGENT_BROADCAST = Constants.PACKAGE_NAME + ".LOCATION_AGENT_BROADCAST";
     public static final String ACTIVATED_TASK_ID_KEY = Constants.PACKAGE_NAME + ".ACTIVATED_TASK_ID_KEY";
@@ -32,7 +32,7 @@ public class LocationAgent extends IntentService {
      *
      * Used to name the worker thread, important only for debugging.
      */
-    public LocationAgent() {
+    public GeofenceService() {
         super(TAG);
     }
 

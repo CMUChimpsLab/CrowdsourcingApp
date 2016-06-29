@@ -23,7 +23,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.dhchoi.crowdsourcingapp.Constants;
-import com.dhchoi.crowdsourcingapp.services.LocationAgent;
+import com.dhchoi.crowdsourcingapp.services.GeofenceService;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.fragments.CrowdActivityFragment;
 import com.dhchoi.crowdsourcingapp.fragments.TaskAvailableFragment;
@@ -64,8 +64,8 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         public void onReceive(Context context, Intent intent) {
             Log.d(Constants.TAG, "Broadcast Received");
 
-            ArrayList<String> activatedTaskIds = intent.getStringArrayListExtra(LocationAgent.ACTIVATED_TASK_ID_KEY);
-            ArrayList<String> inactivatedTaskIds = intent.getStringArrayListExtra(LocationAgent.INACTIVATED_TASK_ID_KEY);
+            ArrayList<String> activatedTaskIds = intent.getStringArrayListExtra(GeofenceService.ACTIVATED_TASK_ID_KEY);
+            ArrayList<String> inactivatedTaskIds = intent.getStringArrayListExtra(GeofenceService.INACTIVATED_TASK_ID_KEY);
 
             Log.d(Constants.TAG, "Activated: " + activatedTaskIds.toString());
             Log.d(Constants.TAG, "Inactivated: " + inactivatedTaskIds.toString());
@@ -110,7 +110,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         }
     };
 
-    private LocationAgent.LocationChangeListener LocationListener;
+    private GeofenceService.LocationChangeListener LocationListener;
 
     private TaskAvailableFragment mTaskAvailableFragment = TaskAvailableFragment.newInstance();
     private CrowdActivityFragment mCrowdActivityFragment = CrowdActivityFragment.newInstance();
@@ -153,14 +153,14 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
 
         // Register to receive messages.
 //        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceTransitionsIntentService.GEOFENCE_TRANSITION_BROADCAST));
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(LocationAgent.LOCATION_AGENT_BROADCAST));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceService.LOCATION_AGENT_BROADCAST));
 
-        LocationListener = new LocationAgent.LocationChangeListener() {
+        LocationListener = new GeofenceService.LocationChangeListener() {
             @Override
             public void onLocationChanged(Location location) {
                 super.onLocationChanged(location);  // print log
 
-                Intent intent = new Intent(MainActivity.this, LocationAgent.class);
+                Intent intent = new Intent(MainActivity.this, GeofenceService.class);
                 String latLngStr = new Gson().toJson(new LatLng(location.getLatitude(), location.getLongitude()));
                 intent.setData(Uri.parse(latLngStr));
                 startService(intent);
@@ -242,13 +242,15 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
                 Fragment currentFragment = mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
                 View currentFragmentView = currentFragment.getView().findViewById(R.id.fragment_content);
 
+                final boolean[] success = {true};
+
                 if (syncSuccess) {
                     Snackbar.make(currentFragmentView, "Sync success!", Snackbar.LENGTH_LONG).show();
 
                     // broadcast tasks to listeners
                     List<Task> allIncompleteTasks = TaskManager.getAllUnownedIncompleteTasks(MainActivity.this);
 
-                    LocationAgent.addGeofences(allIncompleteTasks);
+                    GeofenceService.addGeofences(allIncompleteTasks);
 
                     mActiveTasks = new ArrayList<>();
                     mInactiveTasks = new ArrayList<>();
@@ -265,7 +267,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
 
                     triggerOnTasksUpdatedEvent();
                 } else {
-                    Snackbar.make(currentFragmentView, "Failed to sync with server", Snackbar.LENGTH_LONG).show();
+                    success[0] = false;
                 }
 
                 // after syncing tasks, sync the user
@@ -281,15 +283,18 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
                         Fragment currentFragment = mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
                         View currentFragmentView = currentFragment.getView().findViewById(R.id.fragment_content);
 
-                        if (syncSuccess) {
-                            Snackbar.make(currentFragmentView, "Sync success!", Snackbar.LENGTH_LONG).show();
-                            
+                        if (syncSuccess)
                             triggerOnUserUpdatedEvent();
-                        } else {
-                            Snackbar.make(currentFragmentView, "Failed to sync with server", Snackbar.LENGTH_LONG).show();
-                        }
+                        else
+                            success[0] = false;
                     }
                 }.execute();
+
+                if (success[0])
+                    Snackbar.make(currentFragmentView, "Sync success!", Snackbar.LENGTH_LONG).show();
+                else
+                    Snackbar.make(currentFragmentView, "Failed to sync with server", Snackbar.LENGTH_LONG).show();
+
             }
         }.execute();
 
@@ -389,7 +394,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         if (completedTaskIds.size() > 0) {
 //            LocationServices.GeofencingApi.removeGeofences(getGoogleApiClient(), completedTaskIds);
             for (String id : completedTaskIds)
-                LocationAgent.removeGeofence(TaskManager.getTaskById(this, id));
+                GeofenceService.removeGeofence(TaskManager.getTaskById(this, id));
         }
 
         for (OnTasksUpdatedListener onTasksUpdatedListener : onTasksUpdatedListeners) {

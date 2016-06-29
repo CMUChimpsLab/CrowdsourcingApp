@@ -39,25 +39,49 @@
             <LinearLayout
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
+                android:layout_gravity="center_vertical">
+
+                <TextView
+                    android:id="@+id/task_info"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="15dp"
+                    android:text="Task Info"
+                    android:textAppearance="?android:attr/textAppearanceLarge" />
+
+            </LinearLayout>
+
+            <LinearLayout
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:gravity="top">
 
                 <LinearLayout
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="8"
+                    android:paddingRight="5dp"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/submitted_resp_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Task Name"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
+                    <!--<TextView-->
+                        <!--android:id="@+id/task_name_title"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:text="Task Name"-->
+                        <!--android:textAppearance="?android:attr/textAppearanceLarge" />-->
 
-                    <EditText
-                        android:id="@+id/num_submitted_response"
+                    <!--<EditText-->
+                        <!--android:id="@+id/task_name"-->
+                        <!--android:layout_width="match_parent"-->
+                        <!--android:layout_height="wrap_content" />-->
+
+                    <com.rengwuxian.materialedittext.MaterialEditText
+                        android:id="@+id/task_name"
                         android:layout_width="match_parent"
-                        android:layout_height="wrap_content" />
+                        android:layout_height="wrap_content"
+                        android:hint="Task Name"
+                        app:met_floatingLabel="highlight"
+                        app:met_floatingLabelText="Task Name" />
 
                 </LinearLayout>
 
@@ -67,19 +91,29 @@
                     android:layout_weight="2"
                     android:orientation="vertical">
 
-                    <TextView
-                        android:id="@+id/task_cost_title"
-                        android:layout_width="wrap_content"
-                        android:layout_height="wrap_content"
-                        android:text="Cost"
-                        android:textAppearance="?android:attr/textAppearanceLarge" />
+                    <!--<TextView-->
+                        <!--android:id="@+id/task_cost_title"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:text="Cost"-->
+                        <!--android:textAppearance="?android:attr/textAppearanceLarge" />-->
 
-                    <EditText
+                    <!--<EditText-->
+                        <!--android:id="@+id/task_cost"-->
+                        <!--android:layout_width="wrap_content"-->
+                        <!--android:layout_height="wrap_content"-->
+                        <!--android:ems="8"-->
+                        <!--android:inputType="numberDecimal" />-->
+
+                    <com.rengwuxian.materialedittext.MaterialEditText
                         android:id="@+id/task_cost"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
+                        android:hint="Cost"
                         android:ems="8"
-                        android:inputType="numberDecimal" />
+                        android:inputType="numberDecimal"
+                        app:met_floatingLabel="highlight"
+                        app:met_floatingLabelText="Cost" />
 
                 </LinearLayout>
 
@@ -106,28 +140,33 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/date_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Date: "
-                    android:layout_weight="1"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                <!--<TextView-->
+                    <!--android:id="@+id/date_title"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="Date: "-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
 
-                <EditText
+                <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/date_add_text"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="Select from button." />
+                    android:layout_weight="3"
+                    app:met_floatingLabel="highlight"
+                    app:met_floatingLabelText="Date"
+                    android:singleLine="true"
+                    android:hint="Date" />
 
 
                 <Button
                     android:id="@+id/date_add_btn"
                     style="?android:attr/buttonStyleSmall"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:textColor="@color/colorPrimary"
                     android:text="Select" />
 
             </LinearLayout>
@@ -137,27 +176,32 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/time_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Time: "
-                    android:layout_weight="1"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                <!--<TextView-->
+                    <!--android:id="@+id/time_title"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="Time: "-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
 
-                <EditText
+                <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/time_add_text"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
-                    android:hint="Select from button." />
+                    android:layout_weight="3"
+                    app:met_floatingLabel="highlight"
+                    app:met_floatingLabelText="Time"
+                    android:singleLine="true"
+                    android:hint="Time" />
 
                 <Button
                     android:id="@+id/time_add_btn"
                     style="?android:attr/buttonStyleSmall"
                     android:layout_weight="1"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:textColor="@color/colorPrimary"
                     android:text="Select" />
 
             </LinearLayout>
@@ -167,29 +211,47 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/refresh_rate_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Refresh Rate: "
-                    android:layout_weight="1"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                <!--<TextView-->
+                    <!--android:id="@+id/refresh_rate_title"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="Refresh Rate: "-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
 
-                <EditText
+                <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/refresh_rate"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_weight="1"
                     android:inputType="numberDecimal"
                     android:textAlignment="center"
+                    android:paddingRight="10dp"
+                    app:met_floatingLabel="highlight"
+                    app:met_floatingLabelText="Refresh Rate (min)"
+                    app:met_floatingLabelAlwaysShown="true"
                     android:text="60" />
 
-                <TextView
-                    android:layout_width="wrap_content"
+                <!--<TextView-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text=" minutes"-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
+
+                <com.rengwuxian.materialedittext.MaterialEditText
+                    android:id="@+id/location_radius"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:text=" minutes"
                     android:layout_weight="1"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                    android:inputType="numberDecimal"
+                    android:textAlignment="center"
+                    android:paddingLeft="10dp"
+                    app:met_floatingLabel="highlight"
+                    app:met_floatingLabelText="Radius (m)"
+                    app:met_floatingLabelAlwaysShown="true"
+                    android:text="1000" />
+
 
             </LinearLayout>
 
@@ -198,28 +260,31 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <TextView
-                    android:id="@+id/answers_left_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Total Answers: "
-                    android:layout_weight="1"
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                <!--<TextView-->
+                    <!--android:id="@+id/answers_left_title"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="Total Answers: "-->
+                    <!--android:layout_weight="1"-->
+                    <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
 
-                <EditText
+                <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/answers_left"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_weight="1"
+                    android:layout_weight="5"
                     android:inputType="number"
                     android:textAlignment="center"
+                    app:met_floatingLabel="highlight"
+                    app:met_floatingLabelText="Total Answers"
+                    app:met_floatingLabelAlwaysShown="true"
                     android:text="1" />
 
                 <TextView
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="30dp"
-                    android:layout_weight=".3"
+                    android:layout_weight="1.5"
                     android:text="Endless"/>
 
                 <CheckBox
@@ -227,6 +292,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="10dp"
+                    android:imeActionLabel="Endless"
                     android:checked="false"/>
 
             </LinearLayout>
@@ -250,6 +316,8 @@
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:textColor="@color/colorPrimary"
                     android:text="Pick" />
 
             </LinearLayout>
@@ -258,18 +326,20 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <TextView
-                    android:id="@+id/location_name_title"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:text="Name: "
-                    android:textAppearance="?android:attr/textAppearanceMedium" />
+                <!--<TextView-->
+                    <!--android:id="@+id/location_name_title"-->
+                    <!--android:layout_width="wrap_content"-->
+                    <!--android:layout_height="wrap_content"-->
+                    <!--android:text="Name: "-->
+                    <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
 
-                <EditText
+                <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/location_name"
                     android:layout_width="match_parent"
                     android:layout_height="wrap_content"
-                    android:hint="Pick by choosing from the map." />
+                    app:met_floatingLabel="highlight"
+                    app:met_floatingLabelText="Location"
+                    android:hint="Pick by choosing from the map" />
 
             </LinearLayout>
 
@@ -287,12 +357,12 @@
                 android:text="location_lng"
                 android:visibility="gone" />
 
-            <EditText
-                android:id="@+id/location_radius"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="1000"
-                android:visibility="gone" />
+            <!--<EditText-->
+                <!--android:id="@+id/location_radius"-->
+                <!--android:layout_width="wrap_content"-->
+                <!--android:layout_height="wrap_content"-->
+                <!--android:text="1000"-->
+                <!--android:visibility="gone" />-->
 
             <LinearLayout
                 android:layout_width="match_parent"
@@ -313,6 +383,8 @@
                     style="?android:attr/buttonStyleSmall"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:background="?android:attr/selectableItemBackground"
+                    android:textColor="@color/colorPrimary"
                     android:text="Add" />
 
             </LinearLayout>
@@ -325,11 +397,11 @@
 
             <Button
                 android:id="@+id/submit_btn"
-                style="?android:attr/buttonStyle"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginTop="30dp"
+                android:background="?android:attr/selectableItemBackground"
                 android:text="Submit" />
 
             <ProgressBar

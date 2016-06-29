@@ -52,11 +52,11 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
     private final int ZOOM_LEVEL = 13;
     private GoogleMap mGoogleMap;
     private Circle mCurrentVisibleCircle = null;
-    private Map<Marker, Task> mMarkerToTask = new HashMap<Marker, Task>();
+    private Map<Marker, Task> mMarkerToTask = new HashMap<>();
 
     // task related
-    private List<Task> mActiveTasks = new ArrayList<Task>();
-    private List<Task> mInactiveTasks = new ArrayList<Task>();
+    private List<Task> mActiveTasks = new ArrayList<>();
+    private List<Task> mInactiveTasks = new ArrayList<>();
 
     public TaskAvailableMapFragment() {
         super();
@@ -75,6 +75,10 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
         mGoogleMap = googleMap;
         UiSettings settings = mGoogleMap.getUiSettings();
         settings.setAllGesturesEnabled(true);
+        settings.setCompassEnabled(true);
+        settings.setMyLocationButtonEnabled(true);
+        settings.setZoomControlsEnabled(true);
+        settings.setIndoorLevelPickerEnabled(true);
         mGoogleMap.setOnMarkerClickListener(new GoogleMap.OnMarkerClickListener() {
             @Override
             public boolean onMarkerClick(Marker marker) {
@@ -171,7 +175,7 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
         // remove previous markers
         mGoogleMap.clear();
 
-        List<Task> allTasks = new ArrayList<Task>();
+        List<Task> allTasks = new ArrayList<>();
         allTasks.addAll(mActiveTasks);
         allTasks.addAll(mInactiveTasks);
 

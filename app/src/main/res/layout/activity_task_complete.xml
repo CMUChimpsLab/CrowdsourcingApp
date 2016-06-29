@@ -71,6 +71,7 @@
             android:layout_below="@id/task_actions"
             android:layout_centerHorizontal="true"
             android:layout_marginTop="32dp"
+            android:background="?android:attr/selectableItemBackground"
             android:text="Submit Response" />
 
         <ProgressBar

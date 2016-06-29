@@ -77,7 +77,7 @@ public class TaskInfoActivity extends AppCompatActivity {
         mDeactivateTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(TaskInfoActivity.this, "Deactivate Activity", Toast.LENGTH_SHORT).show();
+                Toast.makeText(TaskInfoActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
             }
         });
         mDeleteTask.setOnClickListener(new View.OnClickListener() {

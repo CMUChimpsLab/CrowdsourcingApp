@@ -24,7 +24,7 @@ import android.widget.Toast;
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientAsyncTask;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
-import com.dhchoi.crowdsourcingapp.services.LocationAgent;
+import com.dhchoi.crowdsourcingapp.services.GeofenceService;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskAction;
@@ -34,11 +34,11 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.json.JSONObject;
 
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -57,8 +57,8 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Broadcast Received");
 
-            ArrayList<String> activatedTaskIds = intent.getStringArrayListExtra(LocationAgent.ACTIVATED_TASK_ID_KEY);
-            ArrayList<String> inactivatedTaskIds = intent.getStringArrayListExtra(LocationAgent.INACTIVATED_TASK_ID_KEY);
+            ArrayList<String> activatedTaskIds = intent.getStringArrayListExtra(GeofenceService.ACTIVATED_TASK_ID_KEY);
+            ArrayList<String> inactivatedTaskIds = intent.getStringArrayListExtra(GeofenceService.INACTIVATED_TASK_ID_KEY);
 
             Log.d(TAG, "Activated: " + activatedTaskIds.toString());
             Log.d(TAG, "Inactivated: " + inactivatedTaskIds.toString());
@@ -75,7 +75,7 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
         }
     };
 
-    private LocationAgent.LocationChangeListener locationListener;
+    private GeofenceService.LocationChangeListener locationListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -102,8 +102,13 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
         for (TaskAction taskAction : mTask.getTaskActions()) {
             if (taskAction.getType() == TaskAction.TaskActionType.TEXT) {
                 View taskActionLayout = LayoutInflater.from(this).inflate(R.layout.task_action_text_complete, null);
-                ((TextView) taskActionLayout.findViewById(R.id.task_action_description)).setText(taskAction.getDescription());
-                taskActionLayout.findViewById(R.id.task_action_response).setTag(taskAction.getId());
+
+//                ((TextView) taskActionLayout.findViewById(R.id.task_action_description)).setText(taskAction.getDescription());
+
+                MaterialEditText materialEditText = (MaterialEditText) taskActionLayout.findViewById(R.id.task_action_response);
+                materialEditText.setFloatingLabelText(taskAction.getDescription());
+                materialEditText.setTag(taskAction.getId());
+
                 mTaskActionLayouts.add((ViewGroup) taskActionLayout);
                 taskActionsLayout.addView(taskActionLayout);
             }
@@ -130,7 +135,7 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
                             } else if (responseObj.getBoolean("result")) {
                                 Toast.makeText(TaskCompleteActivity.this, "Response submitted!", Toast.LENGTH_SHORT).show();
                                 // update the time when the task was completed
-                                // TODO: use same value from server
+                                // use same value from server ???
                                 // update the task from server
                                 // mainly for answersLeft field, and answerers
 
@@ -154,14 +159,14 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
 
         // Register to receive messages.
 //        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceTransitionsIntentService.GEOFENCE_TRANSITION_BROADCAST));
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(LocationAgent.LOCATION_AGENT_BROADCAST));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceService.LOCATION_AGENT_BROADCAST));
 
-        locationListener = new LocationAgent.LocationChangeListener() {
+        locationListener = new GeofenceService.LocationChangeListener() {
             @Override
             public void onLocationChanged(Location location) {
                 super.onLocationChanged(location);      // print log
 
-                Intent intent = new Intent(TaskCompleteActivity.this, LocationAgent.class);
+                Intent intent = new Intent(TaskCompleteActivity.this, GeofenceService.class);
                 String latLngStr = new Gson().toJson(new LatLng(location.getLatitude(), location.getLongitude()));
                 intent.setData(Uri.parse(latLngStr));
                 startService(intent);

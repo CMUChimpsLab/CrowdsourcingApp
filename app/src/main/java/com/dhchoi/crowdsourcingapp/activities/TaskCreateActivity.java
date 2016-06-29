@@ -18,6 +18,7 @@ import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
 
@@ -30,6 +31,7 @@ import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
 import com.google.android.gms.location.places.Place;
 import com.google.android.gms.location.places.ui.PlacePicker;
+import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.json.JSONObject;
 
@@ -46,23 +48,25 @@ import java.util.TimeZone;
 
 public class TaskCreateActivity extends AppCompatActivity {
 
+    private static final String TAG = "TaskCreate";
+
     private final int PLACE_PICKER_REQUEST = 1;
     private final PlacePicker.IntentBuilder mPlacePickerIntentBuilder = new PlacePicker.IntentBuilder();
     private List<ViewGroup> mTaskActionLayouts = new ArrayList<>();
     private String userId;
 
-    private EditText mTaskName;
-    private EditText mTaskCost;
+    private MaterialEditText mTaskName;
+    private MaterialEditText mTaskCost;
     private EditText mLocationName;
     private EditText mLocationLat;
     private EditText mLocationLng;
-    private EditText mLocationRadius;
+    private MaterialEditText mLocationRadius;
     private Button mDateAdd;
-    private EditText mDateText;
+    private MaterialEditText mDateText;
     private Button mTimeAdd;
-    private EditText mTimeText;
-    private EditText mRefreshRate;
-    private EditText mAnswersLeft;
+    private MaterialEditText mTimeText;
+    private MaterialEditText mRefreshRate;
+    private MaterialEditText mAnswersLeft;
     private CheckBox mEndlessAnswers;
     private Button mLocationAdd;
     private ViewGroup mTaskActionsContainer;
@@ -88,23 +92,23 @@ public class TaskCreateActivity extends AppCompatActivity {
         userId = UserManager.getUserId(this);
 
         // views
-        mTaskName = (EditText) findViewById(R.id.num_submitted_response);
-        mTaskCost = (EditText) findViewById(R.id.task_cost);
+        mTaskName = (MaterialEditText) findViewById(R.id.task_name);
+        mTaskCost = (MaterialEditText) findViewById(R.id.task_cost);
         mLocationName = (EditText) findViewById(R.id.location_name);
         mLocationLat = (EditText) findViewById(R.id.location_lat);
         mLocationLng = (EditText) findViewById(R.id.location_lng);
-        mLocationRadius = (EditText) findViewById(R.id.location_radius);
+        mLocationRadius = (MaterialEditText) findViewById(R.id.location_radius);
         mLocationAdd = (Button) findViewById(R.id.location_add_btn);
         mTaskActionsContainer = (ViewGroup) findViewById(R.id.task_actions_container);
         mTaskActionAdd = (Button) findViewById(R.id.task_action_add_btn);
         mSubmit = (Button) findViewById(R.id.submit_btn);
         mSubmitProgressBar = (ProgressBar) findViewById(R.id.submit_progress_bar);
         mDateAdd = (Button) findViewById(R.id.date_add_btn);
-        mDateText = (EditText) findViewById(R.id.date_add_text);
+        mDateText = (MaterialEditText) findViewById(R.id.date_add_text);
         mTimeAdd = (Button) findViewById(R.id.time_add_btn);
-        mTimeText = (EditText) findViewById(R.id.time_add_text);
-        mRefreshRate = (EditText) findViewById(R.id.refresh_rate);
-        mAnswersLeft = (EditText) findViewById(R.id.answers_left);
+        mTimeText = (MaterialEditText) findViewById(R.id.time_add_text);
+        mRefreshRate = (MaterialEditText) findViewById(R.id.refresh_rate);
+        mAnswersLeft = (MaterialEditText) findViewById(R.id.answers_left);
         mEndlessAnswers = (CheckBox) findViewById(R.id.endless_answers_check);
 
         // set OnClickListeners on buttons
@@ -172,11 +176,10 @@ public class TaskCreateActivity extends AppCompatActivity {
                 Map<String, String> userEntries = getUserEntries();
                 Log.d(Constants.TAG, "User attempting to submit: " + userEntries.toString());
 
-                // TODO: uncomment
-//                if (!hasAllFieldsEntered(userEntries)) {
-//                    Toast.makeText(TaskCreateActivity.this, "Please check if all fields have been completed.", Toast.LENGTH_SHORT).show();
-//                    return;
-//                }
+                if (!hasAllFieldsEntered(userEntries)) {
+                    Toast.makeText(TaskCreateActivity.this, "Please check if all fields have been completed.", Toast.LENGTH_SHORT).show();
+                    return;
+                }
 
                 mSubmit.setEnabled(false);
                 mSubmitProgressBar.setVisibility(ProgressBar.VISIBLE);
@@ -221,12 +224,13 @@ public class TaskCreateActivity extends AppCompatActivity {
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         if (requestCode == PLACE_PICKER_REQUEST) {
+            Log.d(TAG, "Returned from PlacePicker");
             if (resultCode == RESULT_OK) {
                 Place place = PlacePicker.getPlace(this, data);
                 mLocationName.setText(place.getName());
                 mLocationLat.setText(String.valueOf(place.getLatLng().latitude));
                 mLocationLng.setText(String.valueOf(place.getLatLng().longitude));
-                mLocationRadius.setText(String.valueOf(60.0f));
+//                mLocationRadius.setText(String.valueOf(1000.0f));
             }
         }
     }
@@ -263,55 +267,54 @@ public class TaskCreateActivity extends AppCompatActivity {
     }
 
     private Map<String, String> getUserEntries() {
-        Map<String, String> userEntries = new HashMap<String, String>();
-//        userEntries.put("userId", userId);
-//        userEntries.put("taskName", mTaskName.getText().toString());
-//        userEntries.put("cost", mTaskCost.getText().toString());
-//        String expiresAt = getExpiresAt();
-//        if (expiresAt != null) {
-//            userEntries.put("expiresAt", expiresAt);
-//        }
-//        userEntries.put("refreshRate", mRefreshRate.getText().toString());
-//        userEntries.put("locationName", mLocationName.getText().toString());
-//        userEntries.put("lat", mLocationLat.getText().toString());
-//        userEntries.put("lng", mLocationLng.getText().toString());
-//        userEntries.put("radius", mLocationRadius.getText().toString());
-//        userEntries.put("answersLeft", mEndlessAnswers.isChecked() ? "-1" : mAnswersLeft.getText().toString());
-
-//        int tagId = 0;
-//        for (ViewGroup taskActionViewGroup : mTaskActionLayouts) {
-//            String descriptionKey = "taskActions[" + tagId + "][description]";
-//            String typeKey = "taskActions[" + tagId + "][type]";
-//            String descriptionValue = ((EditText) taskActionViewGroup.findViewById(R.id.action_description)).getText().toString();
-//            String typeValue = ((Spinner) taskActionViewGroup.findViewById(R.id.action_type)).getSelectedItem().toString();
-//            if (!descriptionValue.isEmpty() && !typeValue.isEmpty()) {
-//                userEntries.put(descriptionKey, descriptionValue);
-//                userEntries.put(typeKey, typeValue);
-//                tagId++;
-//            }
-//        }
-
-        // TODO: remove
+        Map<String, String> userEntries = new HashMap<>();
         userEntries.put("userId", userId);
-        userEntries.put("taskName", "Default task");
-        userEntries.put("cost", "1");
-        userEntries.put("expiresAt", String.valueOf(new Date().getTime() + 1000 * 60 * 60 * 24));
-        userEntries.put("refreshRate", "60");
-        userEntries.put("answersLeft", "-1");
-        userEntries.put("locationName", "CMU");
-        userEntries.put("lat", "40.4430");
-        userEntries.put("lng", "-79.9455");
-        userEntries.put("radius", "1000");
+        userEntries.put("taskName", mTaskName.getText().toString());
+        userEntries.put("cost", mTaskCost.getText().toString());
+        String expiresAt = getExpiresAt();
+        if (expiresAt != null) {
+            userEntries.put("expiresAt", expiresAt);
+        }
+        userEntries.put("refreshRate", mRefreshRate.getText().toString());
+        userEntries.put("locationName", mLocationName.getText().toString());
+        userEntries.put("lat", mLocationLat.getText().toString());
+        userEntries.put("lng", mLocationLng.getText().toString());
+        userEntries.put("radius", mLocationRadius.getText().toString());
+        userEntries.put("answersLeft", mEndlessAnswers.isChecked() ? "-1" : mAnswersLeft.getText().toString());
 
-        String descriptionKey = "taskActions[" + 0 + "][description]";
-        String typeKey = "taskActions[" + 0 + "][type]";
-        userEntries.put(descriptionKey, "Default description");
-        userEntries.put(typeKey, "text");
+        int tagId = 0;
+        for (ViewGroup taskActionViewGroup : mTaskActionLayouts) {
+            String descriptionKey = "taskActions[" + tagId + "][description]";
+            String typeKey = "taskActions[" + tagId + "][type]";
+            String descriptionValue = ((MaterialEditText) taskActionViewGroup.findViewById(R.id.action_description)).getText().toString();
+            String typeValue = ((Spinner) taskActionViewGroup.findViewById(R.id.action_type)).getSelectedItem().toString();
+            if (!descriptionValue.isEmpty() && !typeValue.isEmpty()) {
+                userEntries.put(descriptionKey, descriptionValue);
+                userEntries.put(typeKey, typeValue);
+                tagId++;
+            }
+        }
 
-        descriptionKey = "taskActions[" + 1 + "][description]";
-        typeKey = "taskActions[" + 1 + "][type]";
-        userEntries.put(descriptionKey, "Default description");
-        userEntries.put(typeKey, "text");
+//        userEntries.put("userId", userId);
+//        userEntries.put("taskName", "Default task");
+//        userEntries.put("cost", "1");
+//        userEntries.put("expiresAt", String.valueOf(new Date().getTime() + 1000 * 60 * 60 * 24));
+//        userEntries.put("refreshRate", "60");
+//        userEntries.put("answersLeft", "-1");
+//        userEntries.put("locationName", "CMU");
+//        userEntries.put("lat", "40.4430");
+//        userEntries.put("lng", "-79.9455");
+//        userEntries.put("radius", "1000");
+//
+//        String descriptionKey = "taskActions[" + 0 + "][description]";
+//        String typeKey = "taskActions[" + 0 + "][type]";
+//        userEntries.put(descriptionKey, "Default description");
+//        userEntries.put(typeKey, "text");
+//
+//        descriptionKey = "taskActions[" + 1 + "][description]";
+//        typeKey = "taskActions[" + 1 + "][type]";
+//        userEntries.put(descriptionKey, "Default description");
+//        userEntries.put(typeKey, "text");
 
         return userEntries;
     }

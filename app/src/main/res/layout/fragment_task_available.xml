@@ -17,7 +17,7 @@
         android:layout_height="wrap_content"
         android:layout_gravity="bottom|right"
         android:layout_margin="@dimen/fab_margin"
-        android:src="@android:drawable/ic_menu_rotate"
+        android:src="@android:drawable/ic_dialog_map"
         android:tint="#ffffff"
         app:elevation="4dp" />
 
