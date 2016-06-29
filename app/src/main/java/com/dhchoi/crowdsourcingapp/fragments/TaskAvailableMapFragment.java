@@ -173,7 +173,8 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
 
     private void updateMarkers() {
         // remove previous markers
-        mGoogleMap.clear();
+        if (mGoogleMap != null)
+            mGoogleMap.clear();
 
         List<Task> allTasks = new ArrayList<>();
         allTasks.addAll(mActiveTasks);

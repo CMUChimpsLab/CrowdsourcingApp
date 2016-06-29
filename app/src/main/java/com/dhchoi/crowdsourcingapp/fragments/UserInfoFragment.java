@@ -268,7 +268,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
                 @Override
                 protected void onPostExecute(JSONArray jsonArray) {
                     try {
-                        if (jsonArray.length() > 0) {
+                        if (jsonArray != null && jsonArray.length() > 0) {
                             ((TextView)convertView.findViewById(R.id.num_answers)).setText(
                                     String.valueOf(jsonArray.length()));
 
