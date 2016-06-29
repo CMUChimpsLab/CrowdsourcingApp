@@ -230,7 +230,7 @@ public class TaskCreateActivity extends AppCompatActivity {
                 mLocationName.setText(place.getName());
                 mLocationLat.setText(String.valueOf(place.getLatLng().latitude));
                 mLocationLng.setText(String.valueOf(place.getLatLng().longitude));
-                mLocationRadius.setText(String.valueOf(1000.0f));
+//                mLocationRadius.setText(String.valueOf(1000.0f));
             }
         }
     }

@@ -64,17 +64,21 @@ public class HttpClientCallable implements Callable<String> {
                 }
             }
 
+            BufferedReader in;
             if (urlConnection.getResponseCode() == HttpsURLConnection.HTTP_OK) {
-                BufferedReader in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
-                response = "";
-                String line;
-                while ((line = in.readLine()) != null) {
-                    response += line;
-                }
+                in = new BufferedReader(new InputStreamReader(urlConnection.getInputStream()));
             } else {
                 // Do response handling for bad response codes
-                Log.e(TAG, "Bad http response code: " + urlConnection.getResponseCode());
+                in = new BufferedReader(new InputStreamReader(urlConnection.getErrorStream()));
             }
+
+            // read response
+            response = "";
+            String line;
+            while ((line = in.readLine()) != null) {
+                response += line;
+            }
+
         } catch (IOException e) {
             Log.e(TAG, e.getMessage());
         } finally {
