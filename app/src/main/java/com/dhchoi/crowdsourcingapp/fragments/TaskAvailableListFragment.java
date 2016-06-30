@@ -21,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dhchoi.crowdsourcingapp.Constants;
+import com.dhchoi.crowdsourcingapp.NotificationHelper;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.dhchoi.crowdsourcingapp.views.CustomListView;
 import com.dhchoi.crowdsourcingapp.R;
@@ -41,6 +42,8 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
     private TextView mInactiveTasksNotice;
 
     private static final String TAG = "TaskAvailableList";
+    private static Context context;
+    private static boolean firstLaunch;     // whether to display notification
 
     // task related
     private List<Task> mActiveTasks = new ArrayList<>();
@@ -52,6 +55,8 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        context = getActivity();
+
         View rootView = inflater.inflate(R.layout.fragment_task_available_list, container, false);
 
         mActiveTasksNotice = (TextView) rootView.findViewById(R.id.active_tasks_notice);
@@ -100,12 +105,37 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
             }
         });
 
+        firstLaunch = true;
+
         // Inflate the layout for this fragment
         return rootView;
     }
 
     @Override
     public void onTasksActivationUpdated(List<Task> activatedTasks, List<Task> inactivatedTasks) {
+        if (firstLaunch) {
+            firstLaunch = false;
+        } else {
+            // hope it's not too noisy
+            for (Task task : activatedTasks) {
+                boolean contains = false;
+                for (Task t : mActiveTasks) {
+                    if (t.getId().equals(task.getId())) {
+                        contains = true;
+                        break;
+                    }
+                }
+                if (!contains) {        // new task available
+                    NotificationHelper.createNotification(
+                            "A Task Just Became Available",
+                            "You just entered the active area of another task",
+                            context,
+                            MainActivity.class);
+                    break;
+                }
+            }
+        }
+
         mActiveTasks.clear();
         mActiveTasks.addAll(activatedTasks);
         mInactiveTasks.clear();
