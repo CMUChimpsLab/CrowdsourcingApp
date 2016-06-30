@@ -254,6 +254,9 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
             protected void onPostExecute(Boolean syncSuccess) {
 //                mSyncProgressBar.setVisibility(ProgressBar.GONE);
                 Fragment currentFragment = mSectionsPagerAdapter.getItem(mViewPager.getCurrentItem());
+                if (currentFragment.getView() == null)
+                    return;
+
                 View currentFragmentView = currentFragment.getView().findViewById(R.id.fragment_content);
 
                 final boolean[] success = {true};

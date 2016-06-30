@@ -21,7 +21,7 @@
 
     </android.support.design.widget.AppBarLayout>
 
-    <RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
         xmlns:app="http://schemas.android.com/apk/res-auto"
         xmlns:tools="http://schemas.android.com/tools"
         android:layout_width="match_parent"
@@ -30,69 +30,76 @@
         android:paddingLeft="@dimen/activity_horizontal_margin"
         android:paddingRight="@dimen/activity_horizontal_margin"
         android:paddingTop="@dimen/activity_vertical_margin"
+        android:scrollbars="none"
         app:layout_behavior="@string/appbar_scrolling_view_behavior">
 
-        <TextView
-            android:id="@+id/num_submitted_response"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentEnd="true"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:text="Task Name"
-            android:textAppearance="?android:attr/textAppearanceLarge"
-            android:textSize="32dp" />
-
-        <TextView
-            android:id="@+id/task_location"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@id/num_submitted_response"
-            android:layout_marginBottom="32dp"
-            android:text="Task Location"
-            android:textAppearance="?android:attr/textAppearanceSmall"
-            android:textSize="20dp" />
-
-        <LinearLayout
-            android:id="@+id/task_actions"
+        <RelativeLayout
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_below="@id/task_location"
-            android:orientation="vertical">
+            android:layout_height="match_parent">
 
-        </LinearLayout>
+            <TextView
+                android:id="@+id/num_submitted_response"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentEnd="true"
+                android:layout_alignParentStart="true"
+                android:layout_alignParentTop="true"
+                android:text="Task Name"
+                android:textAppearance="?android:attr/textAppearanceLarge"
+                android:textSize="32dp" />
 
-        <Button
-            android:id="@+id/submit_button"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/task_actions"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="32dp"
-            android:background="?android:attr/selectableItemBackground"
-            android:text="Submit Response" />
+            <TextView
+                android:id="@+id/task_location"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/num_submitted_response"
+                android:layout_marginBottom="32dp"
+                android:text="Task Location"
+                android:textAppearance="?android:attr/textAppearanceSmall"
+                android:textSize="20dp" />
 
-        <ProgressBar
-            android:id="@+id/submitResponseProgressBar"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignTop="@id/submit_button"
-            android:layout_toEndOf="@id/submit_button"
-            android:visibility="gone" />
+            <LinearLayout
+                android:id="@+id/task_actions"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_alignParentStart="true"
+                android:layout_below="@id/task_location"
+                android:orientation="vertical">
 
-        <TextView
-            android:id="@+id/submission_notice"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_below="@id/submit_button"
-            android:layout_centerHorizontal="true"
-            android:layout_marginTop="10dp"
-            android:text="Submission Notice"
-            android:textAppearance="?android:attr/textAppearanceMedium"
-            android:textColor="#a72121" />
+            </LinearLayout>
 
-    </RelativeLayout>
+            <Button
+                android:id="@+id/submit_button"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/task_actions"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="32dp"
+                android:background="?android:attr/selectableItemBackground"
+                android:text="Submit Response" />
+
+            <ProgressBar
+                android:id="@+id/submitResponseProgressBar"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_alignTop="@id/submit_button"
+                android:layout_toEndOf="@id/submit_button"
+                android:visibility="gone" />
+
+            <TextView
+                android:id="@+id/submission_notice"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_below="@id/submit_button"
+                android:layout_centerHorizontal="true"
+                android:layout_marginTop="10dp"
+                android:text="Submission Notice"
+                android:textAppearance="?android:attr/textAppearanceMedium"
+                android:textColor="#a72121" />
+
+        </RelativeLayout>
+
+    </ScrollView>
 
 </android.support.design.widget.CoordinatorLayout>
