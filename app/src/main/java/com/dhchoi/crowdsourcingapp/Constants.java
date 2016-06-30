@@ -9,8 +9,8 @@ public class Constants {
     public static final String PACKAGE_NAME = "com.dhchoi.crowdsourcingapp";
     public static final String DEFAULT_SHARED_PREF = PACKAGE_NAME + ".DEFAULT_SHARED_PREF";
 
-//    public static final String APP_SERVER_BASE_URL = "http://ec2-54-221-193-1.compute-1.amazonaws.com:3000";
-    public static final String APP_SERVER_BASE_URL = "http://10.0.2.2:3000";
+    public static final String APP_SERVER_BASE_URL = "http://ec2-54-221-193-1.compute-1.amazonaws.com:3000";
+//    public static final String APP_SERVER_BASE_URL = "http://10.0.2.2:3000";
 //    public static final String APP_SERVER_BASE_URL = "http://128.237.133.121:3000";
     public static final String APP_SERVER_TASK_CREATE_URL = APP_SERVER_BASE_URL + "/db/task-add";
     public static final String APP_SERVER_TASK_COMPLETE_URL = APP_SERVER_BASE_URL + "/db/task-respond";
