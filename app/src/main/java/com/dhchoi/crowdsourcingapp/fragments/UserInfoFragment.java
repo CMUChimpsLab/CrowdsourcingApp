@@ -20,7 +20,6 @@ import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.TextView;
-import android.widget.Toast;
 
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.activities.MainActivity;
@@ -28,7 +27,6 @@ import com.dhchoi.crowdsourcingapp.activities.TaskCreateActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskInfoActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
-import com.dhchoi.crowdsourcingapp.task.TaskResponse;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
 
 import org.json.JSONArray;
@@ -165,7 +163,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         mUserBalance = (TextView) rootView.findViewById(R.id.available_balance);
 
         // swipe refresh layout
-        mSwipeRefresh = (SwipeRefreshLayout) rootView.findViewById(R.id.layout_swipe_refresh);
+        mSwipeRefresh = (SwipeRefreshLayout) rootView.findViewById(R.id.user_info_swipe_refresh);
         mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {
@@ -319,7 +317,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
     /***
      * to display user's own response to a task
      */
-    private static class ResponseInfoDialogFragment extends DialogFragment {
+    public static class ResponseInfoDialogFragment extends DialogFragment {
 
         public static ResponseInfoDialogFragment newInstance(Bundle args) {
             ResponseInfoDialogFragment fragment = new ResponseInfoDialogFragment();

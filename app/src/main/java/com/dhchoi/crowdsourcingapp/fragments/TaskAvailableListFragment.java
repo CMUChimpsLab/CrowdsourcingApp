@@ -2,8 +2,12 @@ package com.dhchoi.crowdsourcingapp.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.os.AsyncTask;
 import android.os.Bundle;
+import android.support.design.widget.Snackbar;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
+import android.support.v4.widget.SwipeRefreshLayout;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -17,6 +21,7 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import com.dhchoi.crowdsourcingapp.Constants;
+import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.dhchoi.crowdsourcingapp.views.CustomListView;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.activities.MainActivity;
@@ -63,11 +68,35 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
 
         updateNoticeTextViews();
 
-        final ScrollView scrollView = (ScrollView) rootView.findViewById(R.id.scroll_view);
+        final ScrollView scrollView = (ScrollView) rootView.findViewById(R.id.task_list_scroll_view);
         scrollView.getViewTreeObserver().addOnGlobalLayoutListener(new ViewTreeObserver.OnGlobalLayoutListener() {
             @Override
             public void onGlobalLayout() {
                 scrollView.fullScroll(View.FOCUS_UP);
+            }
+        });
+
+        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.task_list_swipe_refresh);
+        swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
+            @Override
+            public void onRefresh() {
+                new AsyncTask<Void, Void, Boolean>() {
+                    @Override
+                    protected Boolean doInBackground(Void... params) {
+                        return TaskManager.syncTasks(getActivity(), ((MainActivity)getActivity()).getGoogleApiClient());
+                    }
+
+                    @Override
+                    protected void onPostExecute(Boolean syncSuccess) {
+                        if (syncSuccess) {
+                            mActiveTaskListAdapter.notifyDataSetChanged();
+                            mInactiveTaskListAdapter.notifyDataSetChanged();
+                        }
+                        swipeRefreshLayout.setRefreshing(false);
+                        Snackbar.make(getView(), "Sync success!", Snackbar.LENGTH_LONG).show();
+                    }
+
+                }.execute();
             }
         });
 
@@ -135,8 +164,15 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
             ((TextView) convertView.findViewById(R.id.task_expires_at)).setText(expiresAtText);
 
             final ImageView taskImage = (ImageView) convertView.findViewById(R.id.task_image);
-            Random random = new Random();
-            taskImage.setBackgroundColor(0xff000000 + 256 * 256 * random.nextInt(256) + 256 * random.nextInt(256) + random.nextInt(256));
+
+//            Random random = new Random();
+//            taskImage.setBackgroundColor(0xff000000 + 256 * 256 * random.nextInt(256) + 256 * random.nextInt(256) + random.nextInt(256));
+            if (task.isActivated())
+                taskImage.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorAccent));
+            else
+                taskImage.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorPrimary));
+
+
 //            new AsyncTask<Void, Void, Bitmap>() {
 //                @Override
 //                protected Bitmap doInBackground(Void... params) {
