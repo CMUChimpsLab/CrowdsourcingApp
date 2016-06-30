@@ -2,6 +2,7 @@ package com.dhchoi.crowdsourcingapp.activities;
 
 import android.content.BroadcastReceiver;
 import android.content.Context;
+import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
 import android.location.Location;
@@ -15,6 +16,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentPagerAdapter;
 import android.support.v4.content.LocalBroadcastManager;
 import android.support.v4.view.ViewPager;
+import android.support.v7.app.AlertDialog;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
@@ -185,23 +187,35 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
 
         int id = item.getItemId();
 
-        if (id == R.id.action_settings) {
-            return true;
-//        } else if (id == R.id.action_check_current_location) {
-//            startActivity(new Intent(this, CurrentLocationActivity.class));
-//            return true;
-        } else if (id == R.id.action_logout) {
-            // reset or remove all data
-            UserManager.reset(this);
-            TaskManager.reset(this, getGoogleApiClient());
+        if (id == R.id.action_logout) {
+            AlertDialog dialog = new AlertDialog.Builder(this)
+                    .setMessage("Are you sure you want to log out?")
+                    .setPositiveButton("Yes", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            // reset or remove all data
+                            UserManager.reset(MainActivity.this);
+                            TaskManager.reset(MainActivity.this, getGoogleApiClient());
 
-            // go back to login page
-            startActivity(new Intent(this, CheckLoginActivity.class));
+                            // go back to login page
+                            startActivity(new Intent(MainActivity.this, CheckLoginActivity.class));
 
-            // unregister location listener
-            LocationServices.FusedLocationApi.removeLocationUpdates(getGoogleApiClient(), LocationListener);
+                            // unregister location listener
+                            LocationServices.FusedLocationApi.removeLocationUpdates(getGoogleApiClient(), LocationListener);
 
-            finish();
+                            finish();
+                        }
+                    })
+                    .setNegativeButton("No", new DialogInterface.OnClickListener() {
+                        @Override
+                        public void onClick(DialogInterface dialog, int which) {
+                            dialog.dismiss();
+                        }
+                    })
+                    .create();
+                    dialog.setCanceledOnTouchOutside(true);
+                    dialog.show();
+
             return true;
         }
 

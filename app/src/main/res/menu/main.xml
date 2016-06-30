@@ -7,14 +7,15 @@
         <!--android:orderInCategory="100"-->
         <!--android:title="Check Current Location"-->
         <!--app:showAsAction="never" />-->
-    <item
-        android:id="@+id/action_settings"
-        android:orderInCategory="200"
-        android:title="@string/action_settings"
-        app:showAsAction="never" />
+    <!--<item-->
+        <!--android:id="@+id/action_settings"-->
+        <!--android:orderInCategory="200"-->
+        <!--android:title="@string/action_settings"-->
+        <!--app:showAsAction="never" />-->
     <item
         android:id="@+id/action_logout"
         android:orderInCategory="300"
         android:title="Logout"
-        app:showAsAction="never" />
+        android:icon="@drawable/ic_exit_to_app_white"
+        app:showAsAction="ifRoom" />
 </menu>
