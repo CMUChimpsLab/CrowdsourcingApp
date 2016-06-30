@@ -46,6 +46,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.TimeZone;
 
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
+
 public class TaskCreateActivity extends AppCompatActivity {
 
     private static final String TAG = "TaskCreate";
@@ -79,6 +82,8 @@ public class TaskCreateActivity extends AppCompatActivity {
     private int mExpirationDay;
     private int mExpirationHour;
     private int mExpirationMinute;
+
+    private static final String SHOWCASE_ID = "TaskCreateActivityShowcase";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -219,6 +224,17 @@ public class TaskCreateActivity extends AppCompatActivity {
         });
 
         hideSoftKeyboard();
+
+        // showcase the views
+        ShowcaseConfig config = new ShowcaseConfig();
+        config.setDelay(300);
+
+        MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this, SHOWCASE_ID);
+        sequence.setConfig(config);
+        sequence.addSequenceItem(mRefreshRate, "Refresh Rate", "Interval between each answer", "GOT IT")
+                .addSequenceItem(mLocationRadius, "Location Radius", "Radius of area where people can do this task", "GOT IT")
+                .addSequenceItem(mAnswersLeft, "Total Answers", "How many answers you expect to receive, check endless if no limit", "GOT IT")
+                .start();
     }
 
     @Override
@@ -230,7 +246,6 @@ public class TaskCreateActivity extends AppCompatActivity {
                 mLocationName.setText(place.getName());
                 mLocationLat.setText(String.valueOf(place.getLatLng().latitude));
                 mLocationLng.setText(String.valueOf(place.getLatLng().longitude));
-//                mLocationRadius.setText(String.valueOf(1000.0f));
             }
         }
     }
