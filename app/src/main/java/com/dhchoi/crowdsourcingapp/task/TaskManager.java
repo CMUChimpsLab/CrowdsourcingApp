@@ -45,6 +45,7 @@ public class TaskManager {
     private static final String JSON_FIELD_STATUS_CREATED = "created";
     private static final String JSON_FIELD_STATUS_DELETED = "deleted";
     private static final String JSON_FIELD_STATUS_UPDATED = "updated";
+    private static final String JSON_FIELD_STATUS_COMPLETED = "completed";
     private static final String JSON_FIELD_TASK_ID = "taskId";
 
     private static List<OnSyncCompleteListener> mOnSyncCompleteListeners = new ArrayList<>();
@@ -63,7 +64,7 @@ public class TaskManager {
      * @return the {@link Task} object for the corresponding task id
      */
     public static Task getTaskById(Context context, String id) {
-        return new Gson().fromJson(getSharedPreferences(context).getString(getTaskKeyById(id), ""), Task.class);
+        return new Gson().fromJson(getSharedPreferences(context).getString(getTaskKeyById(id), null), Task.class);
     }
 
     /**
@@ -312,6 +313,7 @@ public class TaskManager {
                     List<String> tasksCreatedIds = new ArrayList<>();
                     List<String> tasksUpdatedIds = new ArrayList<>();
                     List<String> tasksDeletedIds = new ArrayList<>();
+                    List<String> tasksCompletedIds = new ArrayList<>();
                     for (int i = 0; i < changes.length(); i++) {
                         String taskId = changes.getJSONObject(i).getString(JSON_FIELD_TASK_ID);
                         String taskStatus = changes.getJSONObject(i).getString(JSON_FIELD_STATUS);
@@ -325,6 +327,18 @@ public class TaskManager {
                         }
                         if (taskStatus.equals(JSON_FIELD_STATUS_DELETED)) {
                             tasksDeletedIds.add(taskId);
+                        }
+                        if (taskStatus.equals(JSON_FIELD_STATUS_COMPLETED)) {
+                            tasksCompletedIds.add(taskId);
+                        }
+                    }
+
+                    for (String id : tasksCompletedIds) {
+                        Task task = getTaskById(context, id);
+                        if (task == null)
+                            tasksDeletedIds.add(id);
+                        else if (!task.isCompleted() && !task.getOwner().equals(UserManager.getUserId(context))) {     // not my task
+                            tasksDeletedIds.add(id);
                         }
                     }
 
