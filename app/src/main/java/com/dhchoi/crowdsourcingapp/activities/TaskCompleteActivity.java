@@ -48,7 +48,6 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
     private static final String TAG = "TaskComplete";
 
     private List<ViewGroup> mTaskActionLayouts = new ArrayList<>();
-    private SharedPreferences mSharedPreferences;
     private Button mSubmitResponseButton;
     private TextView mSubmissionNotice;
     private Task mTask;
@@ -82,8 +81,6 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
         setSupportActionBar(toolbar);
         getSupportActionBar().setDisplayHomeAsUpEnabled(true);
 
-        mSharedPreferences = getSharedPreferences(Constants.DEFAULT_SHARED_PREF, MODE_PRIVATE);
-
         mTask = TaskManager.getTaskById(this, getIntent().getStringExtra(Task.TASK_KEY_SERIALIZABLE));
         Log.d(Constants.TAG, "creating activity with task: " + mTask);
 
@@ -97,8 +94,6 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
         for (TaskAction taskAction : mTask.getTaskActions()) {
             if (taskAction.getType() == TaskAction.TaskActionType.TEXT) {
                 View taskActionLayout = LayoutInflater.from(this).inflate(R.layout.task_action_text_complete, null);
-
-//                ((TextView) taskActionLayout.findViewById(R.id.task_action_description)).setText(taskAction.getDescription());
 
                 MaterialEditText materialEditText = (MaterialEditText) taskActionLayout.findViewById(R.id.task_action_response);
                 materialEditText.setFloatingLabelText(taskAction.getDescription());
