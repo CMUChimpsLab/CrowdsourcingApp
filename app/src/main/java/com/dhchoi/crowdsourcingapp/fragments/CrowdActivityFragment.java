@@ -32,7 +32,6 @@ public class CrowdActivityFragment extends Fragment {
         }
     }
 
-    // TODO: Customize parameter initialization
     public static CrowdActivityFragment newInstance() {
         return new CrowdActivityFragment();
     }

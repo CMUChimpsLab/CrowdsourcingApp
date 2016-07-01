@@ -9,7 +9,7 @@
     android:paddingTop="@dimen/activity_vertical_margin"
     tools:context=".fragments.TaskAvailableListFragment">
 
-    <android.support.v4.widget.SwipeRefreshLayout
+    <com.dhchoi.crowdsourcingapp.views.CustomSwipeRefreshLayout
         android:id="@+id/task_list_swipe_refresh"
         android:layout_width="match_parent"
         android:layout_height="match_parent">
@@ -73,6 +73,6 @@
 
         </ScrollView>
 
-    </android.support.v4.widget.SwipeRefreshLayout>
+    </com.dhchoi.crowdsourcingapp.views.CustomSwipeRefreshLayout>
 
 </LinearLayout>

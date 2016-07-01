@@ -276,9 +276,8 @@ public class TaskCreateActivity extends AppCompatActivity {
 
         // required fields: (with at least one pair of [taskDescription, taskType])
         String[] requiredFields = {"userId", "taskName", "cost", "expiresAt", "refreshRate", "locationName", "lat", "lng", "radius", "taskDescription", "taskType"};
-        if (userEntries.size() < requiredFields.length) {
+        if (userEntries.size() < requiredFields.length)
             return false;
-        }
 
         return true;
     }
@@ -304,9 +303,8 @@ public class TaskCreateActivity extends AppCompatActivity {
         userEntries.put("taskName", mTaskName.getText().toString());
         userEntries.put("cost", mTaskCost.getText().toString());
         String expiresAt = getExpiresAt();
-        if (expiresAt != null) {
+        if (expiresAt != null)
             userEntries.put("expiresAt", expiresAt);
-        }
         userEntries.put("refreshRate", mRefreshRate.getText().toString());
         userEntries.put("locationName", mLocationName.getText().toString());
         userEntries.put("lat", mLocationLat.getText().toString());

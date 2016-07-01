@@ -28,6 +28,7 @@ import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskCompleteActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
+import com.dhchoi.crowdsourcingapp.views.CustomSwipeRefreshLayout;
 
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -81,7 +82,8 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
             }
         });
 
-        final SwipeRefreshLayout swipeRefreshLayout = (SwipeRefreshLayout) rootView.findViewById(R.id.task_list_swipe_refresh);
+        final CustomSwipeRefreshLayout swipeRefreshLayout = (CustomSwipeRefreshLayout) rootView.findViewById(R.id.task_list_swipe_refresh);
+        swipeRefreshLayout.setScrollView(scrollView);
         swipeRefreshLayout.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {

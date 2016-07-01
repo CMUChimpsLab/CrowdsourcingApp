@@ -180,7 +180,6 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
         allTasks.addAll(mActiveTasks);
         allTasks.addAll(mInactiveTasks);
 
-        // TODO: take care for case of too much clustered tasks in one region
         for (Task t : allTasks) {
             SimpleGeofence simpleGeofence = t.getLocation();
             LatLng latLng = new LatLng(simpleGeofence.getLatitude(), simpleGeofence.getLongitude());
