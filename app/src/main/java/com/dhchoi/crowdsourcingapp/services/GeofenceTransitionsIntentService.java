@@ -67,7 +67,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
                 Log.d(TAG, "Geofence Enter");
 
                 if (!triggeredTask.isActivated()) {
-                    NotificationHelper.createNotification("Activated: " + taskName, taskLocationName, taskId, this, MainActivity.class);
+                    NotificationHelper.createNotification("Activated: " + taskName, taskLocationName, taskId, this, MainActivity.class, null);
                     triggeredTask.setActivated(true);
                     activatedTaskIds.add(taskId);
                     inactivatedTaskIds.remove(taskId);
@@ -76,7 +76,7 @@ public class GeofenceTransitionsIntentService extends IntentService {
                 Log.d(TAG, "Geofence Exit");
 
                 if (triggeredTask.isActivated()) {
-                    NotificationHelper.createNotification("Inactivated: " + taskName, taskLocationName, taskId, this, MainActivity.class);
+                    NotificationHelper.createNotification("Inactivated: " + taskName, taskLocationName, taskId, this, MainActivity.class, null);
                     triggeredTask.setActivated(false);
                     inactivatedTaskIds.add(taskId);
                     activatedTaskIds.remove(taskId);

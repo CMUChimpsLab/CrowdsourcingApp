@@ -5,6 +5,7 @@ import android.util.Log;
 
 import com.dhchoi.crowdsourcingapp.NotificationHelper;
 import com.dhchoi.crowdsourcingapp.activities.MainActivity;
+import com.dhchoi.crowdsourcingapp.activities.TaskInfoActivity;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
 import com.google.android.gms.gcm.GcmListenerService;
 
@@ -27,6 +28,7 @@ public class GcmMessageListenerService extends GcmListenerService {
         // taskOwnerId
         // taskName
         // taskStatus
+        // taskId
         try {
             String ownerId = data.getString("taskOwnerId");
             String type = data.getString("taskStatus");
@@ -37,7 +39,7 @@ public class GcmMessageListenerService extends GcmListenerService {
             if (type.equals("created") && !ownerId.equals(UserManager.getUserId(this))) {
                 NotificationHelper.createNotification("New Task Available", data.getString("taskName", "Touch to check new task."), this, MainActivity.class);
             } else if (type.equals("updated") && ownerId.equals(UserManager.getUserId(this))) {
-                NotificationHelper.createNotification("Someone responded to your task", data.getString("taskName", "Touch to check response"), this, MainActivity.class);
+                NotificationHelper.createNotification("Someone responded to your task", data.getString("taskName", "Touch to check response"), this, TaskInfoActivity.class, data.getString("taskId", null));
             }
         } catch (Exception e) {
             e.printStackTrace();
