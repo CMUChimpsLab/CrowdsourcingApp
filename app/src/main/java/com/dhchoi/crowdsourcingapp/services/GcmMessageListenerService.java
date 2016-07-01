@@ -24,9 +24,11 @@ public class GcmMessageListenerService extends GcmListenerService {
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Bundle Data: " + data);
 
-        // taskOwnerId, taskName, messageType
+        // taskOwnerId
+        // taskName
+        // taskStatus
         try {
-            String ownerId = data.getString("task");
+            String ownerId = data.getString("taskOwnerId");
             String type = data.getString("taskStatus");
 
             assert ownerId != null;
