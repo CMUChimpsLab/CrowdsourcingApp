@@ -28,6 +28,7 @@ import com.dhchoi.crowdsourcingapp.activities.TaskInfoActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
+import com.dhchoi.crowdsourcingapp.views.CustomSwipeRefreshLayout;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -62,7 +63,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
     private TextView mNumCompletedTasks;
     private LinearLayout mNumCreatedTasksTitle;
     private LinearLayout mNumCompletedTasksTitle;
-    private SwipeRefreshLayout mSwipeRefresh;
+    private CustomSwipeRefreshLayout mSwipeRefresh;
 
     private static final int TIME_OFFSET = -1000 * 3600 * 4;        // UTC to EST
 
@@ -112,6 +113,8 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
                     // disable task completed
                     completedTasksContainer.setVisibility(View.GONE);
                     mNumCompletedTasksTitle.setBackgroundColor(COLOR_OFF);
+
+                    mSwipeRefresh.setListView(mListCreatedTasks);
                 }
             }
         });
@@ -146,6 +149,8 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
                     // enable task completed
                     completedTasksContainer.setVisibility(View.VISIBLE);
                     mNumCompletedTasksTitle.setBackgroundColor(COLOR_ON);
+
+                    mSwipeRefresh.setListView(mListCompletedTasks);
                 }
             }
         });
@@ -163,7 +168,8 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         mUserBalance = (TextView) rootView.findViewById(R.id.available_balance);
 
         // swipe refresh layout
-        mSwipeRefresh = (SwipeRefreshLayout) rootView.findViewById(R.id.user_info_swipe_refresh);
+        mSwipeRefresh = (CustomSwipeRefreshLayout) rootView.findViewById(R.id.user_info_swipe_refresh);
+        mSwipeRefresh.setListView(mListCreatedTasks);
         mSwipeRefresh.setOnRefreshListener(new SwipeRefreshLayout.OnRefreshListener() {
             @Override
             public void onRefresh() {

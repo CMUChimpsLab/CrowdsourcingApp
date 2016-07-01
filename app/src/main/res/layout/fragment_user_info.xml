@@ -27,7 +27,7 @@
             android:textColor="#ffffff"
             android:textSize="12sp" />
 
-        <android.support.v4.widget.SwipeRefreshLayout
+        <com.dhchoi.crowdsourcingapp.views.CustomSwipeRefreshLayout
             android:id="@+id/user_info_swipe_refresh"
             android:layout_width="match_parent"
             android:layout_height="match_parent">
@@ -35,7 +35,7 @@
             <!--Most outside container-->
             <LinearLayout
                 android:layout_width="match_parent"
-                android:layout_height="match_parent"
+                android:layout_height="wrap_content"
                 android:orientation="vertical">
 
                 <LinearLayout
@@ -191,7 +191,7 @@
 
             </LinearLayout>
 
-        </android.support.v4.widget.SwipeRefreshLayout>
+        </com.dhchoi.crowdsourcingapp.views.CustomSwipeRefreshLayout>
 
     </LinearLayout>
 
