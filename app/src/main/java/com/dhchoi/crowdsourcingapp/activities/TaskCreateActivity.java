@@ -122,12 +122,18 @@ public class TaskCreateActivity extends AppCompatActivity {
             @Override
             public void onFocusChange(View v, boolean hasFocus) {
                 if (!hasFocus) {        // user has left this blank
-                    if (((MaterialEditText) v).getText() != null) {
-                        double cost = Double.valueOf(((MaterialEditText) v).getText().toString());
-                        ((MaterialEditText) v).setText(
-                                String.valueOf(
-                                        new DecimalFormat("#.#").format(
-                                                Math.floor(cost * 10 + .5) / 10)));
+                    MaterialEditText editText = (MaterialEditText) v;
+                    try {
+                        if (editText.getText() != null) {
+                            double cost = Double.valueOf(editText.getText().toString());
+                            editText.setText(
+                                    String.valueOf(
+                                            new DecimalFormat("#.#").format(
+                                                    Math.floor(cost * 10 + .5) / 10)));
+                        }
+                    } catch (NumberFormatException e) {
+                        e.printStackTrace();
+                        editText.setText("0");
                     }
                 }
             }
