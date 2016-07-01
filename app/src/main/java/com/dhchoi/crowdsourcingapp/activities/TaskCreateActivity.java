@@ -36,6 +36,7 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 import org.json.JSONObject;
 
 import java.text.DateFormat;
+import java.text.DecimalFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -115,6 +116,22 @@ public class TaskCreateActivity extends AppCompatActivity {
         mRefreshRate = (MaterialEditText) findViewById(R.id.refresh_rate);
         mAnswersLeft = (MaterialEditText) findViewById(R.id.answers_left);
         mEndlessAnswers = (CheckBox) findViewById(R.id.endless_answers_check);
+
+        // validate cost decimal
+        mTaskCost.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View v, boolean hasFocus) {
+                if (!hasFocus) {        // user has left this blank
+                    if (((MaterialEditText) v).getText() != null) {
+                        double cost = Double.valueOf(((MaterialEditText) v).getText().toString());
+                        ((MaterialEditText) v).setText(
+                                String.valueOf(
+                                        new DecimalFormat("#.#").format(
+                                                Math.floor(cost * 10 + .5) / 10)));
+                    }
+                }
+            }
+        });
 
         // set OnClickListeners on buttons
         mDateAdd.setOnClickListener(new View.OnClickListener() {
