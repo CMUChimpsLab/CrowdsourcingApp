@@ -27,7 +27,7 @@ public class GcmMessageListenerService extends GcmListenerService {
         // taskOwnerId, taskName, messageType
         try {
             String ownerId = data.getString("task");
-            String type = data.getString("messageType");
+            String type = data.getString("taskStatus");
 
             assert ownerId != null;
             assert type != null;
