@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">Crowdsourcing App</string>
+    <string name="app_name">CitySourcing</string>
     <string name="title_activity_login">Sign in</string>
     <string name="title_activity_task_create">Create Task</string>
     <string name="title_activity_task_complete">Complete Task</string>
