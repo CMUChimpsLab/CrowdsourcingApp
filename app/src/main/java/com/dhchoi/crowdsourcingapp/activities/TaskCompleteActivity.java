@@ -24,7 +24,7 @@ import android.widget.Toast;
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientAsyncTask;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
-import com.dhchoi.crowdsourcingapp.services.GeofenceService;
+import com.dhchoi.crowdsourcingapp.services.GeofenceIntentService;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskAction;
@@ -57,8 +57,8 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
         public void onReceive(Context context, Intent intent) {
             Log.d(TAG, "Broadcast Received");
 
-            ArrayList<String> activatedTaskIds = intent.getStringArrayListExtra(GeofenceService.ACTIVATED_TASK_ID_KEY);
-            ArrayList<String> inactivatedTaskIds = intent.getStringArrayListExtra(GeofenceService.INACTIVATED_TASK_ID_KEY);
+            ArrayList<String> activatedTaskIds = intent.getStringArrayListExtra(GeofenceIntentService.ACTIVATED_TASK_ID_KEY);
+            ArrayList<String> inactivatedTaskIds = intent.getStringArrayListExtra(GeofenceIntentService.INACTIVATED_TASK_ID_KEY);
 
             Log.d(TAG, "Activated: " + activatedTaskIds.toString());
             Log.d(TAG, "Inactivated: " + inactivatedTaskIds.toString());
@@ -67,15 +67,10 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
 
             updateSubmitResponseButtonStatus();
 
-//            List<String> inactivatedTaskIds = Arrays.asList(intent.getStringArrayExtra(GeofenceTransitionsIntentService.INACTIVATED_TASK_ID_KEY));
-//            List<String> activatedTaskIds = Arrays.asList(intent.getStringArrayExtra(GeofenceTransitionsIntentService.ACTIVATED_TASK_ID_KEY));
-//            if (inactivatedTaskIds.contains(mTask.getId()) || activatedTaskIds.contains(mTask.getId())) {
-//                updateSubmitResponseButtonStatus();
-//            }
         }
     };
 
-    private GeofenceService.LocationChangeListener locationListener;
+    private GeofenceIntentService.LocationChangeListener locationListener;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -159,14 +154,14 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
 
         // Register to receive messages.
 //        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceTransitionsIntentService.GEOFENCE_TRANSITION_BROADCAST));
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceService.LOCATION_AGENT_BROADCAST));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceIntentService.LOCATION_AGENT_BROADCAST));
 
-        locationListener = new GeofenceService.LocationChangeListener() {
+        locationListener = new GeofenceIntentService.LocationChangeListener() {
             @Override
             public void onLocationChanged(Location location) {
                 super.onLocationChanged(location);      // print log
 
-                Intent intent = new Intent(TaskCompleteActivity.this, GeofenceService.class);
+                Intent intent = new Intent(TaskCompleteActivity.this, GeofenceIntentService.class);
                 String latLngStr = new Gson().toJson(new LatLng(location.getLatitude(), location.getLongitude()));
                 intent.setData(Uri.parse(latLngStr));
                 startService(intent);

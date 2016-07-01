@@ -25,7 +25,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.dhchoi.crowdsourcingapp.Constants;
-import com.dhchoi.crowdsourcingapp.services.GeofenceService;
+import com.dhchoi.crowdsourcingapp.services.GeofenceIntentService;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.fragments.CrowdActivityFragment;
 import com.dhchoi.crowdsourcingapp.fragments.TaskAvailableFragment;
@@ -66,8 +66,8 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         public void onReceive(Context context, Intent intent) {
             Log.d(Constants.TAG, "Broadcast Received");
 
-            ArrayList<String> activatedTaskIds = intent.getStringArrayListExtra(GeofenceService.ACTIVATED_TASK_ID_KEY);
-            ArrayList<String> inactivatedTaskIds = intent.getStringArrayListExtra(GeofenceService.INACTIVATED_TASK_ID_KEY);
+            ArrayList<String> activatedTaskIds = intent.getStringArrayListExtra(GeofenceIntentService.ACTIVATED_TASK_ID_KEY);
+            ArrayList<String> inactivatedTaskIds = intent.getStringArrayListExtra(GeofenceIntentService.INACTIVATED_TASK_ID_KEY);
 
             Log.d(Constants.TAG, "Activated: " + activatedTaskIds.toString());
             Log.d(Constants.TAG, "Inactivated: " + inactivatedTaskIds.toString());
@@ -84,35 +84,11 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
                 mInactiveTasks.add(task);
             }
 
-//            String[] activatedTaskIds = intent.getStringArrayExtra(GeofenceTransitionsIntentService.ACTIVATED_TASK_ID_KEY);
-//            Log.d(Constants.TAG, "activatedTaskIds: " + Arrays.toString(activatedTaskIds));
-//            for (String activatedTaskId : intent.getStringArrayExtra(GeofenceTransitionsIntentService.ACTIVATED_TASK_ID_KEY)) {
-//                for (int i = 0; i < mInactiveTasks.size(); i++) {
-//                    Task inactiveTask = mInactiveTasks.get(i);
-//                    if (inactiveTask.getId().equals(activatedTaskId)) {
-//                        mInactiveTasks.remove(inactiveTask);
-//                        mActiveTasks.add(inactiveTask);
-//                    }
-//                }
-//            }
-//
-//            String[] inactivatedTaskIds = intent.getStringArrayExtra(GeofenceTransitionsIntentService.INACTIVATED_TASK_ID_KEY);
-//            Log.d(Constants.TAG, "inactivatedTaskIds: " + Arrays.toString(inactivatedTaskIds));
-//            for (String inactivatedTaskId : inactivatedTaskIds) {
-//                for (int i = 0; i < mActiveTasks.size(); i++) {
-//                    Task activeTask = mActiveTasks.get(i);
-//                    if (activeTask.getId().equals(inactivatedTaskId)) {
-//                        mActiveTasks.remove(activeTask);
-//                        mInactiveTasks.add(activeTask);
-//                    }
-//                }
-//            }
-
             triggerOnTasksUpdatedEvent();
         }
     };
 
-    private GeofenceService.LocationChangeListener LocationListener;
+    private GeofenceIntentService.LocationChangeListener LocationListener;
 
     private TaskAvailableFragment mTaskAvailableFragment = TaskAvailableFragment.newInstance();
     private CrowdActivityFragment mCrowdActivityFragment = CrowdActivityFragment.newInstance();
@@ -155,14 +131,14 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
 
         // Register to receive messages.
 //        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceTransitionsIntentService.GEOFENCE_TRANSITION_BROADCAST));
-        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceService.LOCATION_AGENT_BROADCAST));
+        LocalBroadcastManager.getInstance(this).registerReceiver(mBroadcastReceiver, new IntentFilter(GeofenceIntentService.LOCATION_AGENT_BROADCAST));
 
-        LocationListener = new GeofenceService.LocationChangeListener() {
+        LocationListener = new GeofenceIntentService.LocationChangeListener() {
             @Override
             public void onLocationChanged(Location location) {
                 super.onLocationChanged(location);  // print log
 
-                Intent intent = new Intent(MainActivity.this, GeofenceService.class);
+                Intent intent = new Intent(MainActivity.this, GeofenceIntentService.class);
                 String latLngStr = new Gson().toJson(new LatLng(location.getLatitude(), location.getLongitude()));
                 intent.setData(Uri.parse(latLngStr));
                 startService(intent);
@@ -267,7 +243,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
                     // broadcast tasks to listeners
                     List<Task> allIncompleteTasks = TaskManager.getAllUnownedIncompleteTasks(MainActivity.this);
 
-                    GeofenceService.addGeofences(allIncompleteTasks);
+                    GeofenceIntentService.addGeofences(allIncompleteTasks);
 
                     mActiveTasks = new ArrayList<>();
                     mInactiveTasks = new ArrayList<>();
@@ -411,7 +387,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         if (completedTaskIds.size() > 0) {
 //            LocationServices.GeofencingApi.removeGeofences(getGoogleApiClient(), completedTaskIds);
             for (String id : completedTaskIds)
-                GeofenceService.removeGeofence(TaskManager.getTaskById(this, id));
+                GeofenceIntentService.removeGeofence(TaskManager.getTaskById(this, id));
         }
 
         for (OnTasksUpdatedListener onTasksUpdatedListener : onTasksUpdatedListeners) {

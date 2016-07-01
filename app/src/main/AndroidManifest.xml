@@ -94,15 +94,12 @@
         <!-- [END gcm_receiver] -->
 
         <service
-            android:name=".services.GeofenceTransitionsIntentService"
-            android:exported="false" />
-        <service
             android:name=".services.FetchAddressIntentService"
             android:exported="false" />
         <service
             android:name=".services.GcmRegistrationIntentService"
             android:exported="false" />
-        <service android:name=".services.GeofenceService"
+        <service android:name=".services.GeofenceIntentService"
             android:exported="false" />
 
         <!-- [START gcm_listener] -->
