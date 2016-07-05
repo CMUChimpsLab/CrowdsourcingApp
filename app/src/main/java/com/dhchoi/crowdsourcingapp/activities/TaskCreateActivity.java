@@ -117,6 +117,11 @@ public class TaskCreateActivity extends AppCompatActivity {
         mAnswersLeft = (MaterialEditText) findViewById(R.id.answers_left);
         mEndlessAnswers = (CheckBox) findViewById(R.id.endless_answers_check);
 
+        // make date & time not editable
+        mDateText.setKeyListener(null);
+        mTimeText.setKeyListener(null);
+        mLocationName.setKeyListener(null);
+
         // validate cost decimal
         mTaskCost.setOnFocusChangeListener(new View.OnFocusChangeListener() {
             @Override
