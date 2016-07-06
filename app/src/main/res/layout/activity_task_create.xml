@@ -64,18 +64,6 @@
                     android:paddingRight="5dp"
                     android:orientation="vertical">
 
-                    <!--<TextView-->
-                        <!--android:id="@+id/task_name_title"-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:text="Task Name"-->
-                        <!--android:textAppearance="?android:attr/textAppearanceLarge" />-->
-
-                    <!--<EditText-->
-                        <!--android:id="@+id/task_name"-->
-                        <!--android:layout_width="match_parent"-->
-                        <!--android:layout_height="wrap_content" />-->
-
                     <com.rengwuxian.materialedittext.MaterialEditText
                         android:id="@+id/task_name"
                         android:layout_width="match_parent"
@@ -91,20 +79,6 @@
                     android:layout_height="wrap_content"
                     android:layout_weight="2"
                     android:orientation="vertical">
-
-                    <!--<TextView-->
-                        <!--android:id="@+id/task_cost_title"-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:text="Cost"-->
-                        <!--android:textAppearance="?android:attr/textAppearanceLarge" />-->
-
-                    <!--<EditText-->
-                        <!--android:id="@+id/task_cost"-->
-                        <!--android:layout_width="wrap_content"-->
-                        <!--android:layout_height="wrap_content"-->
-                        <!--android:ems="8"-->
-                        <!--android:inputType="numberDecimal" />-->
 
                     <com.rengwuxian.materialedittext.MaterialEditText
                         android:id="@+id/task_cost"
@@ -141,14 +115,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <!--<TextView-->
-                    <!--android:id="@+id/date_title"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="Date: "-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
-
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/date_add_text"
                     android:layout_width="0dp"
@@ -177,14 +143,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <!--<TextView-->
-                    <!--android:id="@+id/time_title"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="Time: "-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
-
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/time_add_text"
                     android:layout_width="0dp"
@@ -212,14 +170,6 @@
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
 
-                <!--<TextView-->
-                    <!--android:id="@+id/refresh_rate_title"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="Refresh Rate: "-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
-
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/refresh_rate"
                     android:layout_width="0dp"
@@ -233,13 +183,6 @@
                     app:met_floatingLabelAlwaysShown="true"
                     android:text="60" />
 
-                <!--<TextView-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text=" minutes"-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
-
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/location_radius"
                     android:layout_width="0dp"
@@ -251,7 +194,7 @@
                     app:met_floatingLabel="highlight"
                     app:met_floatingLabelText="Radius (m)"
                     app:met_floatingLabelAlwaysShown="true"
-                    android:text="1000" />
+                    android:text="100" />
 
 
             </LinearLayout>
@@ -260,14 +203,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:orientation="horizontal">
-
-                <!--<TextView-->
-                    <!--android:id="@+id/answers_left_title"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="Total Answers: "-->
-                    <!--android:layout_weight="1"-->
-                    <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
 
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/answers_left"
@@ -327,13 +262,6 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content">
 
-                <!--<TextView-->
-                    <!--android:id="@+id/location_name_title"-->
-                    <!--android:layout_width="wrap_content"-->
-                    <!--android:layout_height="wrap_content"-->
-                    <!--android:text="Name: "-->
-                    <!--android:textAppearance="?android:attr/textAppearanceMedium" />-->
-
                 <com.rengwuxian.materialedittext.MaterialEditText
                     android:id="@+id/location_name"
                     android:layout_width="match_parent"
@@ -357,13 +285,6 @@
                 android:layout_height="wrap_content"
                 android:text="location_lng"
                 android:visibility="gone" />
-
-            <!--<EditText-->
-                <!--android:id="@+id/location_radius"-->
-                <!--android:layout_width="wrap_content"-->
-                <!--android:layout_height="wrap_content"-->
-                <!--android:text="1000"-->
-                <!--android:visibility="gone" />-->
 
             <LinearLayout
                 android:layout_width="match_parent"

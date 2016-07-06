@@ -25,6 +25,11 @@ public class GcmMessageListenerService extends GcmListenerService {
         Log.d(TAG, "From: " + from);
         Log.d(TAG, "Bundle Data: " + data);
 
+        // in case notification received when user hasn't logged in
+        if (!UserManager.isUserLoggedIn(this)) {
+            return;
+        }
+
         // taskOwnerId
         // taskName
         // taskStatus
