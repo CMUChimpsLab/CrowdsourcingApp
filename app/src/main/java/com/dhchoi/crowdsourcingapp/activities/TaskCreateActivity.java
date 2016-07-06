@@ -137,8 +137,8 @@ public class TaskCreateActivity extends AppCompatActivity {
                             double cost = Double.valueOf(editText.getText().toString());
                             editText.setText(
                                     String.valueOf(
-                                            new DecimalFormat("#.#").format(
-                                                    Math.floor(cost * 10 + .5) / 10)));
+                                            new DecimalFormat("#.##").format(
+                                                    Math.floor(cost * 100 + .5) / 100)));
                         }
                     } catch (NumberFormatException e) {
                         e.printStackTrace();
@@ -354,27 +354,6 @@ public class TaskCreateActivity extends AppCompatActivity {
                 tagId++;
             }
         }
-
-//        userEntries.put("userId", userId);
-//        userEntries.put("taskName", "Default task");
-//        userEntries.put("cost", "1");
-//        userEntries.put("expiresAt", String.valueOf(new Date().getTime() + 1000 * 60 * 60 * 24));
-//        userEntries.put("refreshRate", "60");
-//        userEntries.put("answersLeft", "-1");
-//        userEntries.put("locationName", "CMU");
-//        userEntries.put("lat", "40.4430");
-//        userEntries.put("lng", "-79.9455");
-//        userEntries.put("radius", "1000");
-//
-//        String descriptionKey = "taskActions[" + 0 + "][description]";
-//        String typeKey = "taskActions[" + 0 + "][type]";
-//        userEntries.put(descriptionKey, "Default description");
-//        userEntries.put(typeKey, "text");
-//
-//        descriptionKey = "taskActions[" + 1 + "][description]";
-//        typeKey = "taskActions[" + 1 + "][type]";
-//        userEntries.put(descriptionKey, "Default description");
-//        userEntries.put(typeKey, "text");
 
         return userEntries;
     }

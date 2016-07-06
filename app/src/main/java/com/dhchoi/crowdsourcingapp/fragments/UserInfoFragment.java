@@ -206,7 +206,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
 
     @SuppressWarnings("All")
     public void updateUserTextViews() {
-        mUserBalance.setText(String.format("%.1f", UserManager.getUserBalance(getActivity())));
+        mUserBalance.setText(String.format("%.2f", UserManager.getUserBalance(getActivity())));
     }
 
     private void fetchTasks() {
