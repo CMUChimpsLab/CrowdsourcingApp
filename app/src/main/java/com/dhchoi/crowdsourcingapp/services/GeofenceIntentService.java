@@ -48,18 +48,19 @@ public class GeofenceIntentService extends IntentService {
 
         Log.d(TAG, "Geofences: " + mGeofenceList.toString());
 
-        for (Task task : mGeofenceList) {
+        for (int i = 0; i < mGeofenceList.size(); i++) {
+            Task task = mGeofenceList.get(i);
             LatLng existingLocation = task.getLocation().getLatLng();
 
             Log.d(TAG, "Task ID: " + task.getId() + " Distance: " + getDistanceFromLatLng(newLocation, existingLocation) + " Radius: " + task.getRadius());
 
-            if ((int)getDistanceFromLatLng(newLocation, existingLocation) <= task.getRadius()) {
-                activatedTaskIds.add(task.getId());
+            if ((int) getDistanceFromLatLng(newLocation, existingLocation) <= task.getRadius()) {
                 task.setActivated(true);
+                activatedTaskIds.add(task.getId());
                 TaskManager.updateTask(this, task);
             } else {
-                inactivatedTaskIds.add(task.getId());
                 task.setActivated(false);
+                inactivatedTaskIds.add(task.getId());
                 TaskManager.updateTask(this, task);
             }
         }
