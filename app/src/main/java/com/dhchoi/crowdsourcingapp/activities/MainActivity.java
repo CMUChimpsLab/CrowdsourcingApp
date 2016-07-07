@@ -5,10 +5,12 @@ import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.content.SharedPreferences;
 import android.location.Location;
 import android.net.Uri;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.design.widget.Snackbar;
 import android.support.design.widget.TabLayout;
 import android.support.v4.app.Fragment;
@@ -64,6 +66,11 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
+            // TODO: test code for context initialisation bug
+            // so if MainActivity is not running, let's not do too much
+            if (!PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("MainActivityRunning", false))
+                return;
+
             Log.d(Constants.TAG, "Broadcast Received");
 
             ArrayList<String> activatedTaskIds = intent.getStringArrayListExtra(GeofenceIntentService.ACTIVATED_TASK_ID_KEY);
@@ -308,6 +315,22 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         // Unregister since the activity is about to be closed.
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
         super.onDestroy();
+    }
+
+    @Override
+    protected void onResume() {
+        PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit()
+                .putBoolean("MainActivityRunning", true)
+                .commit();
+        super.onResume();
+    }
+
+    @Override
+    protected void onPause() {
+        super.onPause();
+        PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit()
+                .putBoolean("MainActivityRunning", false)
+                .commit();
     }
 
     @Override

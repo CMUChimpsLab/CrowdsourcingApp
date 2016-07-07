@@ -76,7 +76,7 @@ public class UserManager {
      * @return the user's id
      */
     public static String getUserId(Context context) {
-        return getSharedPreferences(context).getString(USER_ID_KEY, "");
+        return getSharedPreferences(context).getString(USER_ID_KEY, null);
     }
 
     /**
