@@ -51,7 +51,9 @@
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_marginTop="16dp"
+                android:background="?android:attr/selectableItemBackground"
                 android:text="Pick existing email"
+                android:textColor="@android:color/black"
                 android:textStyle="bold" />
 
             <Button
@@ -59,9 +61,10 @@
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
                 android:enabled="false"
+                android:background="?android:attr/selectableItemBackground"
                 android:text="@string/action_sign_in"
+                android:textColor="@android:color/black"
                 android:textStyle="bold" />
 
             <TextView
