@@ -114,6 +114,7 @@ public class Task implements Serializable {
 
         JSONArray jsonArray = TaskManager.getTaskResponses(mId);
         try {
+            assert jsonArray != null;
             for (int i = 0; i < jsonArray.length(); i++) {
                 if (jsonArray.getJSONObject(i).getString("userId").equals(answererId)) {
                     // get all of my responses
@@ -123,7 +124,7 @@ public class Task implements Serializable {
                     break;
                 }
             }
-        } catch (JSONException e) {
+        } catch (JSONException | NullPointerException e) {
             e.printStackTrace();
         }
 
