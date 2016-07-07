@@ -2,6 +2,7 @@ package com.dhchoi.crowdsourcingapp.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.Location;
 import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
@@ -31,14 +32,13 @@ import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskCompleteActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.views.CustomSwipeRefreshLayout;
-import com.google.android.gms.location.FusedLocationProviderApi;
+import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
-import java.util.Random;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -186,17 +186,23 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
             ((TextView) convertView.findViewById(R.id.num_submitted_response)).setText(task.getName());
             ((TextView) convertView.findViewById(R.id.task_cost)).setText("$" + task.getCost());
 
+            // display either distance of location name
             String locationName = task.getLocation().getName();
             Matcher matcher = Pattern.compile("\\(*\\)").matcher(locationName);
             if (matcher.find()) {
                 LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-                LatLng currentLocation = new LatLng(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).getLatitude(),
-                        locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).getLongitude());
 
+                LatLng currentLocation;
+                Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(((MainActivity) getActivity()).getGoogleApiClient());
+                currentLocation = new LatLng(
+                        lastKnownLocation.getLatitude(),
+                        lastKnownLocation.getLongitude());
+
+                // calculate distance to task
                 double distance = GeofenceIntentService.getDistanceFromLatLng(task.getLocation().getLatLng(),
                         currentLocation);
                 ((TextView) convertView.findViewById(R.id.task_location)).setText(
-                        new DecimalFormat("#.#").format(distance) + " meters away");
+                        new DecimalFormat("#.#").format(distance) + "m away");
             } else {
                 ((TextView) convertView.findViewById(R.id.task_location)).setText(locationName);
             }
@@ -219,8 +225,6 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
 
             final ImageView taskImage = (ImageView) convertView.findViewById(R.id.task_image);
 
-//            Random random = new Random();
-//            taskImage.setBackgroundColor(0xff000000 + 256 * 256 * random.nextInt(256) + 256 * random.nextInt(256) + random.nextInt(256));
             if (task.isActivated())
                 taskImage.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorAccent));
             else
