@@ -47,7 +47,7 @@ public class GeofenceIntentService extends IntentService {
         List<String> inactivatedTaskIds = new ArrayList<>();
 
         Log.d(TAG, "Geofences: " + mGeofenceList.toString());
-
+        
         for (int i = 0; i < mGeofenceList.size(); i++) {
             Task task = mGeofenceList.get(i);
             LatLng existingLocation = task.getLocation().getLatLng();
@@ -116,7 +116,7 @@ public class GeofenceIntentService extends IntentService {
      * @param location2 second location
      * @return          distance between 2 locations
      */
-    private static double getDistanceFromLatLng(LatLng location1, LatLng location2) {
+    public static double getDistanceFromLatLng(LatLng location1, LatLng location2) {
         double lat1 = location1.latitude;
         double lng1 = location1.longitude;
         double lat2 = location2.latitude;

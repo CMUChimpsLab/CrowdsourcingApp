@@ -1,5 +1,7 @@
 package com.dhchoi.crowdsourcingapp.services;
 
+import android.content.pm.PackageInfo;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.util.Log;
 
@@ -27,6 +29,20 @@ public class GcmMessageListenerService extends GcmListenerService {
 
         // in case notification received when user hasn't logged in
         if (!UserManager.isUserLoggedIn(this)) {
+            return;
+        }
+
+        // update push
+        if (data.getString("update", "0").equals("1")) {
+            try {
+                PackageInfo packageInfo = getPackageManager().getPackageInfo(getPackageName(), 0);
+                if (Integer.parseInt(data.getString("version", "0")) > packageInfo.versionCode) {      // new version available
+                    Log.i(TAG, "New apk available");
+                    NotificationHelper.createDownloadNotification("Update Available", "Click to to download the latest apk", this, "http://ec2-54-221-193-1.compute-1.amazonaws.com:3000/apk");
+                }
+            } catch (PackageManager.NameNotFoundException e) {
+                e.printStackTrace();
+            }
             return;
         }
 

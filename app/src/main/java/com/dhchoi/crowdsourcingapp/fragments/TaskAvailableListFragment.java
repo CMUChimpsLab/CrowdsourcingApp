@@ -2,6 +2,7 @@ package com.dhchoi.crowdsourcingapp.fragments;
 
 import android.content.Context;
 import android.content.Intent;
+import android.location.LocationManager;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.support.design.widget.Snackbar;
@@ -22,6 +23,7 @@ import android.widget.Toast;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.NotificationHelper;
+import com.dhchoi.crowdsourcingapp.services.GeofenceIntentService;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.dhchoi.crowdsourcingapp.views.CustomListView;
 import com.dhchoi.crowdsourcingapp.R;
@@ -29,11 +31,16 @@ import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskCompleteActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.views.CustomSwipeRefreshLayout;
+import com.google.android.gms.location.FusedLocationProviderApi;
+import com.google.android.gms.maps.model.LatLng;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Random;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class TaskAvailableListFragment extends Fragment implements MainActivity.OnTasksUpdatedListener {
 
@@ -165,6 +172,7 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
             Log.d(Constants.TAG, "got tasks: " + tasks);
         }
 
+        @SuppressWarnings("all")
         @Override
         public View getView(int position, View convertView, ViewGroup parent) {
             Task task = getItem(position);
@@ -176,8 +184,22 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
 
             // set texts
             ((TextView) convertView.findViewById(R.id.num_submitted_response)).setText(task.getName());
-            ((TextView) convertView.findViewById(R.id.task_location)).setText(task.getLocation().getName());
             ((TextView) convertView.findViewById(R.id.task_cost)).setText("$" + task.getCost());
+
+            String locationName = task.getLocation().getName();
+            Matcher matcher = Pattern.compile("\\(*\\)").matcher(locationName);
+            if (matcher.find()) {
+                LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+                LatLng currentLocation = new LatLng(locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).getLatitude(),
+                        locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER).getLongitude());
+
+                double distance = GeofenceIntentService.getDistanceFromLatLng(task.getLocation().getLatLng(),
+                        currentLocation);
+                ((TextView) convertView.findViewById(R.id.task_location)).setText(
+                        new DecimalFormat("#.#").format(distance) + " meters away");
+            } else {
+                ((TextView) convertView.findViewById(R.id.task_location)).setText(locationName);
+            }
 
             // set remaining time
             String expiresAtText = "";

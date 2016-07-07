@@ -51,4 +51,21 @@ public class NotificationHelper {
     public static void createNotification(String title, String message, Context context, Class targetActivity, @Nullable String taskId) {
         createNotification(title, message, "", context, targetActivity, taskId);
     }
+
+    public static void createDownloadNotification(String title, String message, Context context, String link) {
+        Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
+//        intent.setClassName("com.android.browser", "com.android.browser.BrowserActivity");
+
+        PendingIntent pendingIntent = PendingIntent.getActivity(context, 26, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+        NotificationCompat.Builder notificationBuilder = new NotificationCompat.Builder(context)
+                .setSmallIcon(R.mipmap.ic_launcher)
+                .setContentTitle(title)
+                .setContentText(message)
+                .setAutoCancel(true)
+                .setSound(RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION))
+                .setContentIntent(pendingIntent);
+
+        NotificationManager notificationManager = (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.notify(null, 26, notificationBuilder.build());
+    }
 }
