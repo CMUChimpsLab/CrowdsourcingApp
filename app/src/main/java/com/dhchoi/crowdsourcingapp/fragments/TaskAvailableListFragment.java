@@ -190,19 +190,27 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
             String locationName = task.getLocation().getName();
             Matcher matcher = Pattern.compile("\\(*\\)").matcher(locationName);
             if (matcher.find()) {
-                LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
-
                 LatLng currentLocation;
                 Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(((MainActivity) getActivity()).getGoogleApiClient());
-                currentLocation = new LatLng(
-                        lastKnownLocation.getLatitude(),
-                        lastKnownLocation.getLongitude());
 
-                // calculate distance to task
-                double distance = GeofenceIntentService.getDistanceFromLatLng(task.getLocation().getLatLng(),
-                        currentLocation);
-                ((TextView) convertView.findViewById(R.id.task_location)).setText(
-                        new DecimalFormat("#.#").format(distance) + "m away");
+                // returning from place picker
+                if (lastKnownLocation == null) {
+                    LocationManager locationManager = (LocationManager) getActivity().getSystemService(Context.LOCATION_SERVICE);
+                    lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                }
+                if (lastKnownLocation != null) {
+                    currentLocation = new LatLng(
+                            lastKnownLocation.getLatitude(),
+                            lastKnownLocation.getLongitude());
+
+                    // calculate distance to task
+                    double distance = GeofenceIntentService.getDistanceFromLatLng(task.getLocation().getLatLng(),
+                            currentLocation);
+                    ((TextView) convertView.findViewById(R.id.task_location)).setText(
+                            new DecimalFormat("#.#").format(distance) + "m away");
+                } else {
+                    ((TextView) convertView.findViewById(R.id.task_location)).setText(locationName);
+                }
             } else {
                 ((TextView) convertView.findViewById(R.id.task_location)).setText(locationName);
             }
@@ -229,28 +237,6 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
                 taskImage.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorAccent));
             else
                 taskImage.setBackgroundColor(ContextCompat.getColor(getActivity(), R.color.colorPrimary));
-
-
-//            new AsyncTask<Void, Void, Bitmap>() {
-//                @Override
-//                protected Bitmap doInBackground(Void... params) {
-//                    Bitmap image = null;
-//                    try {
-//                        URL url = new URL("https://c2.staticflickr.com/4/3713/10988185013_26082c04a4_b.jpg");
-//                        image = BitmapFactory.decodeStream(url.openStream());
-//                    } catch (IOException e) {
-//                        e.printStackTrace();
-//                    }
-//                    return image;
-//                }
-//
-//                @Override
-//                protected void onPostExecute(Bitmap image) {
-//                    if (image != null) {
-//                        taskImage.setImageBitmap(image);
-//                    }
-//                }
-//            }.execute();
 
             // Return the completed view to render on screen
             return convertView;

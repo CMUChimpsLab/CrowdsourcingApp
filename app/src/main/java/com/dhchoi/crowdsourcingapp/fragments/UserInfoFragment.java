@@ -349,6 +349,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
                 TextView responseTextView = new TextView(getActivity());
                 responseTextView.setTextSize(16);
                 responseTextView.setText(resp);
+                responseTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
                 taskResponseContainer.addView(responseTextView);
             }
 
