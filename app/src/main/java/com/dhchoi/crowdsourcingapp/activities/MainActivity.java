@@ -1,6 +1,8 @@
 package com.dhchoi.crowdsourcingapp.activities;
 
 import android.app.ActivityManager;
+import android.app.AlarmManager;
+import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -28,6 +30,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.dhchoi.crowdsourcingapp.Constants;
+import com.dhchoi.crowdsourcingapp.services.AlarmReceiver;
 import com.dhchoi.crowdsourcingapp.services.BackgroundLocationService;
 import com.dhchoi.crowdsourcingapp.services.GeofenceIntentService;
 import com.dhchoi.crowdsourcingapp.R;
@@ -44,6 +47,7 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
 
 public class MainActivity extends BaseGoogleApiActivity implements TaskManager.OnSyncCompleteListener {
@@ -157,6 +161,46 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         };
 
         TaskManager.addOnSyncCompleteListener(this);
+
+        setAlarms();
+
+        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+        Intent intent = new Intent(this, AlarmReceiver.class);
+        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
+
+        // set alarm time to 10:00am
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.set(Calendar.HOUR_OF_DAY, 15);
+        calendar.set(Calendar.MINUTE, 58);
+
+        alarmManager.cancel(pendingIntent);
+    }
+
+    private void setAlarms() {
+
+        if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("alarm_set", false)) {
+            // haven't set alarm
+            AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
+
+            Intent intent = new Intent(this, AlarmReceiver.class);
+            PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
+            // set alarm time to 10:00am
+            Calendar calendar = Calendar.getInstance();
+            calendar.setTimeInMillis(System.currentTimeMillis());
+            calendar.set(Calendar.HOUR_OF_DAY, 10);
+            calendar.set(Calendar.MINUTE, 0);
+
+            // "_WAKEUP" will wake up the phone
+            alarmManager.setRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
+                    AlarmManager.INTERVAL_DAY, pendingIntent);
+
+            PreferenceManager.getDefaultSharedPreferences(this).edit()
+                    .putBoolean("alarm_set", true)
+                    .apply();
+        }
     }
 
     /***

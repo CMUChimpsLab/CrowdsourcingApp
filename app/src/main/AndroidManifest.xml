@@ -95,6 +95,11 @@
         </receiver>
         <!-- [END gcm_receiver] -->
 
+        <!-- [START alarm_receiver] -->
+        <receiver android:name=".services.AlarmReceiver" />
+        <!-- [END alarm_receiver] -->
+
+
         <service
             android:name=".services.FetchAddressIntentService"
             android:exported="false" />
