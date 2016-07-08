@@ -54,7 +54,7 @@ public class GcmRegistrationIntentService extends IntentService {
         }
 
         // Notify any listener that registration has completed
-        Intent registrationComplete = new Intent(GCM_REGISTRATION_COMPLETE);
+        Intent registrationComplete = new Intent(GCM_REGISTRATION_COMPLETE);        // currently not listened to by anyone
         LocalBroadcastManager.getInstance(this).sendBroadcast(registrationComplete);
     }
 

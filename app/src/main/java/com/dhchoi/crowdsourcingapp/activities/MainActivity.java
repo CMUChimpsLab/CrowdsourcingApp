@@ -66,7 +66,6 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
     private BroadcastReceiver mBroadcastReceiver = new BroadcastReceiver() {
         @Override
         public void onReceive(Context context, Intent intent) {
-            // TODO: test code for context initialisation bug
             // so if MainActivity is not running, let's not do too much
             if (!PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).getBoolean("MainActivityRunning", false))
                 return;
