@@ -165,6 +165,9 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         setAlarms();
     }
 
+    /***
+     * 10:00am every day
+     */
     private void setAlarms() {
 
         if (!PreferenceManager.getDefaultSharedPreferences(this).getBoolean("alarm_set", false)) {
