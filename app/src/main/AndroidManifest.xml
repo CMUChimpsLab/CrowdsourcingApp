@@ -115,6 +115,9 @@
         </service>
         <!-- [END gcm_listener] -->
 
+        <service android:name=".services.BackgroundLocationService"
+            android:exported="false"/>
+
 
         <!-- [START instanceId_listener] -->
         <service

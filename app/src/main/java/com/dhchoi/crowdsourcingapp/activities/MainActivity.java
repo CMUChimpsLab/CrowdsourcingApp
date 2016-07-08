@@ -1,5 +1,6 @@
 package com.dhchoi.crowdsourcingapp.activities;
 
+import android.app.ActivityManager;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.DialogInterface;
@@ -27,6 +28,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.dhchoi.crowdsourcingapp.Constants;
+import com.dhchoi.crowdsourcingapp.services.BackgroundLocationService;
 import com.dhchoi.crowdsourcingapp.services.GeofenceIntentService;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.fragments.CrowdActivityFragment;
@@ -39,6 +41,7 @@ import com.google.android.gms.location.LocationRequest;
 import com.google.android.gms.location.LocationServices;
 import com.google.android.gms.maps.model.LatLng;
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -114,6 +117,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+
         // Create the adapter that will return a fragment for each of the three
         // primary sections of the activity.
         mSectionsPagerAdapter = new SectionsPagerAdapter(getSupportFragmentManager());
@@ -153,6 +157,20 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         };
 
         TaskManager.addOnSyncCompleteListener(this);
+    }
+
+    /***
+     * Check if the background location service is running
+     * @param service       service to check
+     * @return              running or not
+     */
+    private boolean isServiceRunning(Class<?> service) {
+        ActivityManager manager = (ActivityManager) getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo serviceInfo : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (service.getName().equals(serviceInfo.service.getClassName()))       // is running
+                return true;
+        }
+        return false;
     }
 
     @Override
@@ -314,14 +332,28 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
     }
 
     @Override
-    public void onDestroy() {
+    protected void onStop() {
         // Unregister since the activity is about to be closed.
+        // onDestroy is never called when application is kill from activity stack
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
-        super.onDestroy();
+
+        // start background location service
+        Intent intent = new Intent(getApplicationContext(), BackgroundLocationService.class);
+        String dataStr = new Gson().toJson(GeofenceIntentService.getGeofenceList(), new TypeToken<List<Task>>() {}.getType());
+        PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit()
+                .putString("geofencelist", dataStr)
+                .apply();
+        startService(intent);
+
+        super.onStop();
     }
 
     @Override
     protected void onResume() {
+        // kill running service
+        if (isServiceRunning(BackgroundLocationService.class))
+            stopService(new Intent(getApplicationContext(), BackgroundLocationService.class));
+
         PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit()
                 .putBoolean("MainActivityRunning", true)
                 .commit();
