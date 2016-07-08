@@ -163,19 +163,6 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         TaskManager.addOnSyncCompleteListener(this);
 
         setAlarms();
-
-        AlarmManager alarmManager = (AlarmManager) getSystemService(ALARM_SERVICE);
-
-        Intent intent = new Intent(this, AlarmReceiver.class);
-        PendingIntent pendingIntent = PendingIntent.getBroadcast(this, 0, intent, 0);
-
-        // set alarm time to 10:00am
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
-        calendar.set(Calendar.HOUR_OF_DAY, 15);
-        calendar.set(Calendar.MINUTE, 58);
-
-        alarmManager.cancel(pendingIntent);
     }
 
     private void setAlarms() {
