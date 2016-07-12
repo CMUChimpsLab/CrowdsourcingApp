@@ -16,10 +16,11 @@ import android.view.View;
 import android.view.ViewGroup;
 
 import com.dhchoi.crowdsourcingapp.Constants;
-import com.dhchoi.crowdsourcingapp.SimpleGeofence;
+import com.dhchoi.crowdsourcingapp.GeofenceLocation;
 import com.dhchoi.crowdsourcingapp.activities.BaseGoogleApiActivity;
 import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskCompleteActivity;
+import com.dhchoi.crowdsourcingapp.services.BackgroundLocationService;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.google.android.gms.location.LocationListener;
 import com.google.android.gms.location.LocationRequest;
@@ -109,6 +110,7 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
             @Override
             public void onInfoWindowClick(Marker marker) {
                 // start activity for task
+                BackgroundLocationService.setDoStartService(false);
                 Intent intent = new Intent(getActivity(), TaskCompleteActivity.class);
                 intent.putExtra(Task.TASK_KEY_SERIALIZABLE, mMarkerToTask.get(marker).getId());
                 startActivity(intent);
@@ -183,7 +185,7 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
         allTasks.addAll(mInactiveTasks);
 
         for (Task t : allTasks) {
-            SimpleGeofence simpleGeofence = t.getLocation();
+            GeofenceLocation simpleGeofence = t.getLocation();
             LatLng latLng = new LatLng(simpleGeofence.getLatitude(), simpleGeofence.getLongitude());
             MarkerOptions markerOptions = new MarkerOptions()
                     .position(latLng)

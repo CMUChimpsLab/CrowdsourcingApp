@@ -1,5 +1,6 @@
 package com.dhchoi.crowdsourcingapp.activities;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AppCompatActivity;
@@ -17,6 +18,7 @@ import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientAsyncTask;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
 import com.dhchoi.crowdsourcingapp.R;
+import com.dhchoi.crowdsourcingapp.services.BackgroundLocationService;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 
@@ -156,5 +158,26 @@ public class TaskInfoActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        BackgroundLocationService.setDoStartService(false);
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onResume() {
+        if (BackgroundLocationService.isServiceRunning(getApplicationContext(), BackgroundLocationService.class))
+            stopService(new Intent(getApplicationContext(), BackgroundLocationService.class));
+        BackgroundLocationService.setDoStartService(false);
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        if (BackgroundLocationService.whetherStartService())
+            BackgroundLocationService.startLocationService(getApplicationContext());
+        super.onStop();
     }
 }

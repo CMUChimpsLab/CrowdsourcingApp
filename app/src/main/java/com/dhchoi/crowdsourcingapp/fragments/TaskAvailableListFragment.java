@@ -24,6 +24,7 @@ import android.widget.Toast;
 
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.NotificationHelper;
+import com.dhchoi.crowdsourcingapp.services.BackgroundLocationService;
 import com.dhchoi.crowdsourcingapp.services.GeofenceIntentService;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.dhchoi.crowdsourcingapp.views.CustomListView;
@@ -255,6 +256,7 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
                 return;
             }
 
+            BackgroundLocationService.setDoStartService(false);
             Intent intent = new Intent(getActivity(), TaskCompleteActivity.class);
             intent.putExtra(Task.TASK_KEY_SERIALIZABLE, task.getId());
 

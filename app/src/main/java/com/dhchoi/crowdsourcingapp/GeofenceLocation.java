@@ -11,7 +11,7 @@ import com.google.gson.annotations.SerializedName;
 
 import java.io.Serializable;
 
-public class SimpleGeofence implements Serializable {
+public class GeofenceLocation implements Serializable {
 
     @SerializedName("name")
     private final String mName;
@@ -31,7 +31,7 @@ public class SimpleGeofence implements Serializable {
      * @param longitude Longitude of the Geofence's center in degrees.
      * @param radius    Radius of the geofence circle in meters.
      */
-    public SimpleGeofence(String name, String taskId, double latitude, double longitude, float radius) {
+    public GeofenceLocation(String name, String taskId, double latitude, double longitude, float radius) {
         mName = name;
         mTaskId = taskId;
         mLatitude = latitude;

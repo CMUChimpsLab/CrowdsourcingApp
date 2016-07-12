@@ -24,6 +24,7 @@ import android.widget.Toast;
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientAsyncTask;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
+import com.dhchoi.crowdsourcingapp.services.BackgroundLocationService;
 import com.dhchoi.crowdsourcingapp.services.GeofenceIntentService;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.task.Task;
@@ -163,6 +164,27 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
                 Log.d(TAG, "Intent Sent from " + TAG);
             }
         };
+    }
+
+    @Override
+    public void onBackPressed() {
+        BackgroundLocationService.setDoStartService(false);
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onResume() {
+        if (BackgroundLocationService.isServiceRunning(getApplicationContext(), BackgroundLocationService.class))
+            stopService(new Intent(getApplicationContext(), BackgroundLocationService.class));
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        if (BackgroundLocationService.whetherStartService())
+            BackgroundLocationService.startLocationService(getApplicationContext());
+        BackgroundLocationService.setDoStartService(false);
+        super.onStop();
     }
 
     @Override

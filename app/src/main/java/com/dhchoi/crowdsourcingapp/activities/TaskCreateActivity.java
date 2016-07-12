@@ -30,6 +30,7 @@ import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.HttpClientAsyncTask;
 import com.dhchoi.crowdsourcingapp.HttpClientCallable;
 import com.dhchoi.crowdsourcingapp.R;
+import com.dhchoi.crowdsourcingapp.services.BackgroundLocationService;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
 import com.google.android.gms.common.GooglePlayServicesNotAvailableException;
 import com.google.android.gms.common.GooglePlayServicesRepairableException;
@@ -306,10 +307,8 @@ public class TaskCreateActivity extends AppCompatActivity {
 
         // required fields: (with at least one pair of [taskDescription, taskType])
         String[] requiredFields = {"userId", "taskName", "cost", "expiresAt", "refreshRate", "locationName", "lat", "lng", "radius", "taskDescription", "taskType"};
-        if (userEntries.size() < requiredFields.length)
-            return false;
+        return userEntries.size() >= requiredFields.length;
 
-        return true;
     }
 
     private String getExpiresAt() {
@@ -371,5 +370,26 @@ public class TaskCreateActivity extends AppCompatActivity {
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    public void onBackPressed() {
+        BackgroundLocationService.setDoStartService(false);
+        super.onBackPressed();
+    }
+
+    @Override
+    protected void onResume() {
+        if (BackgroundLocationService.isServiceRunning(getApplicationContext(), BackgroundLocationService.class))
+            stopService(new Intent(getApplicationContext(), BackgroundLocationService.class));
+        super.onResume();
+    }
+
+    @Override
+    protected void onStop() {
+        if (BackgroundLocationService.whetherStartService())
+            BackgroundLocationService.startLocationService(getApplicationContext());
+        BackgroundLocationService.setDoStartService(true);
+        super.onStop();
     }
 }

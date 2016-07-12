@@ -1,5 +1,6 @@
 package com.dhchoi.crowdsourcingapp.services;
 
+import android.app.ActivityManager;
 import android.app.Service;
 import android.content.BroadcastReceiver;
 import android.content.Context;
@@ -19,6 +20,8 @@ import android.util.Log;
 import com.dhchoi.crowdsourcingapp.NotificationHelper;
 import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
+import com.google.android.gms.maps.model.LatLng;
+import com.google.android.gms.maps.model.LatLngBounds;
 import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
@@ -43,6 +46,13 @@ public class BackgroundLocationService extends Service {
             new BackgroundLocationListener(LocationManager.NETWORK_PROVIDER),
             new BackgroundLocationListener(LocationManager.GPS_PROVIDER)
     };
+
+    // whether to start background service when onStop() is called
+    private static boolean doStartService = true;
+
+    private static final LatLngBounds cmuLatLngBounds = new LatLngBounds(
+            new LatLng(40.440673, -79.948488), new LatLng(40.444730, -79.937466)
+    );
 
     @Nullable
     @Override
@@ -89,6 +99,15 @@ public class BackgroundLocationService extends Service {
             locationManager = (LocationManager) getApplicationContext().getSystemService(LOCATION_SERVICE);
     }
 
+    /***
+     * Check whether the user is on CMU campus
+     * @param newLatLng     current location
+     * @return              true or false
+     */
+    private boolean onCMUCampus(LatLng newLatLng) {
+        return cmuLatLngBounds.contains(newLatLng);
+    }
+
     @SuppressWarnings("all")
     @Override
     public void onDestroy() {
@@ -122,6 +141,18 @@ public class BackgroundLocationService extends Service {
             Log.d(TAG, location.getLatitude() + " " + location.getLongitude());
 
             if (isBetterLocation(location, lastKnownLocation)) {
+                LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
+                LatLng lastKnownLatLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
+
+                if (!cmuLatLngBounds.contains(lastKnownLatLng) && cmuLatLngBounds.contains(currentLatLng)) {
+                    // user just entered the cmu campus
+                    NotificationHelper.createNotification(
+                            "Approaching CMU campus",
+                            "Time to use CitySourcing app!",
+                            getApplicationContext(),
+                            MainActivity.class);
+                }
+
                 lastKnownLocation = new Location(location);
 
                 boolean notify = false;
@@ -213,5 +244,39 @@ public class BackgroundLocationService extends Service {
                 return provider2 == null;
             return provider1.equals(provider2);
         }
+    }
+
+    /***
+     * Start background location service
+     */
+    public static void startLocationService(Context context) {
+        Intent intent = new Intent(context, BackgroundLocationService.class);
+        String dataStr = new Gson().toJson(GeofenceIntentService.getGeofenceList(), new TypeToken<List<Task>>() {}.getType());
+        PreferenceManager.getDefaultSharedPreferences(context).edit()
+                .putString("geofencelist", dataStr)
+                .apply();
+        context.startService(intent);
+    }
+
+    /***
+     * Check if the background location service is running
+     * @param service       service to check
+     * @return              running or not
+     */
+    public static boolean isServiceRunning(Context context, Class<?> service) {
+        ActivityManager manager = (ActivityManager) context.getSystemService(ACTIVITY_SERVICE);
+        for (ActivityManager.RunningServiceInfo serviceInfo : manager.getRunningServices(Integer.MAX_VALUE)) {
+            if (service.getName().equals(serviceInfo.service.getClassName()))       // is running
+                return true;
+        }
+        return false;
+    }
+
+    public static void setDoStartService(boolean startService) {
+        doStartService = startService;
+    }
+
+    public static boolean whetherStartService() {
+        return doStartService;
     }
 }

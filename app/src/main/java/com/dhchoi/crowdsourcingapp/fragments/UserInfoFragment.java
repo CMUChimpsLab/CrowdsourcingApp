@@ -25,6 +25,7 @@ import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskCreateActivity;
 import com.dhchoi.crowdsourcingapp.activities.TaskInfoActivity;
+import com.dhchoi.crowdsourcingapp.services.BackgroundLocationService;
 import com.dhchoi.crowdsourcingapp.task.Task;
 import com.dhchoi.crowdsourcingapp.task.TaskManager;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
@@ -83,6 +84,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                BackgroundLocationService.setDoStartService(false);
                 Intent intent = new Intent(getActivity(), TaskCreateActivity.class);
                 startActivity(intent);
             }
@@ -97,6 +99,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         mListCreatedTasks.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
+                BackgroundLocationService.setDoStartService(false);
                 Intent intent = new Intent(getActivity(), TaskInfoActivity.class);
                 intent.putExtra("taskId", mCreatedTaskListAdapter.getItem(position).getId());
                 startActivity(intent);

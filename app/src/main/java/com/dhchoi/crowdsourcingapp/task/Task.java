@@ -1,16 +1,13 @@
 package com.dhchoi.crowdsourcingapp.task;
 
-import com.dhchoi.crowdsourcingapp.SimpleGeofence;
-import com.dhchoi.crowdsourcingapp.user.UserManager;
+import com.dhchoi.crowdsourcingapp.GeofenceLocation;
 import com.google.gson.annotations.SerializedName;
 
 import org.json.JSONArray;
 import org.json.JSONException;
-import org.json.JSONObject;
 
 import java.io.Serializable;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 import static com.dhchoi.crowdsourcingapp.Constants.PACKAGE_NAME;
@@ -38,7 +35,7 @@ public class Task implements Serializable {
     @SerializedName("userId")
     private String mUserId;
     @SerializedName("location")
-    private SimpleGeofence mLocation;
+    private GeofenceLocation mLocation;
     @SerializedName("taskresponses")
     private List<TaskResponse> mTaskResponses;
     @SerializedName("taskactions")
@@ -79,7 +76,7 @@ public class Task implements Serializable {
         return (int) mLocation.getRadius();
     }
 
-    public SimpleGeofence getLocation() {
+    public GeofenceLocation getLocation() {
         return mLocation;
     }
 
