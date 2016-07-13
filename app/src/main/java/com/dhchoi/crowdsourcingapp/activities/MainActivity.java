@@ -372,7 +372,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
 
     @Override
     protected void onStop() {
-        // Unregister since the activity is about to be closed.
+        // Unregister since the activity is about to be closed
         // onDestroy is never called when application is kill from activity stack
         LocalBroadcastManager.getInstance(this).unregisterReceiver(mBroadcastReceiver);
 
