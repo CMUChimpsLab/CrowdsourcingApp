@@ -4,8 +4,10 @@ import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.support.annotation.NonNull;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
@@ -84,6 +86,22 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
+                // warn about region
+                SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(getActivity());
+                if (!sharedPreferences.getBoolean("boundary_warning_shown", false)) {
+                    android.support.v7.app.AlertDialog alertDialog = new android.support.v7.app.AlertDialog.Builder(getActivity())
+                            .setPositiveButton("GOT IT", null)
+                            .setMessage("We are still in testing phase so please kindly limit your tasks inside the CMU campus")
+                            .create();
+                    alertDialog.setCanceledOnTouchOutside(false);
+                    alertDialog.show();
+
+                    SharedPreferences.Editor editor = sharedPreferences.edit();
+                    editor.putBoolean("boundary_warning_shown", true)
+                            .apply();
+                    return;
+                }
+
                 BackgroundLocationService.setDoStartService(false);
                 Intent intent = new Intent(getActivity(), TaskCreateActivity.class);
                 startActivity(intent);

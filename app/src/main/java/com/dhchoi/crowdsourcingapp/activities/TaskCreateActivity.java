@@ -268,21 +268,6 @@ public class TaskCreateActivity extends AppCompatActivity {
                 .addSequenceItem(mLocationRadius, "Location Radius", "Radius of area where people can do this task", "GOT IT")
                 .addSequenceItem(mAnswersLeft, "Total Answers", "How many answers you expect to receive, check endless if no limit", "GOT IT")
                 .start();
-
-        // warn about region
-        SharedPreferences sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
-        if (!sharedPreferences.getBoolean("boundary_warning_shown", false)) {
-            AlertDialog alertDialog = new AlertDialog.Builder(this)
-                    .setPositiveButton("GOT IT", null)
-                    .setMessage("We are still in testing phase so please kindly limit your tasks inside the CMU campus")
-                    .create();
-            alertDialog.setCanceledOnTouchOutside(false);
-            alertDialog.show();
-
-            SharedPreferences.Editor editor = sharedPreferences.edit();
-            editor.putBoolean("boundary_warning_shown", true)
-                    .apply();
-        }
     }
 
     @Override
