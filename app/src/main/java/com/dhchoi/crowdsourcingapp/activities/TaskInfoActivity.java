@@ -79,13 +79,15 @@ public class TaskInfoActivity extends AppCompatActivity {
         mDeactivateTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(TaskInfoActivity.this, "Not implemented yet", Toast.LENGTH_SHORT).show();
+                deactivateTask();
             }
         });
         mDeleteTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                deleteTask();
+                Toast.makeText(TaskInfoActivity.this, "Sorry, we decided it's better you don't use this function", Toast.LENGTH_LONG).show();
+
+//                deleteTask();
             }
         });
     }
@@ -125,6 +127,29 @@ public class TaskInfoActivity extends AppCompatActivity {
         }
     }
 
+    private void deactivateTask() {
+        Map<String, String> params = new HashMap<>();
+        new HttpClientAsyncTask(Constants.APP_SERVER_TASK_DEACTIVATE_URL + "/" + taskId, HttpClientCallable.GET, params) {
+            @Override
+            protected void onPostExecute(String response) {
+                try {
+                    if (response != null) {
+                        Log.d(TAG, response);
+                        onBackPressed();
+                    } else {
+                        Toast.makeText(TaskInfoActivity.this, "Failed to deactivate task", Toast.LENGTH_SHORT).show();
+                        Log.d(TAG, "Response is null");
+                    }
+                } catch (Exception e) {
+                    e.printStackTrace();
+                    Log.e(Constants.TAG, e.getMessage());
+                    Toast.makeText(TaskInfoActivity.this, "Error deactivating task", Toast.LENGTH_SHORT).show();
+                }
+                super.onPostExecute(response);
+            }
+        }.execute();
+    }
+
     private void deleteTask() {
         Map<String, String> params = new HashMap<>();
         new HttpClientAsyncTask(Constants.APP_SERVER_TASK_DELETE_URL + "/" + taskId, HttpClientCallable.GET, params) {
@@ -132,11 +157,11 @@ public class TaskInfoActivity extends AppCompatActivity {
             protected void onPostExecute(String response) {
                 try {
                     if (response != null) {
-                        Log.d("TaskInfoActivity", response);
+                        Log.d(TAG, response);
                         onBackPressed();
                     } else {
                         Toast.makeText(TaskInfoActivity.this, "Failed to delete task", Toast.LENGTH_SHORT).show();
-                        Log.d("TaskInfoActivity", "Response is null");
+                        Log.d(TAG, "Response is null");
                     }
                 } catch (Exception e) {
                     e.printStackTrace();
