@@ -22,6 +22,7 @@ import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -53,6 +54,7 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
+import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 public class TaskCreateActivity extends AppCompatActivity {
@@ -264,7 +266,9 @@ public class TaskCreateActivity extends AppCompatActivity {
 
         MaterialShowcaseSequence sequence = new MaterialShowcaseSequence(this, SHOWCASE_ID);
         sequence.setConfig(config);
-        sequence.addSequenceItem(mRefreshRate, "Refresh Rate", "Interval between each answer", "GOT IT")
+
+        sequence.addSequenceItem(mTaskName, "Task Name", "e.g. Is the CHIMPS Lab crowded right now?", "GOT IT")
+                .addSequenceItem(mRefreshRate, "Refresh Rate", "Interval between each answer", "GOT IT")
                 .addSequenceItem(mLocationRadius, "Location Radius", "Radius of area where people can do this task", "GOT IT")
                 .addSequenceItem(mAnswersLeft, "Total Answers", "How many answers you expect to receive, check endless if no limit", "GOT IT")
                 .start();
