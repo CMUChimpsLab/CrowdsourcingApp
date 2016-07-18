@@ -5,6 +5,8 @@ import android.app.TimePickerDialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.location.Location;
+import android.location.LocationManager;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
 import android.support.v7.app.AlertDialog;
@@ -93,6 +95,7 @@ public class TaskCreateActivity extends AppCompatActivity {
 
     private static final String SHOWCASE_ID = "TaskCreateActivityShowcase";
 
+    @SuppressWarnings("all")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -220,6 +223,15 @@ public class TaskCreateActivity extends AppCompatActivity {
                     Toast.makeText(TaskCreateActivity.this, "Please check if all fields have been completed.", Toast.LENGTH_SHORT).show();
                     return;
                 }
+
+                Location createLocation;
+                LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
+                if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                    createLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
+                else
+                    createLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                userEntries.put("createLat", String.valueOf(createLocation.getLatitude()));
+                userEntries.put("createLng", String.valueOf(createLocation.getLongitude()));
 
                 mSubmit.setEnabled(false);
                 mSubmitProgressBar.setVisibility(ProgressBar.VISIBLE);
