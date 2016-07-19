@@ -150,6 +150,7 @@ public class TaskInfoActivity extends AppCompatActivity {
         }.execute();
     }
 
+    @Deprecated
     private void deleteTask() {
         Map<String, String> params = new HashMap<>();
         new HttpClientAsyncTask(Constants.APP_SERVER_TASK_DELETE_URL + "/" + taskId, HttpClientCallable.GET, params) {
