@@ -64,8 +64,8 @@ public class TaskInfoActivity extends AppCompatActivity {
 
         mTaskResponseContainer = (ViewGroup) findViewById(R.id.task_response_container);
 
-        Task currentTask = TaskManager.getTaskById(this, getIntent().getStringExtra("taskId"));
-        taskId = currentTask.getId();
+        taskId = getIntent().getStringExtra("taskId");
+        Task currentTask = TaskManager.getTaskById(this, taskId);
         Log.i(TAG, "Task ID: " + taskId);
         Log.i(TAG, "Task Name: " + currentTask.getName());
         Log.i(TAG, "Task Cost: " + currentTask.getCost());
@@ -76,12 +76,16 @@ public class TaskInfoActivity extends AppCompatActivity {
 
         mTaskName.setText(currentTask.getName());
 
-        mDeactivateTask.setOnClickListener(new View.OnClickListener() {
+        if (!currentTask.isActivated())
+            mDeactivateTask.setEnabled(false);
+        else
+            mDeactivateTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 deactivateTask();
             }
         });
+
         mDeleteTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -128,6 +132,10 @@ public class TaskInfoActivity extends AppCompatActivity {
     }
 
     private void deactivateTask() {
+        Task deactivatedTask = TaskManager.getTaskById(this, taskId);
+        deactivatedTask.setActivated(false);
+        TaskManager.updateTask(this, deactivatedTask);
+
         Map<String, String> params = new HashMap<>();
         new HttpClientAsyncTask(Constants.APP_SERVER_TASK_DEACTIVATE_URL + "/" + taskId, HttpClientCallable.GET, params) {
             @Override

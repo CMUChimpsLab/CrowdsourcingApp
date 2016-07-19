@@ -186,11 +186,11 @@ public class TaskManager {
             // create list of tasks from json string
             List<Task> allTasks = new Gson().fromJson(fetchResponse, new TypeToken<ArrayList<Task>>() {}.getType());
             List<Task> addedTasks = new ArrayList<>();      // also to be added as geofence
-            List<Task> ownedTasks = new ArrayList<>();
 
             for (Task t : allTasks) {
                 Log.d("Scanning Tasks", "Task ID: " + t.getId() + " #Responses: " + t.getTaskResponses().size());
 
+                t.setActivated(true);
                 for (TaskResponse taskResponse : t.getTaskResponses()) {
                     String answererId = taskResponse.getUserId();
                     Log.d("Scanning Responses",  "      User ID: " + answererId);
@@ -212,8 +212,6 @@ public class TaskManager {
 
                 if (!userId.equals(t.getOwner())) {     // not my task
                     addedTasks.add(t);
-                } else {
-                    ownedTasks.add(t);
                 }
             }
 
@@ -324,6 +322,8 @@ public class TaskManager {
                             tasksDeletedIds.add(id);
                         else if (!task.isCompleted() && !task.getOwner().equals(UserManager.getUserId(context))) {     // not my task
                             tasksDeletedIds.add(id);
+                        } else {
+                            updateTask(context, task.setActivated(false));
                         }
                     }
 
