@@ -17,6 +17,7 @@ import android.util.Log;
 import android.util.Patterns;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.WindowManager;
 import android.widget.AutoCompleteTextView;
 import android.widget.Button;
 import android.widget.Toast;
@@ -49,7 +50,6 @@ public class LoginActivity extends AppCompatActivity {
     private View mProgressView;
     private View mLoginFormView;
     private Button mEmailSignInButton;
-    private Button mChooseEmailButton;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,16 +70,6 @@ public class LoginActivity extends AppCompatActivity {
             }
         });
 
-        // Set EmailChoose button OnClickListener
-        mChooseEmailButton = (Button) findViewById(R.id.email_choose_button);
-        mChooseEmailButton.setOnClickListener(new OnClickListener() {
-            @Override
-            public void onClick(View view) {
-                Intent emailRequestIntent = AccountPicker.newChooseAccountIntent(null, null, new String[]{GoogleAuthUtil.GOOGLE_ACCOUNT_TYPE}, false, null, null, null, null);
-                startActivityForResult(emailRequestIntent, USER_EMAIL_REQUEST);
-            }
-        });
-
         if (ContextCompat.checkSelfPermission(this, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED) {
             // Permission to access the location is missing.
             PermissionUtils.requestPermission(this, LOCATION_PERMISSION_REQUEST, Manifest.permission.ACCESS_FINE_LOCATION, false);
@@ -89,6 +79,8 @@ public class LoginActivity extends AppCompatActivity {
 
         // start IntentService to register this application with GCM
         startService(new Intent(this, GcmRegistrationIntentService.class));
+
+        hideSoftKeyboard();
     }
 
     /**
@@ -164,6 +156,10 @@ public class LoginActivity extends AppCompatActivity {
         return Patterns.EMAIL_ADDRESS.matcher(email).matches();                     // Android's default check
     }
 
+    private void hideSoftKeyboard() {
+        getWindow().setSoftInputMode(WindowManager.LayoutParams.SOFT_INPUT_STATE_HIDDEN);
+    }
+
     /**
      * Shows the progress UI and hides the login form.
      */
@@ -205,6 +201,7 @@ public class LoginActivity extends AppCompatActivity {
             String userEmail = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
             Log.d(Constants.TAG, "received user email: " + userEmail);
             mEmailView.setText(userEmail);
+            attemptLogin();         // go straight to log in
         }
     }
 

@@ -46,17 +46,6 @@
             </android.support.design.widget.TextInputLayout>
 
             <Button
-                android:id="@+id/email_choose_button"
-                style="?android:textAppearanceSmall"
-                android:layout_width="match_parent"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="16dp"
-                android:background="?android:attr/selectableItemBackground"
-                android:text="Pick existing email"
-                android:textColor="@android:color/black"
-                android:textStyle="bold" />
-
-            <Button
                 android:id="@+id/email_sign_in_button"
                 style="?android:textAppearanceSmall"
                 android:layout_width="match_parent"
@@ -76,6 +65,33 @@
                 android:text="@string/location_permission_denied"
                 android:textColor="#ff0000"
                 android:visibility="gone" />
+            
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="26sp"
+                android:textAlignment="center"
+                android:layout_marginTop="60dp"
+                android:textColor="@android:color/black"
+                android:text="Welcome to CitySoucring!"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_marginTop="10dp"
+                android:textColor="@android:color/black"
+                android:textAlignment="viewStart"
+                android:text="1. Please sign in with your email address in order to complete tasks and post tasks for others to complete"/>
+
+            <TextView
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:textSize="20sp"
+                android:layout_marginTop="10dp"
+                android:textColor="@android:color/black"
+                android:textAlignment="viewStart"
+                android:text="2. You will earn money by answering other people's tasks and spend money by postings tasks"/>
 
         </LinearLayout>
 
