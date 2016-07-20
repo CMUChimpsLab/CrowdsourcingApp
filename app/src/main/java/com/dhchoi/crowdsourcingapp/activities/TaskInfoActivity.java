@@ -89,9 +89,7 @@ public class TaskInfoActivity extends AppCompatActivity {
         mDeleteTask.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Toast.makeText(TaskInfoActivity.this, "Sorry, we decided it's better you don't use this function", Toast.LENGTH_LONG).show();
-
-//                deleteTask();
+                deleteTask();
             }
         });
     }
@@ -158,7 +156,6 @@ public class TaskInfoActivity extends AppCompatActivity {
         }.execute();
     }
 
-    @Deprecated
     private void deleteTask() {
         Map<String, String> params = new HashMap<>();
         new HttpClientAsyncTask(Constants.APP_SERVER_TASK_DELETE_URL + "/" + taskId, HttpClientCallable.GET, params) {

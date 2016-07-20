@@ -85,11 +85,11 @@
                         android:id="@+id/task_cost"
                         android:layout_width="wrap_content"
                         android:layout_height="wrap_content"
-                        android:hint="Cost"
+                        android:hint="Cost ($)"
                         android:ems="8"
                         android:inputType="numberDecimal"
                         app:met_floatingLabel="highlight"
-                        app:met_floatingLabelText="Cost" />
+                        app:met_floatingLabelText="Cost ($)" />
 
                 </LinearLayout>
 
@@ -325,7 +325,7 @@
                 android:layout_gravity="center"
                 android:layout_marginTop="30dp"
                 android:background="?android:attr/selectableItemBackground"
-                android:text="Submit" />
+                android:text="Create New Task" />
 
             <ProgressBar
                 android:id="@+id/submit_progress_bar"
