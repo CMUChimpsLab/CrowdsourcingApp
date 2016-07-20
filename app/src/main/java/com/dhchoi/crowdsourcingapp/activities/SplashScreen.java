@@ -21,7 +21,7 @@ public class SplashScreen extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_splash);
 
-        gImageView splashImage = (ImageView) findViewById(R.id.splash_image);
+        ImageView splashImage = (ImageView) findViewById(R.id.splash_image);
 
         DisplayMetrics metrics = new DisplayMetrics();
         getWindowManager().getDefaultDisplay().getMetrics(metrics);
