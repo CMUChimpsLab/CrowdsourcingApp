@@ -6,18 +6,16 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.Nullable;
 import android.support.v7.app.AlertDialog;
-import android.support.v7.app.AppCompatActivity;
 import android.util.DisplayMetrics;
 import android.widget.ImageView;
 
 import com.dhchoi.crowdsourcingapp.R;
-import com.google.android.gms.common.api.GoogleApiActivity;
 
 /**
  * Created by Peter on 7/20/16.
  *
  */
-public class SplashScreen extends BaseGoogleApiActivity {
+public class SplashActivity extends BaseGoogleApiActivity {
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
@@ -50,7 +48,7 @@ public class SplashScreen extends BaseGoogleApiActivity {
             new Handler().postDelayed(new Runnable() {
                 @Override
                 public void run() {
-                    Intent intent = new Intent(SplashScreen.this, CheckLoginActivity.class);
+                    Intent intent = new Intent(SplashActivity.this, CheckLoginActivity.class);
                     startActivity(intent);
 
                     finish();

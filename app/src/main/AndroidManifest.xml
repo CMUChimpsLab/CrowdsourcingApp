@@ -27,7 +27,7 @@
 
         <!-- [START activities] -->
         <activity
-            android:name=".activities.SplashScreen"
+            android:name=".activities.SplashActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.Nothing" >
             <intent-filter>
