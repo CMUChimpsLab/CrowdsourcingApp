@@ -141,19 +141,17 @@ public class BaseGoogleApiActivity extends AppCompatActivity implements
      * @return true if it is.
      */
     protected boolean isGooglePlayServicesAvailable() {
-        return false;
+        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+        if (resultCode != ConnectionResult.SUCCESS) {
+            if (apiAvailability.isUserResolvableError(resultCode)) {
+                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
+            } else {
+                Log.i(TAG, "This device is not supported.");
+            }
+            return false;
+        }
 
-//        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-//        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
-//        if (resultCode != ConnectionResult.SUCCESS) {
-//            if (apiAvailability.isUserResolvableError(resultCode)) {
-//                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-//            } else {
-//                Log.i(TAG, "This device is not supported.");
-//            }
-//            return false;
-//        }
-//
-//        return true;
+        return true;
     }
 }
