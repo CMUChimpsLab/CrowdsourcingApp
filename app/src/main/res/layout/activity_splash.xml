@@ -13,4 +13,48 @@
         android:layout_gravity="center"
         android:contentDescription="@string/app_name" />
 
+    <TextView
+        android:id="@+id/splash_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
+        android:textSize="26sp"
+        android:textColor="@android:color/black"
+        android:gravity="center"
+        android:text="CitySourcing" />
+
+    <TextView
+        android:id="@+id/splash_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textColor="@android:color/black"
+        android:textSize="20sp"
+        android:gravity="center"
+        android:text="Asking and answering questions about cities in near realtime"/>
+
+    <TextView
+        android:id="@+id/splash_eg1"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="30dp"
+        android:textSize="16sp"
+        android:textAlignment="center"
+        android:text="e.g. How many people are in CHIMPS Lab?"/>
+
+    <TextView
+        android:id="@+id/splash_eg2"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textAlignment="center"
+        android:text="Is the soccer field empty?"/>
+
+    <TextView
+        android:id="@+id/splash_eg3"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:textSize="16sp"
+        android:textAlignment="center"
+        android:text="Pick up a coffee for me at Starbucks"/>
+
 </LinearLayout>

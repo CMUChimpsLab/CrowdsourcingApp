@@ -2,14 +2,10 @@ package com.dhchoi.crowdsourcingapp.activities;
 
 import android.app.DatePickerDialog;
 import android.app.TimePickerDialog;
-import android.content.Context;
 import android.content.Intent;
-import android.content.SharedPreferences;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
-import android.preference.PreferenceManager;
-import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -24,7 +20,6 @@ import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
 import android.widget.ProgressBar;
-import android.widget.ScrollView;
 import android.widget.Spinner;
 import android.widget.TimePicker;
 import android.widget.Toast;
@@ -56,7 +51,6 @@ import java.util.Map;
 import java.util.TimeZone;
 
 import uk.co.deanwild.materialshowcaseview.MaterialShowcaseSequence;
-import uk.co.deanwild.materialshowcaseview.MaterialShowcaseView;
 import uk.co.deanwild.materialshowcaseview.ShowcaseConfig;
 
 public class TaskCreateActivity extends AppCompatActivity {
@@ -173,6 +167,8 @@ public class TaskCreateActivity extends AppCompatActivity {
                         mDateText.setText(mExpirationYear + "/" + mExpirationMonth + "/" + mExpirationDay);
                     }
                 }, currentYear, currentMonth, currentDay);
+                datePickerDialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
+                datePickerDialog.setTitle(null);
                 datePickerDialog.show();
             }
         });
@@ -187,6 +183,19 @@ public class TaskCreateActivity extends AppCompatActivity {
                 TimePickerDialog timePickerDialog = new TimePickerDialog(TaskCreateActivity.this, new TimePickerDialog.OnTimeSetListener() {
                     @Override
                     public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
+                        Calendar calendar = Calendar.getInstance();
+                        calendar.setTimeZone(TimeZone.getDefault());
+                        long currentTimeInMillis = calendar.getTimeInMillis();
+                        calendar.set(Calendar.YEAR, mExpirationYear);
+                        calendar.set(Calendar.MONTH, mExpirationMonth - 1);
+                        calendar.set(Calendar.DAY_OF_MONTH, mExpirationDay);
+                        calendar.set(Calendar.HOUR_OF_DAY, hourOfDay);
+                        calendar.set(Calendar.MINUTE, minute);
+                        if (calendar.getTimeInMillis() < currentTimeInMillis) {
+                            Toast.makeText(TaskCreateActivity.this, "Cannot set expiration time in the past", Toast.LENGTH_SHORT).show();
+                            return;
+                        }
+
                         mExpirationHour = hourOfDay;
                         mExpirationMinute = minute;
                         mTimeText.setText(mExpirationHour + ":" + (mExpirationMinute < 10 ? "0" + mExpirationMinute : mExpirationMinute + ""));    // add padding
@@ -284,6 +293,8 @@ public class TaskCreateActivity extends AppCompatActivity {
                 .addSequenceItem(mLocationRadius, "Location Radius", "Radius of area where people can do this task", "GOT IT")
                 .addSequenceItem(mAnswersLeft, "Total Answers", "How many answers you expect to receive, check endless if no limit", "GOT IT")
                 .start();
+
+        setDefaultTime();
     }
 
     @Override
@@ -310,6 +321,19 @@ public class TaskCreateActivity extends AppCompatActivity {
         String[] requiredFields = {"userId", "taskName", "cost", "expiresAt", "refreshRate", "locationName", "lat", "lng", "radius", "taskDescription", "taskType"};
         return userEntries.size() >= requiredFields.length;
 
+    }
+
+    private void setDefaultTime() {
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTimeInMillis(calendar.getTimeInMillis() + 1000 * 60 * 60 * 24);
+        mExpirationYear = calendar.get(Calendar.YEAR);
+        mExpirationMonth = calendar.get(Calendar.MONTH) + 1;
+        mExpirationDay = calendar.get(Calendar.DAY_OF_MONTH);
+        mExpirationHour = calendar.get(Calendar.HOUR_OF_DAY);
+        mExpirationMinute = calendar.get(Calendar.MINUTE);
+
+        mDateText.setText(mExpirationYear + "/" + mExpirationMonth + "/" + mExpirationDay);
+        mTimeText.setText(mExpirationHour + ":" + (mExpirationMinute < 10 ? "0" + mExpirationMinute : mExpirationMinute + ""));    // add padding
     }
 
     private String getExpiresAt() {
