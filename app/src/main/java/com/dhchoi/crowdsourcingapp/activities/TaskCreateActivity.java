@@ -168,6 +168,7 @@ public class TaskCreateActivity extends AppCompatActivity {
                     }
                 }, currentYear, currentMonth, currentDay);
                 datePickerDialog.getDatePicker().setMinDate(Calendar.getInstance().getTimeInMillis());
+                datePickerDialog.getDatePicker().updateDate(mExpirationYear, mExpirationMonth - 1, mExpirationDay);
                 datePickerDialog.setTitle(null);
                 datePickerDialog.show();
             }
@@ -201,6 +202,7 @@ public class TaskCreateActivity extends AppCompatActivity {
                         mTimeText.setText(mExpirationHour + ":" + (mExpirationMinute < 10 ? "0" + mExpirationMinute : mExpirationMinute + ""));    // add padding
                     }
                 }, currentHour, currentMinute, false);
+                timePickerDialog.updateTime(mExpirationHour, mExpirationMinute);
                 timePickerDialog.show();
             }
         });
