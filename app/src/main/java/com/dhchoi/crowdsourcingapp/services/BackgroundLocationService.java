@@ -37,7 +37,7 @@ public class BackgroundLocationService extends Service {
     private static final String GPS = LocationManager.GPS_PROVIDER;
     private static final String NETWORK = LocationManager.NETWORK_PROVIDER;
 
-    private int minInterval = 1000 * 60 * 5;    // 5 minutes
+    private int minInterval = 1000 * 30;    // 5 minutes
     private float minDistance = 5.0f;           // 10 meters?
 
     private List<Task> mGeofenceList;

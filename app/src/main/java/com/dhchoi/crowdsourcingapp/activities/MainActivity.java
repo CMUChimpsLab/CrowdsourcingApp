@@ -343,7 +343,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         LocationServices.FusedLocationApi.requestLocationUpdates(
                 getGoogleApiClient(),
                 LocationRequest.create()
-                        .setInterval(1000 * 60)
+                        .setInterval(1000 * 5)     // 10 seconds
                         .setFastestInterval(1000)
                         .setSmallestDisplacement(0.0001f)
                         .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY),
