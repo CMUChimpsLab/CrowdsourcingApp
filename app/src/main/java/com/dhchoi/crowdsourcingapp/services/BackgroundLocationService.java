@@ -17,6 +17,8 @@ import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
+import com.dhchoi.crowdsourcingapp.Constants;
+import com.dhchoi.crowdsourcingapp.HttpClientCallable;
 import com.dhchoi.crowdsourcingapp.NotificationHelper;
 import com.dhchoi.crowdsourcingapp.activities.MainActivity;
 import com.dhchoi.crowdsourcingapp.task.Task;
@@ -26,7 +28,9 @@ import com.google.gson.Gson;
 import com.google.gson.reflect.TypeToken;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class BackgroundLocationService extends Service {
 
@@ -40,7 +44,7 @@ public class BackgroundLocationService extends Service {
     private int minInterval = 1000 * 30;        // 30 seconds
     private float minDistance = 5.0f;           // 10 meters?
 
-    private List<Task> mGeofenceList;
+    private static List<Task> mGeofenceList;
 
     private BackgroundLocationListener[] locationListeners = new BackgroundLocationListener[] {
             new BackgroundLocationListener(LocationManager.NETWORK_PROVIDER),
@@ -278,5 +282,24 @@ public class BackgroundLocationService extends Service {
 
     public static boolean whetherStartService() {
         return doStartService;
+    }
+
+    public static void addTaskToList(Task task) {
+        mGeofenceList.add(task);
+    }
+
+    public static void addTaskToList(String taskId) {
+        // although this is just one task, we have to use a list
+        Map<String, String> fetchParams = new HashMap<>();
+        List<String> taskIds = new ArrayList<>();
+        taskIds.add(taskId);
+        fetchParams.put("taskId", taskIds.toString());
+        String fetchResponse = HttpClientCallable.Executor.execute(new HttpClientCallable(
+                Constants.APP_SERVER_TASK_FETCH_URL,
+                HttpClientCallable.GET,
+                fetchParams));
+        List<Task> allTasks = new Gson().fromJson(fetchResponse, new TypeToken<ArrayList<Task>>() {}.getType());
+        if (allTasks != null)
+            addTaskToList(allTasks.get(0));
     }
 }

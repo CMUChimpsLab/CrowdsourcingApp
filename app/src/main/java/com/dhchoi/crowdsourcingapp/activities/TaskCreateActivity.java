@@ -237,12 +237,15 @@ public class TaskCreateActivity extends AppCompatActivity {
 
                 Location createLocation;
                 LocationManager locationManager = (LocationManager) getSystemService(LOCATION_SERVICE);
-                if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER))
+                if (locationManager.isProviderEnabled(LocationManager.GPS_PROVIDER)) {
                     createLocation = locationManager.getLastKnownLocation(LocationManager.GPS_PROVIDER);
-                else
+                    if (createLocation == null)
+                        createLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+                } else
                     createLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
-                userEntries.put("createLat", String.valueOf(createLocation.getLatitude()));
-                userEntries.put("createLng", String.valueOf(createLocation.getLongitude()));
+
+                userEntries.put("createLat", createLocation == null ? null : String.valueOf(createLocation.getLatitude()));
+                userEntries.put("createLng", createLocation == null ? null : String.valueOf(createLocation.getLongitude()));
 
                 mSubmit.setEnabled(false);
                 mSubmitProgressBar.setVisibility(ProgressBar.VISIBLE);
