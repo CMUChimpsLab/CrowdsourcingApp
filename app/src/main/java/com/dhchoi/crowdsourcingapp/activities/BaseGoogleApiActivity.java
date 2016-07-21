@@ -38,13 +38,6 @@ public class BaseGoogleApiActivity extends AppCompatActivity implements
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        if (!isGooglePlayServicesAvailable()) {
-            Log.e(TAG, "Google Play services unavailable.");
-            Toast.makeText(this, "The app needs Google Play Services to run properly!", Toast.LENGTH_SHORT).show();
-            finish();
-            return;
-        }
-
         // check permissions
         if (ActivityCompat.checkSelfPermission(this, requiredPermission) != PackageManager.PERMISSION_GRANTED) {
             // Check Permissions Now
@@ -148,17 +141,19 @@ public class BaseGoogleApiActivity extends AppCompatActivity implements
      * @return true if it is.
      */
     protected boolean isGooglePlayServicesAvailable() {
-        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
-        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
-        if (resultCode != ConnectionResult.SUCCESS) {
-            if (apiAvailability.isUserResolvableError(resultCode)) {
-                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
-            } else {
-                Log.i(TAG, "This device is not supported.");
-            }
-            return false;
-        }
+        return false;
 
-        return true;
+//        GoogleApiAvailability apiAvailability = GoogleApiAvailability.getInstance();
+//        int resultCode = apiAvailability.isGooglePlayServicesAvailable(this);
+//        if (resultCode != ConnectionResult.SUCCESS) {
+//            if (apiAvailability.isUserResolvableError(resultCode)) {
+//                apiAvailability.getErrorDialog(this, resultCode, PLAY_SERVICES_RESOLUTION_REQUEST).show();
+//            } else {
+//                Log.i(TAG, "This device is not supported.");
+//            }
+//            return false;
+//        }
+//
+//        return true;
     }
 }
