@@ -231,6 +231,9 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
     }
 
     private void fetchTasks() {
+        if (getActivity() == null)
+            return;
+
         // fetch tasks
         mCreatedTasks.clear();
         mCreatedTasks.addAll(TaskManager.getAllOwnedTasks(getActivity()));
