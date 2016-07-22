@@ -158,12 +158,16 @@ public class TaskInfoActivity extends AppCompatActivity {
 
     private void deleteTask() {
         Map<String, String> params = new HashMap<>();
-        new HttpClientAsyncTask(Constants.APP_SERVER_TASK_DELETE_URL + "/" + taskId, HttpClientCallable.GET, params) {
+        new HttpClientAsyncTask(Constants.APP_SERVER_TASK_DEACTIVATE_URL + "/" + taskId, HttpClientCallable.GET, params) {
             @Override
             protected void onPostExecute(String response) {
                 try {
                     if (response != null) {
                         Log.d(TAG, response);
+                        // remove the task locally
+                        List<String> deleteIds = new ArrayList<>();
+                        deleteIds.add(taskId);
+                        TaskManager.removeTasks(TaskInfoActivity.this, deleteIds);
                         onBackPressed();
                     } else {
                         Toast.makeText(TaskInfoActivity.this, "Failed to delete task", Toast.LENGTH_SHORT).show();

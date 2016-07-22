@@ -230,7 +230,7 @@ public class TaskManager {
      * @param context         of the app
      * @param taskIds         list of {@link Task} ids to be removed
      */
-    private static void removeTasks(Context context, List<String> taskIds) {
+    public static void removeTasks(Context context, List<String> taskIds) {
         SharedPreferences sharedPreferences = getSharedPreferences(context);
         SharedPreferences.Editor prefsEditor = sharedPreferences.edit();
         Set<String> savedTaskIdsSet = getSavedTaskIdsSet(context);
