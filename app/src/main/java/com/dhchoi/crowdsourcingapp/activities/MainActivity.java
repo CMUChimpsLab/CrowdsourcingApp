@@ -31,6 +31,7 @@ import android.widget.ProgressBar;
 import com.dhchoi.crowdsourcingapp.Constants;
 import com.dhchoi.crowdsourcingapp.services.AlarmReceiver;
 import com.dhchoi.crowdsourcingapp.services.BackgroundLocationService;
+import com.dhchoi.crowdsourcingapp.services.GcmMessageListenerService;
 import com.dhchoi.crowdsourcingapp.services.GeofenceIntentService;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.fragments.CrowdActivityFragment;
@@ -48,7 +49,8 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.List;
 
-public class MainActivity extends BaseGoogleApiActivity implements TaskManager.OnSyncCompleteListener {
+public class MainActivity extends BaseGoogleApiActivity implements TaskManager.OnSyncCompleteListener,
+        GcmMessageListenerService.NewTaskListener {
 
     public static final int RESPOND_SUCCESS = 0x5221;
 
@@ -261,12 +263,27 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
     public void onConnected(Bundle bundle) {
         super.onConnected(bundle);
 
-        // sync tasks with server
+        syncEverything();
+
+        mTaskAvailableFragment.getTaskAvailableMapFragment().updateCurrentLocation(this);
+
+        LocationServices.FusedLocationApi.requestLocationUpdates(
+                getGoogleApiClient(),
+                LocationRequest.create()
+                        .setInterval(1000 * 5)     // 10 seconds
+                        .setFastestInterval(1000)
+                        .setSmallestDisplacement(0.0001f)
+                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY),
+                LocationListener);
+    }
+
+    public void syncEverything() {
+// sync tasks with server
         mSyncProgressBar.setVisibility(ProgressBar.VISIBLE);
         new AsyncTask<Void, Void, Boolean>() {
             @Override
             protected Boolean doInBackground(Void... params) {
-                return TaskManager.syncTasks(MainActivity.this, getGoogleApiClient());
+                return TaskManager.syncTasks(MainActivity.this);
             }
 
             @Override
@@ -337,17 +354,6 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
 
             }
         }.execute();
-
-        mTaskAvailableFragment.getTaskAvailableMapFragment().updateCurrentLocation(this);
-
-        LocationServices.FusedLocationApi.requestLocationUpdates(
-                getGoogleApiClient(),
-                LocationRequest.create()
-                        .setInterval(1000 * 5)     // 10 seconds
-                        .setFastestInterval(1000)
-                        .setSmallestDisplacement(0.0001f)
-                        .setPriority(LocationRequest.PRIORITY_HIGH_ACCURACY),
-                LocationListener);
     }
 
     @Override
@@ -359,6 +365,9 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         PreferenceManager.getDefaultSharedPreferences(getApplicationContext()).edit()
                 .putBoolean("MainActivityRunning", true)
                 .commit();
+
+        GcmMessageListenerService.registerNewTaskListener(this);
+
         super.onResume();
     }
 
@@ -388,6 +397,11 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
     public void onSyncComplete() {
         Log.d("MainActivity", "Sync Complete");
         triggerOnTasksUpdatedEvent();
+    }
+
+    @Override
+    public void onNewTask() {
+        syncEverything();
     }
 
     /**

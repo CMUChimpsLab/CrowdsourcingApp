@@ -98,7 +98,7 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
                 new AsyncTask<Void, Void, Boolean>() {
                     @Override
                     protected Boolean doInBackground(Void... params) {
-                        return TaskManager.syncTasks(getActivity(), ((MainActivity)getActivity()).getGoogleApiClient());
+                        return TaskManager.syncTasks(getActivity());
                     }
 
                     @Override

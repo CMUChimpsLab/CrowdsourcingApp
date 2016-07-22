@@ -198,7 +198,7 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
                     @Override
                     protected Void doInBackground(Void... params) {
                         // update the two layouts
-                        TaskManager.syncTasks(getActivity(), ((MainActivity)getActivity()).getGoogleApiClient());
+                        TaskManager.syncTasks(getActivity());
                         UserManager.syncUser(getActivity());
                         return null;
                     }
