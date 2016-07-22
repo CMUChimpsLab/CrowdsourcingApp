@@ -22,7 +22,7 @@ import java.util.List;
 
 public class TaskAvailableFragment extends Fragment {
 
-    public static final String NAME = "NEARBY";
+    public static final String NAME = "NEARBY TASKS";
 
     public boolean isMapShown = false;
     private TaskAvailableMapFragment mTaskAvailableMapFragment = new TaskAvailableMapFragment();

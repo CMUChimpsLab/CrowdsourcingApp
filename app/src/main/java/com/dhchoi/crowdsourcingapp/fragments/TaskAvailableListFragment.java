@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.view.ViewTreeObserver;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.ScrollView;
 import android.widget.TextView;
@@ -43,7 +44,8 @@ import java.util.List;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class TaskAvailableListFragment extends Fragment implements MainActivity.OnTasksUpdatedListener {
+public class TaskAvailableListFragment extends Fragment implements
+        MainActivity.OnTasksUpdatedListener, View.OnClickListener {
 
     private ArrayAdapter<Task> mActiveTaskListAdapter;
     private ArrayAdapter<Task> mInactiveTaskListAdapter;
@@ -70,6 +72,8 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
 
         mActiveTasksNotice = (TextView) rootView.findViewById(R.id.active_tasks_notice);
         mInactiveTasksNotice = (TextView) rootView.findViewById(R.id.inactive_tasks_notice);
+        Button mButtonActiveShowMap = (Button) rootView.findViewById(R.id.btn_show_in_map_active);
+        Button mButtonInactiveShowMap = (Button) rootView.findViewById(R.id.btn_show_in_map_inactive);
 
         // setup task list views and adapters
         CustomListView activeTaskListView = (CustomListView) rootView.findViewById(R.id.active_tasks);
@@ -116,6 +120,9 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
         });
 
         firstLaunch = true;
+
+        mButtonActiveShowMap.setOnClickListener(this);
+        mButtonInactiveShowMap.setOnClickListener(this);
 
         // Inflate the layout for this fragment
         return rootView;
@@ -164,6 +171,11 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
     private void updateNoticeTextViews() {
         mActiveTasksNotice.setVisibility(mActiveTaskListAdapter.getCount() > 0 ? TextView.GONE : TextView.VISIBLE);
         mInactiveTasksNotice.setVisibility(mInactiveTaskListAdapter.getCount() > 0 ? TextView.GONE : TextView.VISIBLE);
+    }
+
+    @Override
+    public void onClick(View view) {
+        ((TaskAvailableFragment) getParentFragment()).swapFragments();
     }
 
     class TaskListAdapter extends ArrayAdapter<Task> {
