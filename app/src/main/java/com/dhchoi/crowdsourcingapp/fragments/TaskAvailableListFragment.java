@@ -185,7 +185,9 @@ public class TaskAvailableListFragment extends Fragment implements MainActivity.
 
             // set texts
             ((TextView) convertView.findViewById(R.id.num_submitted_response)).setText(task.getName());
-            ((TextView) convertView.findViewById(R.id.task_cost)).setText("$" + task.getCost());
+            ((TextView) convertView.findViewById(R.id.task_cost)).setText("$" +
+                    new DecimalFormat("#0.00").format(
+                            task.getCost()));
 
             // display either distance of location name
             String locationName = task.getLocation().getName();

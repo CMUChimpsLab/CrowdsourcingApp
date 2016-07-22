@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.location.Location;
 import android.location.LocationManager;
 import android.os.Bundle;
+import android.support.annotation.IntegerRes;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
@@ -144,6 +145,17 @@ public class TaskCreateActivity extends AppCompatActivity {
                         e.printStackTrace();
                         editText.setText("0");
                     }
+                }
+            }
+        });
+
+        // radius cap 100
+        mLocationRadius.setOnFocusChangeListener(new View.OnFocusChangeListener() {
+            @Override
+            public void onFocusChange(View view, boolean hasFocus) {
+                if (!hasFocus) {
+                    if (Integer.parseInt(mLocationRadius.getText().toString()) > 100)
+                        mLocationRadius.setText(String.valueOf(100));
                 }
             }
         });

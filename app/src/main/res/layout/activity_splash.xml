@@ -38,7 +38,8 @@
         android:layout_height="wrap_content"
         android:layout_marginTop="30dp"
         android:textSize="16sp"
-        android:textAlignment="center"
+        android:textAlignment="viewStart"
+        android:layout_marginStart="20dp"
         android:text="e.g. How many people are in CHIMPS Lab?"/>
 
     <TextView
@@ -46,7 +47,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"
-        android:textAlignment="center"
+        android:textAlignment="viewStart"
+        android:layout_marginStart="20dp"
         android:text="Is the soccer field empty?"/>
 
     <TextView
@@ -54,7 +56,8 @@
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:textSize="16sp"
-        android:textAlignment="center"
+        android:textAlignment="viewStart"
+        android:layout_marginStart="20dp"
         android:text="Pick up a coffee for me at Starbucks"/>
 
 </LinearLayout>

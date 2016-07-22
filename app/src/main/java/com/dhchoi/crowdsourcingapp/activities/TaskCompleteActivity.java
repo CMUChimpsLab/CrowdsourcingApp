@@ -6,6 +6,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.SharedPreferences;
 import android.location.Location;
+import android.location.LocationManager;
 import android.net.Uri;
 import android.os.Bundle;
 import android.support.v4.content.LocalBroadcastManager;
@@ -39,10 +40,12 @@ import com.rengwuxian.materialedittext.MaterialEditText;
 
 import org.json.JSONObject;
 
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Pattern;
 
 public class TaskCompleteActivity extends BaseGoogleApiActivity {
 
@@ -72,6 +75,7 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
 
     private GeofenceIntentService.LocationChangeListener locationListener;
 
+    @SuppressWarnings("all")
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -89,7 +93,31 @@ public class TaskCompleteActivity extends BaseGoogleApiActivity {
         mSubmitResponseButton = (Button) findViewById(R.id.submit_button);
         mSubmissionNotice = (TextView) findViewById(R.id.submission_notice);
         ((TextView) findViewById(R.id.num_submitted_response)).setText(mTask.getName());
-        ((TextView) findViewById(R.id.task_location)).setText(mTask.getLocation().getName());
+        if (Pattern.compile("\\(*\\)").matcher(mTask.getLocation().getName()).find()) {
+            LatLng currentLocation;
+            Location lastKnownLocation = LocationServices.FusedLocationApi.getLastLocation(getGoogleApiClient());
+
+            // returning from place picker
+            if (lastKnownLocation == null) {
+                LocationManager locationManager = (LocationManager) getSystemService(Context.LOCATION_SERVICE);
+                lastKnownLocation = locationManager.getLastKnownLocation(LocationManager.NETWORK_PROVIDER);
+            }
+            if (lastKnownLocation != null) {
+                currentLocation = new LatLng(
+                        lastKnownLocation.getLatitude(),
+                        lastKnownLocation.getLongitude());
+
+                // calculate distance to task
+                double distance = GeofenceIntentService.getDistanceFromLatLng(mTask.getLocation().getLatLng(),
+                        currentLocation);
+                ((TextView) findViewById(R.id.task_location)).setText(
+                        new DecimalFormat("#.#").format(distance) + "m away");
+            } else {
+                ((TextView) findViewById(R.id.task_location)).setText(mTask.getLocation().getName());
+            }
+        } else {
+            ((TextView) findViewById(R.id.task_location)).setText(mTask.getLocation().getName());
+        }
 
         final ViewGroup taskActionsLayout = (ViewGroup) findViewById(R.id.task_actions);
         for (TaskAction taskAction : mTask.getTaskActions()) {
