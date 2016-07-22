@@ -8,6 +8,7 @@ import android.support.v4.animation.AnimatorCompatHelper;
 import android.support.v4.animation.ValueAnimatorCompat;
 import android.support.v4.app.Fragment;
 import android.support.v4.widget.SwipeRefreshLayout;
+import android.util.Log;
 import android.view.Display;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -47,14 +48,14 @@ public class TaskAvailableFragment extends Fragment {
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                swapFragments();
+                swapFragments(TaskAvailableMapFragment.ALL_MARKERS);
             }
         });
 
         return mRootView;
     }
 
-    public void swapFragments() {
+    public void swapFragments(int flag) {
         Display display = getActivity().getWindowManager().getDefaultDisplay();
         Point size = new Point();
         display.getSize(size);
@@ -81,6 +82,7 @@ public class TaskAvailableFragment extends Fragment {
             valueAnimator.start();
         }
 
+        mTaskAvailableMapFragment.FLAG = flag;
         getChildFragmentManager().beginTransaction()
                 // .setCustomAnimations(R.animator.fade_in, R.animator.fade_out)
                 .replace(R.id.task_view_container, !isMapShown ? mTaskAvailableMapFragment : mTaskAvailableListFragment)

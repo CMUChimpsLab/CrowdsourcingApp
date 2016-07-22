@@ -59,9 +59,15 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
     private List<Task> mActiveTasks = new ArrayList<>();
     private List<Task> mInactiveTasks = new ArrayList<>();
 
+    public static final int ALL_MARKERS = 0x010;
+    public static final int ACTIVE_MARKERS = 0x011;
+    public static final int INACTIVE_MARKERS = 0x012;
+
     public TaskAvailableMapFragment() {
         super();
     }
+
+    public int FLAG = ALL_MARKERS;
 
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
@@ -150,7 +156,7 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
             Log.d(Constants.TAG, "ACCESS_FINE_LOCATION not granted and will not perform setMyLocationEnabled(true)");
         }
 
-        updateMarkers();
+        updateMarkers(FLAG);
     }
 
     @Override
@@ -173,7 +179,7 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
         }
     }
 
-    private void updateMarkers() {
+    public void updateMarkers(int flag) {
         // remove previous markers
         if (mGoogleMap != null)
             mGoogleMap.clear();
@@ -181,8 +187,18 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
             return;
 
         List<Task> allTasks = new ArrayList<>();
-        allTasks.addAll(mActiveTasks);
-        allTasks.addAll(mInactiveTasks);
+
+        switch (flag) {
+            case ACTIVE_MARKERS:
+                allTasks.addAll(mActiveTasks);
+                break;
+            case INACTIVE_MARKERS:
+                allTasks.addAll(mInactiveTasks);
+                break;
+            default:
+                allTasks.addAll(mActiveTasks);
+                allTasks.addAll(mInactiveTasks);
+        }
 
         for (Task t : allTasks) {
             GeofenceLocation simpleGeofence = t.getLocation();
@@ -203,7 +219,7 @@ public class TaskAvailableMapFragment extends SupportMapFragment implements
         mInactiveTasks = inactivatedTasks;
 
         if (getView() != null) {
-            updateMarkers();
+            updateMarkers(FLAG);
         }
     }
 }

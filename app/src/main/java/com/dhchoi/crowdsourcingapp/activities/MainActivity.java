@@ -29,6 +29,7 @@ import android.view.View;
 import android.widget.ProgressBar;
 
 import com.dhchoi.crowdsourcingapp.Constants;
+import com.dhchoi.crowdsourcingapp.fragments.TaskAvailableMapFragment;
 import com.dhchoi.crowdsourcingapp.services.AlarmReceiver;
 import com.dhchoi.crowdsourcingapp.services.BackgroundLocationService;
 import com.dhchoi.crowdsourcingapp.services.GcmMessageListenerService;
@@ -251,7 +252,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         }
 
         if (mTaskAvailableFragment.isMapShown) {
-            mTaskAvailableFragment.swapFragments();
+            mTaskAvailableFragment.swapFragments(TaskAvailableMapFragment.ACTIVE_MARKERS);
             return;
         }
 

@@ -175,7 +175,14 @@ public class TaskAvailableListFragment extends Fragment implements
 
     @Override
     public void onClick(View view) {
-        ((TaskAvailableFragment) getParentFragment()).swapFragments();
+        switch (view.getId()) {
+            case R.id.btn_show_in_map_active:
+                ((TaskAvailableFragment) getParentFragment()).swapFragments(TaskAvailableMapFragment.ACTIVE_MARKERS);
+                break;
+            case R.id.btn_show_in_map_inactive:
+                ((TaskAvailableFragment) getParentFragment()).swapFragments(TaskAvailableMapFragment.INACTIVE_MARKERS);
+                break;
+        }
     }
 
     class TaskListAdapter extends ArrayAdapter<Task> {
