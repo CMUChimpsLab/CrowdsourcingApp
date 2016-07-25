@@ -20,6 +20,7 @@ import android.widget.CheckBox;
 import android.widget.CompoundButton;
 import android.widget.DatePicker;
 import android.widget.EditText;
+import android.widget.ImageButton;
 import android.widget.ProgressBar;
 import android.widget.Spinner;
 import android.widget.TimePicker;
@@ -231,8 +232,15 @@ public class TaskCreateActivity extends AppCompatActivity {
         mTaskActionAdd.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                View taskActionLayout = LayoutInflater.from(TaskCreateActivity.this).inflate(R.layout.task_action_text_create, null);
+                final View taskActionLayout = LayoutInflater.from(TaskCreateActivity.this).inflate(R.layout.task_action_text_create, null);
                 mTaskActionLayouts.add((ViewGroup) taskActionLayout);
+                ImageButton actionDelete = (ImageButton) taskActionLayout.findViewById(R.id.action_delete);
+                actionDelete.setOnClickListener(new View.OnClickListener() {
+                    @Override
+                    public void onClick(View view) {
+                        mTaskActionsContainer.removeView(taskActionLayout);
+                    }
+                });
                 mTaskActionsContainer.addView(taskActionLayout);
             }
         });
