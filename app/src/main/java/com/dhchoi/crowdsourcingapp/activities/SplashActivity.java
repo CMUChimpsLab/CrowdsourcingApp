@@ -10,6 +10,8 @@ import android.util.DisplayMetrics;
 import android.widget.ImageView;
 
 import com.dhchoi.crowdsourcingapp.R;
+import com.crashlytics.android.Crashlytics;
+import io.fabric.sdk.android.Fabric;
 
 /**
  * Created by Peter on 7/20/16.
@@ -20,6 +22,7 @@ public class SplashActivity extends BaseGoogleApiActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        Fabric.with(this, new Crashlytics());
         setContentView(R.layout.activity_splash);
 
         ImageView splashImage = (ImageView) findViewById(R.id.splash_image);
