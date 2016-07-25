@@ -106,7 +106,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="15dp"
-                    android:text="Task Expiration"
+                    android:text="Expiration"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
             </LinearLayout>
@@ -178,7 +178,7 @@
                     android:layout_weight="1"
                     android:inputType="numberDecimal"
                     android:textAlignment="center"
-                    android:paddingRight="10dp"
+                    android:paddingEnd="10dp"
                     app:met_floatingLabel="highlight"
                     app:met_floatingLabelText="Refresh Rate (min)"
                     app:met_floatingLabelAlwaysShown="true"
@@ -191,7 +191,7 @@
                     android:layout_weight="1"
                     android:inputType="numberDecimal"
                     android:textAlignment="center"
-                    android:paddingLeft="10dp"
+                    android:paddingStart="10dp"
                     app:met_floatingLabel="highlight"
                     app:met_floatingLabelText="Radius (m)"
                     app:met_floatingLabelAlwaysShown="true"
@@ -245,7 +245,7 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginEnd="15dp"
-                    android:text="Task Location"
+                    android:text="Location"
                     android:textAppearance="?android:attr/textAppearanceLarge" />
 
                 <Button
