@@ -29,8 +29,6 @@ import com.dhchoi.crowdsourcingapp.PermissionUtils;
 import com.dhchoi.crowdsourcingapp.R;
 import com.dhchoi.crowdsourcingapp.services.GcmRegistrationIntentService;
 import com.dhchoi.crowdsourcingapp.user.UserManager;
-import com.google.android.gms.auth.GoogleAuthUtil;
-import com.google.android.gms.common.AccountPicker;
 
 import org.json.JSONObject;
 

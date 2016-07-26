@@ -120,23 +120,6 @@ public class GeofenceIntentService extends IntentService {
         float[] results = new float[1];
         Location.distanceBetween(location1.latitude, location1.longitude, location2.latitude, location2.longitude, results);
         return results[0];
-
-//        double lat1 = location1.latitude;
-//        double lng1 = location1.longitude;
-//        double lat2 = location2.latitude;
-//        double lng2 = location2.longitude;
-//
-//        double earthRadius = 6371000;           // earth radius in meters
-//        double dLat = Math.toRadians(lat2 - lat1);
-//        double dLng = Math.toRadians(lng1 - lng2);
-//        double sinDLat = Math.sin(dLat / 2);
-//        double sinDLng = Math.sin(dLng / 2);
-//
-//        double a = Math.pow(sinDLat, 2) + Math.pow(sinDLng, 2)
-//                 * Math.cos(Math.toRadians(lat1)) * Math.cos(Math.toRadians(lat2));
-//        double c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-//
-//        return earthRadius * c;
     }
 
     public static List<Task> getGeofenceList() {

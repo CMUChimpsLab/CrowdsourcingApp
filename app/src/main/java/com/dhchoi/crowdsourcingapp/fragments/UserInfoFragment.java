@@ -5,6 +5,7 @@ import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
+import android.graphics.drawable.ColorDrawable;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
@@ -13,6 +14,7 @@ import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.Fragment;
+import android.support.v4.content.ContextCompat;
 import android.support.v4.widget.SwipeRefreshLayout;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -20,6 +22,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.LinearLayout;
+import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.TextView;
 
@@ -363,19 +366,20 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
             Task task = TaskManager.getTaskById(getActivity(), args.getString("taskId"));
 
             View dialogView = LayoutInflater.from(getActivity()).inflate(R.layout.dialog_task_info, null);
-            ((TextView)dialogView.findViewById(R.id.dialog_task_name)).setText(task.getName());
-            ((TextView)dialogView.findViewById(R.id.dialog_task_cost)).setText(String.valueOf(task.getCost()));
+            ((TextView)dialogView.findViewById(R.id.dialog_task_name)).setText(task.getName() + " - $" + task.getCost());
 
             // query for all owned answers and display
-            ViewGroup taskResponseContainer = (ViewGroup) dialogView.findViewById(R.id.dialog_task_response_container);
             ArrayList<String> taskResponses = (ArrayList<String>) task.getMyResponses(UserManager.getUserId(getActivity()));
-            for (String resp : taskResponses) {
-                TextView responseTextView = new TextView(getActivity());
-                responseTextView.setTextSize(16);
-                responseTextView.setText(resp);
-                responseTextView.setTextAlignment(View.TEXT_ALIGNMENT_CENTER);
-                taskResponseContainer.addView(responseTextView);
-            }
+            String[] responseArray = new String[taskResponses.size()];
+            for (int i = 0; i < responseArray.length; i++)
+                responseArray[i] = taskResponses.get(i);
+
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getContext(), R.layout.listitem_dialog_task_response, responseArray);
+            ListView listResponses = (ListView) dialogView.findViewById(R.id.dialog_task_response_list);
+            listResponses.setAdapter(adapter);
+            listResponses.setDivider(new ColorDrawable(ContextCompat.getColor(getContext(), R.color.colorPrimary)));
+            listResponses.setDividerHeight(1);
+            listResponses.setPadding(0, 10, 0, 10);
 
             return new AlertDialog.Builder(getActivity())
                     .setView(dialogView)
