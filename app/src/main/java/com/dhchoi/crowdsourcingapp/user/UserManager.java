@@ -107,6 +107,11 @@ public class UserManager {
         return getSharedPreferences(context).getFloat(USER_BALANCE, 20);
     }
 
+    /**
+     * Syncs the current user with the server
+     * @param context of the app
+     * @return current user
+     */
     public static boolean syncUser(Context context) {
         try {
             Map<String, String> userParams = new HashMap<>();

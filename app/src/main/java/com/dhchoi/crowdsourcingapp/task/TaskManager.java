@@ -377,6 +377,11 @@ public class TaskManager {
         return false;
     }
 
+    /**
+     * Queries server for all responses to a particular task
+     * @param taskId of the task
+     * @return all responses to the task
+     */
     public static JSONArray getTaskResponses(String taskId) {
         try {
             Map<String, String> respParams = new HashMap<>();

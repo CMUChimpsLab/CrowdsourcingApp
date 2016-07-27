@@ -233,6 +233,9 @@ public class UserInfoFragment extends Fragment implements MainActivity.OnTasksUp
         mUserBalance.setText(String.format("%.2f", UserManager.getUserBalance(getActivity())));
     }
 
+    /**
+     * Get all tasks from local storage
+     */
     private void fetchTasks() {
         if (getActivity() == null)
             return;

@@ -106,6 +106,11 @@ public class Task implements Serializable {
         return this;
     }
 
+    /**
+     * Returns only the current user's reponse to a task
+     * @param answererId of the user answering the question
+     * @return user's response to a task
+     */
     public List<String> getMyResponses(String answererId) {
         ArrayList<String> myResponseStrings = new ArrayList<>();
 
