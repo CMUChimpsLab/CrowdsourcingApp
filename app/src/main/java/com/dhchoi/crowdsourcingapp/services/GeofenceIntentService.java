@@ -71,6 +71,10 @@ public class GeofenceIntentService extends IntentService {
         LocalBroadcastManager.getInstance(this).sendBroadcast(locationAgentIntent);
     }
 
+    /**
+     * Add single task to Geofence list
+     * @param task to be added
+     */
     public static void addGeofence(Task task) {
         if (task != null) {
             for (Task t : mGeofenceList) {
@@ -81,6 +85,10 @@ public class GeofenceIntentService extends IntentService {
         }
     }
 
+    /**
+     * Add collection of tasks to Geofence list
+     * @param tasks to be added
+     */
     public static void addGeofences(Collection<Task> tasks) {
         if (tasks != null && !tasks.isEmpty()) {
             for (Task task : tasks)
@@ -88,6 +96,10 @@ public class GeofenceIntentService extends IntentService {
         }
     }
 
+    /**
+     * Remove single task to Geofence list
+     * @param task to be removed
+     */
     public static void removeGeofence(Task task) {
         if (task != null) {
             String removeId = task.getId();
@@ -102,6 +114,10 @@ public class GeofenceIntentService extends IntentService {
         }
     }
 
+    /**
+     * Remove collection of tasks to Geofence list
+     * @param tasks to be removed
+     */
     public static void removeGeofences(Collection<Task> tasks) {
         if (tasks != null && !tasks.isEmpty()) {
             for (Task task : tasks)

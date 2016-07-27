@@ -21,7 +21,7 @@ public class NotificationHelper {
      * @param tag               TAG
      * @param context           context
      * @param targetActivity    where to go
-     * @param taskId            optional,
+     * @param taskId            optional
      */
     public static void createNotification(String title, String message, String tag, Context context, Class targetActivity, @Nullable String taskId) {
         Intent intent = new Intent(context, targetActivity);
@@ -44,14 +44,36 @@ public class NotificationHelper {
         notificationManager.notify(tag, 0 /* ID of notification */, notificationBuilder.build());
     }
 
+    /**
+     * Create and show notification
+     * @param title             title
+     * @param message           message
+     * @param context           context
+     * @param targetActivity    where to go
+     */
     public static void createNotification(String title, String message, Context context, Class targetActivity) {
         createNotification(title, message, "", context, targetActivity, null);
     }
 
+    /**
+     * Create and show notification
+     * @param title             title
+     * @param message           message
+     * @param context           context
+     * @param targetActivity    where to go
+     * @param taskId            optional
+     */
     public static void createNotification(String title, String message, Context context, Class targetActivity, @Nullable String taskId) {
         createNotification(title, message, "", context, targetActivity, taskId);
     }
 
+    /**
+     * Create and show notification
+     * @param title             title
+     * @param message           message
+     * @param context           context
+     * @param link              download link
+     */
     public static void createDownloadNotification(String title, String message, Context context, String link) {
         Intent intent = new Intent(Intent.ACTION_VIEW, Uri.parse(link));
 //        intent.setClassName("com.android.browser", "com.android.browser.BrowserActivity");
