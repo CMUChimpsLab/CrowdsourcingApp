@@ -76,10 +76,10 @@ public class BackgroundLocationService extends Service {
 
         try {
             locationManager.requestLocationUpdates(
-                    locationManager.isProviderEnabled(GPS) ? GPS : NETWORK,
+                    locationManager.isProviderEnabled(NETWORK) ? NETWORK : GPS,
                     minInterval,
                     minDistance,
-                    locationListeners[locationManager.isProviderEnabled(GPS) ? 1 : 0]);
+                    locationListeners[locationManager.isProviderEnabled(NETWORK) ? 0 : 1]);
                     // use the best available
         } catch (Exception e) {
             e.printStackTrace();
