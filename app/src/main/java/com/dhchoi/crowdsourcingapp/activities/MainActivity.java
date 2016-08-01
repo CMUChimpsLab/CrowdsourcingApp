@@ -150,6 +150,7 @@ public class MainActivity extends BaseGoogleApiActivity implements TaskManager.O
         LocationListener = new GeofenceIntentService.LocationChangeListener() {
             @Override
             public void onLocationChanged(Location location) {
+
                 super.onLocationChanged(location);  // print log
 
                 Intent intent = new Intent(MainActivity.this, GeofenceIntentService.class);

@@ -6,6 +6,10 @@ import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
 import android.content.IntentFilter;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.location.Location;
 import android.location.LocationListener;
 import android.location.LocationManager;
@@ -15,6 +19,7 @@ import android.os.IBinder;
 import android.preference.PreferenceManager;
 import android.support.annotation.Nullable;
 import android.support.v4.content.LocalBroadcastManager;
+import android.util.FloatMath;
 import android.util.Log;
 
 import com.dhchoi.crowdsourcingapp.Constants;
@@ -32,7 +37,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
-public class BackgroundLocationService extends Service {
+public class BackgroundLocationService extends Service implements SensorEventListener {
 
     private static final String TAG = "LocationService";
     private static final String LOCATION_CHANGE = "location_change";
@@ -41,8 +46,15 @@ public class BackgroundLocationService extends Service {
     private static final String GPS = LocationManager.GPS_PROVIDER;
     private static final String NETWORK = LocationManager.NETWORK_PROVIDER;
 
-    private static final int minInterval = 1000 * 60;        // 1 minute
-    private static final float minDistance = 10.0f;           // 10 meters?
+    private SensorManager sensorManager;
+    private Sensor mSensor;
+    private float[] mGravity;
+    private float mAccel;
+    private float mAccelCurrent;
+    private float mAccelLast;
+
+    private static final int minInterval = 1000 * 60;   // 1 minute
+    private static final float minDistance = 10.0f;     // 10 meters?
 
     private static List<Task> mGeofenceList;
 
@@ -73,6 +85,13 @@ public class BackgroundLocationService extends Service {
                 .getString("geofencelist", new Gson().toJson(new ArrayList<Task>()));
         mGeofenceList = new Gson().fromJson(dataStr, new TypeToken<List<Task>>() {}.getType());
         Log.d(TAG, mGeofenceList.toString());
+
+        sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
+        mSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        mAccel = 0.00f;
+        mAccelCurrent = SensorManager.GRAVITY_EARTH;
+        mAccelLast = SensorManager.GRAVITY_EARTH;
 
         try {
             locationManager.requestLocationUpdates(
@@ -126,7 +145,41 @@ public class BackgroundLocationService extends Service {
             }
         }
 
+        sensorManager.unregisterListener(this);
+
         super.onDestroy();
+    }
+
+    @SuppressWarnings("all")
+    @Override
+    public void onSensorChanged(SensorEvent sensorEvent) {
+        if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+            mGravity = sensorEvent.values.clone();
+            float x = mGravity[0];
+            float y = mGravity[1];
+            float z = mGravity[2];
+            mAccelLast = mAccelCurrent;
+            mAccelCurrent = (float) Math.sqrt(x * x + y * y + z * z);
+            float delta = mAccelCurrent - mAccelLast;
+            mAccel = mAccel * 0.9f + delta;
+
+            if (mAccel > 1) {
+                locationManager.requestLocationUpdates(
+                        locationManager.isProviderEnabled(NETWORK) ? NETWORK : GPS,
+                        minInterval,
+                        minDistance,
+                        locationListeners[locationManager.isProviderEnabled(NETWORK) ? 0 : 1]);
+            } else {
+                for (int i = 0; i < locationListeners.length; i++) {
+                    locationManager.removeUpdates(locationListeners[i]);
+                }
+            }
+        }
+    }
+
+    @Override
+    public void onAccuracyChanged(Sensor sensor, int i) {
+
     }
 
     private class BackgroundLocationListener implements LocationListener {
@@ -140,6 +193,7 @@ public class BackgroundLocationService extends Service {
             lastKnownLocation = new Location(provider);
         }
 
+        @SuppressWarnings("all")
         @Override
         public void onLocationChanged(Location location) {
             Log.d(TAG, location.getLatitude() + " " + location.getLongitude());
@@ -148,7 +202,7 @@ public class BackgroundLocationService extends Service {
                 LatLng currentLatLng = new LatLng(location.getLatitude(), location.getLongitude());
                 LatLng lastKnownLatLng = new LatLng(lastKnownLocation.getLatitude(), lastKnownLocation.getLongitude());
 
-                if (!cmuLatLngBounds.contains(lastKnownLatLng) && cmuLatLngBounds.contains(currentLatLng)) {
+                if (!onCMUCampus(lastKnownLatLng) && onCMUCampus(currentLatLng)) {
                     // user just entered the cmu campus
                     NotificationHelper.createNotification(
                             "Approaching CMU campus",
