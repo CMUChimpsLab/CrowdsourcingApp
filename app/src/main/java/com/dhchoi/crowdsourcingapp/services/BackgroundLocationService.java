@@ -52,6 +52,7 @@ public class BackgroundLocationService extends Service implements SensorEventLis
     private float mAccel;
     private float mAccelCurrent;
     private float mAccelLast;
+    private long lastCheckTime;
 
     private static final int minInterval = 1000 * 60;   // 1 minute
     private static final float minDistance = 10.0f;     // 10 meters?
@@ -62,6 +63,7 @@ public class BackgroundLocationService extends Service implements SensorEventLis
             new BackgroundLocationListener(LocationManager.NETWORK_PROVIDER),
             new BackgroundLocationListener(LocationManager.GPS_PROVIDER)
     };
+    private boolean requestingLocationUpdates = false;
 
     // whether to start background service when onStop() is called
     private static boolean doStartService = true;
@@ -88,10 +90,11 @@ public class BackgroundLocationService extends Service implements SensorEventLis
 
         sensorManager = (SensorManager) getSystemService(SENSOR_SERVICE);
         mSensor = sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-        sensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_NORMAL);
+        sensorManager.registerListener(this, mSensor, SensorManager.SENSOR_DELAY_UI);
         mAccel = 0.00f;
         mAccelCurrent = SensorManager.GRAVITY_EARTH;
         mAccelLast = SensorManager.GRAVITY_EARTH;
+        lastCheckTime = 0;
 
         try {
             locationManager.requestLocationUpdates(
@@ -100,6 +103,7 @@ public class BackgroundLocationService extends Service implements SensorEventLis
                     minDistance,
                     locationListeners[locationManager.isProviderEnabled(NETWORK) ? 0 : 1]);
                     // use the best available
+            requestingLocationUpdates = true;
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -136,13 +140,9 @@ public class BackgroundLocationService extends Service implements SensorEventLis
     public void onDestroy() {
         Log.i(TAG, "Destroyed");
         if (locationManager != null) {
-            for (int i = 0; i < locationListeners.length; i++) {
-                try {
-                    locationManager.removeUpdates(locationListeners[i]);
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            }
+            for (int i = 0; i < locationListeners.length; i++)
+                locationManager.removeUpdates(locationListeners[i]);
+            requestingLocationUpdates = false;
         }
 
         sensorManager.unregisterListener(this);
@@ -153,7 +153,8 @@ public class BackgroundLocationService extends Service implements SensorEventLis
     @SuppressWarnings("all")
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+        if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER
+                && System.currentTimeMillis() - lastCheckTime > 10000) {     // check acceleration every 10 seconds
             mGravity = sensorEvent.values.clone();
             float x = mGravity[0];
             float y = mGravity[1];
@@ -163,17 +164,24 @@ public class BackgroundLocationService extends Service implements SensorEventLis
             float delta = mAccelCurrent - mAccelLast;
             mAccel = mAccel * 0.9f + delta;
 
-            if (mAccel > 1) {
-                locationManager.requestLocationUpdates(
-                        locationManager.isProviderEnabled(NETWORK) ? NETWORK : GPS,
-                        minInterval,
-                        minDistance,
-                        locationListeners[locationManager.isProviderEnabled(NETWORK) ? 0 : 1]);
-            } else {
-                for (int i = 0; i < locationListeners.length; i++) {
-                    locationManager.removeUpdates(locationListeners[i]);
+            if (mAccel > 0) {
+                Log.d(TAG, "Moving");
+                if (!requestingLocationUpdates) {
+                    locationManager.requestLocationUpdates(
+                            locationManager.isProviderEnabled(NETWORK) ? NETWORK : GPS,
+                            minInterval,
+                            minDistance,
+                            locationListeners[locationManager.isProviderEnabled(NETWORK) ? 0 : 1]);
+                    requestingLocationUpdates = true;
                 }
+            } else {
+                Log.d(TAG, "Station");
+                for (int i = 0; i < locationListeners.length; i++)
+                    locationManager.removeUpdates(locationListeners[i]);
+                requestingLocationUpdates = false;
             }
+
+            lastCheckTime = System.currentTimeMillis();
         }
     }
 
